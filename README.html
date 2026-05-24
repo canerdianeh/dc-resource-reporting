@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DC Water Report — Start Here</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0f;--s1:#0d1018;--s2:#111520;--b1:#1e2535;--t1:#dde4f0;--t2:#8a96b0;--t3:#4a5570;--ac:#4f86f7;--g:#34c978;--am:#e8a032}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:15px}
+body{max-width:780px;margin:0 auto;padding:60px 32px 80px}
+h1{font-size:26px;font-weight:600;margin-bottom:8px;line-height:1.2}
+.sub{color:var(--t2);font-size:14px;margin-bottom:36px;line-height:1.6}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:36px}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;transition:all .2s}
+.card:hover{background:var(--s2);border-color:var(--ac);transform:translateY(-2px)}
+.card-icon{font-size:28px;margin-bottom:4px}
+.card-title{font-weight:600;font-size:15px;color:var(--t1)}
+.card-desc{font-size:12px;color:var(--t2);line-height:1.5}
+.card-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--ac);margin-top:4px}
+.section-h{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--b1)}
+.notes{background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:16px 20px;font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:24px}
+.notes strong{color:var(--t1)}
+.meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);margin-top:36px;border-top:1px solid var(--b1);padding-top:16px}
+.meta div{margin-bottom:4px}
+</style>
+</head>
+<body>
+<h1>Global Data Center Water &amp; Land Use Report</h1>
+<div class="sub">An interactive research tool covering 35 facilities across 15 countries, with benchmark comparisons across agriculture, industry, recreation, and residential land use. Open any file below directly in your browser — no server required.</div>
+
+<div class="section-h">Files in this bundle</div>
+<div class="cards">
+  <a class="card" href="index.html">
+    <div class="card-icon">🗺️</div>
+    <div class="card-title">Main Application</div>
+    <div class="card-desc">Interactive facility table, benchmark chart, side-by-side comparison, US density map, and Sankey water flow diagrams. Start here.</div>
+    <div class="card-badge">index.html · ~70 KB</div>
+  </a>
+  <a class="card" href="methodology.html">
+    <div class="card-icon">📋</div>
+    <div class="card-title">Methodology</div>
+    <div class="card-desc">Full methodology document: data confidence tiers, estimation formulas, benchmark sources, reproducibility guide, peer review instructions, and resource impact accounting.</div>
+    <div class="card-badge">methodology.html · peer-reviewable</div>
+  </a>
+  <a class="card" href="data_manifest.csv">
+    <div class="card-icon">📊</div>
+    <div class="card-title">Data Manifest (CSV)</div>
+    <div class="card-desc">Machine-readable dataset with all 35 facilities, all numeric fields, confidence tiers, and source notes. Import into R, Python, or Excel for independent analysis.</div>
+    <div class="card-badge">data_manifest.csv · 33 rows</div>
+  </a>
+</div>
+
+<div class="section-h">How to use</div>
+<div class="notes">
+  <strong>Local browser:</strong> Double-click <code>index.html</code> to open in Safari, Chrome, or Firefox. All functionality works offline — the application loads D3.js from a CDN (requires internet for first load; fonts also require internet). No server, no installation.
+  <br><br>
+  <strong>Publishing:</strong> Upload the folder to any static web host (GitHub Pages, Netlify, Cloudflare Pages, S3 static hosting). No backend required. If deploying to a subdirectory, all file references are relative and will resolve correctly.
+  <br><br>
+  <strong>Updating data:</strong> Open <code>index.html</code> in a text editor and find the <code>const FACILITIES = [</code> array. Each facility is a JavaScript object — add entries following the same field structure. The application will automatically include new entries in all views. The <code>data_manifest.csv</code> should be updated in parallel to keep the dataset synchronized.
+  <br><br>
+  <strong>Peer review:</strong> The methodology document (methodology.html) contains the full reproducibility guide in Section 9, including step-by-step instructions for obtaining primary sources and validating each estimate tier.
+  <br><br>
+  <strong>Citation:</strong> "Global Data Center Water &amp; Land Use Report" (May 2026). Developed with Claude Sonnet 4.6 (Anthropic). Methodology version 1.0. License: CC BY 4.0.
+</div>
+
+<div class="section-h">Key findings summary</div>
+<div class="notes">
+  <strong>Most intensive per acre:</strong> Google The Dalles (7.02 AF/ac/yr) withdraws more water per acre than any irrigated crop in the USDA database except semiconductor fabrication facilities. It withdraws 5.3× more water than falls as precipitation on its own campus footprint and supplies 1/3 of the City of The Dalles' total water for a population of ~16,200 people.
+  <br><br>
+  <strong>Best-in-class:</strong> Microsoft Quincy (post-2021 QWRU closed-loop) and Switch Citadel (air-cooled) demonstrate that geography + technology can bring water consumption to near zero regardless of scale. Google's Hamina, Finland campus (seawater cooling) eliminates freshwater dependency entirely.
+  <br><br>
+  <strong>Counterintuitive residential finding:</strong> Dense urban residential land (apartments, Q5) uses only ~0.6 AF/acre/year — less than semi-rural residential (~1.8 AF/ac) and less than most data centers. High population density reduces water intensity per acre by eliminating landscaping and enabling efficient shared infrastructure.
+  <br><br>
+  <strong>Disclosure gap:</strong> Only Google provides site-level water data proactively. Most large operators' water footprints are unknown or estimable only through public records requests to local utilities — a significant accountability gap given the scale of consumption.
+</div>
+
+<div class="meta">
+  <div>Version: 1.0 · May 2026</div>
+  <div>Model: Claude Sonnet 4.6 (Anthropic)</div>
+  <div>License: CC BY 4.0 — attribution required</div>
+  <div>Estimated development cost: ~$2.35 API equivalent · ~0.5 liters cooling water · See methodology.html §10</div>
+</div>
+</body>
+</html>

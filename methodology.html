@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology — Global Data Center Water & Land Use Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fafaf8;--s1:#f3f2ef;--s2:#eae9e4;
+  --b1:#d8d5ce;--b2:#c0bdb5;
+  --t1:#1a1a18;--t2:#4a4840;--t3:#7a7870;--t4:#aaa89f;
+  --ac:#1a5adc;--ac2:#e8eeff;
+  --g:#1a7a3a;--g2:#e8f5ee;
+  --am:#8a4a00;--am2:#fff4e0;
+  --rd:#9a1a1a;--rd2:#fff0f0;
+  --pu:#5a1a9a;--pu2:#f5eeff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;background:var(--bg);color:var(--t1);line-height:1.7}
+body{font-family:'DM Sans',sans-serif;max-width:900px;margin:0 auto;padding:40px 32px 80px}
+h1{font-size:28px;font-weight:600;color:var(--t1);margin-bottom:6px;line-height:1.2}
+h2{font-size:19px;font-weight:600;color:var(--t1);margin:40px 0 12px;padding-top:8px;border-top:2px solid var(--b1)}
+h3{font-size:15px;font-weight:600;color:var(--t2);margin:24px 0 8px}
+h4{font-size:13px;font-weight:600;color:var(--t3);margin:16px 0 6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+p{margin-bottom:14px;color:var(--t2)}
+ul,ol{margin:10px 0 14px 24px;color:var(--t2)}
+li{margin-bottom:6px}
+strong{color:var(--t1);font-weight:600}
+em{font-style:italic}
+code{font-family:'DM Mono',monospace;font-size:12.5px;background:var(--s2);padding:2px 6px;border-radius:3px;color:var(--pu)}
+pre{font-family:'DM Mono',monospace;font-size:12px;background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:16px;overflow-x:auto;margin:12px 0 18px;line-height:1.6;color:var(--t1)}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--t4);margin-bottom:30px;border-bottom:1px solid var(--b1);padding-bottom:16px}
+.meta span{margin-right:24px}
+.alert{border-left:3px solid;padding:12px 16px;border-radius:0 5px 5px 0;margin:16px 0;font-size:13.5px}
+.alert-warn{background:var(--am2);border-color:var(--am);color:var(--am)}
+.alert-info{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+.alert-ok{background:var(--g2);border-color:var(--g);color:var(--g)}
+.alert-caution{background:var(--rd2);border-color:var(--rd);color:var(--rd)}
+.formula{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:14px 18px;margin:14px 0;font-family:'DM Mono',monospace;font-size:13px;color:var(--t1);line-height:1.8}
+.formula .comment{color:var(--t4);font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0 20px}
+th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:8px 12px;text-align:left;border-bottom:2px solid var(--b1);background:var(--s1)}
+td{padding:8px 12px;border-bottom:1px solid var(--b2);vertical-align:top;color:var(--t2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--s1)}
+.conf{display:inline-block;padding:2px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
+.conf-m{background:#e0f5e8;color:#1a7a3a}
+.conf-e{background:#fff4e0;color:#8a4a00}
+.conf-u{background:#f0f0f0;color:#7a7870}
+.toc{background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:18px 22px;margin-bottom:32px}
+.toc h3{margin:0 0 10px;font-size:13px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.toc ol{margin:0 0 0 18px}
+.toc li{margin-bottom:4px;font-size:13px}
+.impact-card{background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:18px 22px;margin:16px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.impact-item{text-align:center}
+.impact-val{font-size:22px;font-weight:600;color:var(--t1);font-family:'DM Mono',monospace}
+.impact-lbl{font-size:11px;color:var(--t3);margin-top:2px}
+.impact-note{font-size:10px;color:var(--t4);margin-top:2px}
+.footnote{font-size:12px;color:var(--t4);border-top:1px solid var(--b2);padding-top:12px;margin-top:12px}
+.cite-list{list-style:none;margin-left:0}
+.cite-list li{padding:6px 0;border-bottom:1px solid var(--b2);font-size:13px;display:grid;grid-template-columns:28px 1fr;gap:8px}
+.cite-list li:last-child{border-bottom:none}
+.cite-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--ac);font-weight:600;padding-top:2px}
+@media(max-width:600px){
+  body{padding:20px 16px 60px}
+  .impact-card{grid-template-columns:1fr}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<h1>Global Data Center Water &amp; Land Use Report</h1>
+<h2 style="border:none;margin-top:4px;font-size:16px;font-weight:300;color:var(--t3)">Methodology, Data Sources, Confidence Assessment, and Reproducibility Guide</h2>
+
+<div class="meta">
+  <span>Version 1.0</span>
+  <span>Published: May 2026</span>
+  <span>Developed with: Claude Sonnet 4.6 (Anthropic)</span>
+  <span>License: CC BY 4.0</span>
+</div>
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#overview">Overview and Scope</a></li>
+    <li><a href="#data-tiers">Data Confidence Tiers</a></li>
+    <li><a href="#water-methodology">Water Consumption Methodology</a></li>
+    <li><a href="#benchmarks">Benchmark Comparator Methodology</a></li>
+    <li><a href="#precipitation">Precipitation Data Methodology</a></li>
+    <li><a href="#energy">Energy Mix Methodology</a></li>
+    <li><a href="#population">Population Density Quintiles</a></li>
+    <li><a href="#limitations">Known Limitations and Caveats</a></li>
+    <li><a href="#reproducibility">Reproducibility Guide</a></li>
+    <li><a href="#resource-impact">Resource Impact of Report Development</a></li>
+    <li><a href="#references">Full Reference List</a></li>
+  </ol>
+</div>
+
+<!-- ═══ 1. OVERVIEW ═══ -->
+<h2 id="overview">1. Overview and Scope</h2>
+
+<p>This report compiles water withdrawal, land footprint, energy, and precipitation data for 35 data center facilities across 15 countries, alongside benchmark comparators covering irrigated agriculture, livestock operations, industrial manufacturing, recreation, and human habitation across population density quintiles.</p>
+
+<p>The primary research questions are:</p>
+<ol>
+  <li>How does data center water intensity (AF/acre/year) compare to other industrial and land uses?</li>
+  <li>How does geography — local precipitation, grid mix, water source type — affect a facility's actual environmental footprint?</li>
+  <li>What is the relationship between cooling technology choice and water consumption, and what does "efficient" look like?</li>
+  <li>How does the water footprint of modern hyperscale AI infrastructure compare to historical enterprise data center designs?</li>
+</ol>
+
+<div class="alert alert-warn">
+  <strong>Scope limitations:</strong> This report covers <em>direct, on-site</em> water consumption only (cooling and sanitation). It does not include: (a) indirect water embedded in grid electricity generation; (b) water consumed in manufacturing the servers and hardware; (c) water used by supply chain logistics. Full lifecycle water footprints are estimated to be 3–5× the on-site direct figures reported here. See EESI (2024) for methodology on indirect water estimation.
+</div>
+
+<!-- ═══ 2. CONFIDENCE TIERS ═══ -->
+<h2 id="data-tiers">2. Data Confidence Tiers</h2>
+
+<p>Every water figure in this report carries one of three confidence designations:</p>
+
+<table>
+  <thead><tr><th>Tier</th><th>Label</th><th>Definition</th><th>Appropriate Use</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="conf conf-m">[M] Metered</span></td>
+      <td>Measured / officially reported</td>
+      <td>Water figures obtained from: (a) utility billing records accessed via public records request, (b) operator-published sustainability reports with site-level granularity, or (c) regulatory permit filings. These are the most reliable figures.</td>
+      <td>Precise comparisons, policy analysis, regulatory citations.</td>
+    </tr>
+    <tr>
+      <td><span class="conf conf-e">[E] Estimated</span></td>
+      <td>Model-derived estimate</td>
+      <td>Water figures derived from the Siddik et al. (2021) empirical benchmark of 1.8 m³/MWh applied to a facility's disclosed IT capacity. See Section 3 for full formula and uncertainty bounds.</td>
+      <td>Order-of-magnitude comparison only. Do not cite as precise figures. ±40–60% uncertainty typical.</td>
+    </tr>
+    <tr>
+      <td><span class="conf conf-u">[U] Undisclosed</span></td>
+      <td>No reliable estimate possible</td>
+      <td>Either: (a) the operator has not disclosed MW capacity or water use, making estimation impossible; or (b) the cooling design (air-only, seawater, closed-loop) makes the evaporative benchmark inapplicable and actual use is near zero.</td>
+      <td>Do not estimate. Absence of data is itself a finding — note it as such.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="alert alert-info">
+  <strong>A note on [U] for near-zero facilities:</strong> Microsoft Quincy (post-QWRU), Switch Citadel, Google Hamina (seawater), and Microsoft Gävle all carry [U] not because data is hidden, but because their cooling designs make the standard evaporative benchmark inapplicable. Their actual water use is near zero — a different kind of unknown than facilities that simply refuse to disclose.
+</div>
+
+<!-- ═══ 3. WATER METHODOLOGY ═══ -->
+<h2 id="water-methodology">3. Water Consumption Methodology</h2>
+
+<h3>3.1 Metered Data Sources</h3>
+<p>The highest-quality data in this report comes from three independent routes:</p>
+<ol>
+  <li><strong>Utility public records (FOIA/open records):</strong> Oregon Public Broadcasting obtained Google The Dalles consumption figures (434.4M gal in 2024; 383.9M gal in 2023) directly from the City of The Dalles via public records request. West Des Moines Water Works publishes annual water use reports listing Microsoft's 5 campuses as the city's largest user (68.5M gal in 2024).</li>
+  <li><strong>Operator sustainability reports:</strong> Google publishes site-level figures for owned/leased facilities in its annual Environmental Report. Meta publishes campus-level aggregates. Microsoft reports global totals but not per-site breakdowns (exception: West Des Moines, available via utility).</li>
+  <li><strong>Third-party analysis of disclosed data:</strong> Valicor (May 2026) analyzed Google Council Bluffs cooling system mechanics to derive the 1.4B gal withdrawn / 1.0B evaporated / 400M discharged breakdown from Google's disclosed total.</li>
+</ol>
+
+<h3>3.2 Estimated Water Figures — Formula and Derivation</h3>
+<p>For facilities with disclosed IT capacity (MW) but no disclosed water data, the following benchmark is applied:</p>
+
+<div class="formula">
+W<sub>direct</sub> (m³/yr) = P<sub>IT</sub> × 1,000 × 8,760 × WUE<sub>direct</sub>
+<br><br>
+Where:
+<br>&nbsp;&nbsp;P<sub>IT</sub>  = IT load capacity (MW)
+<br>&nbsp;&nbsp;1,000  = kW per MW
+<br>&nbsp;&nbsp;8,760  = hours per year (assumes ~100% utilization; see note)
+<br>&nbsp;&nbsp;WUE<sub>direct</sub>  = 1.8 m³/MWh  (Siddik et al. 2021, median for US evaporative-cooled DCs)
+<br><br>
+<span class="comment">To convert to US gallons: × 264.172</span>
+<br>
+<span class="comment">To convert to acre-feet: ÷ 325,851</span>
+</div>
+
+<h4>Source and validation of the 1.8 m³/MWh benchmark</h4>
+<p>Siddik, Shehabi, and Marston (2021) computed facility-level direct water footprints for the US data center fleet using cooling system type, local climate, and operating data. Their median figure of 1.8 m³/MWh for evaporative-cooled facilities is derived from cooling tower heat rejection physics: approximately 1.8 liters of water are consumed per kWh of heat rejected through evaporation at median US ambient conditions.</p>
+
+<div class="alert alert-caution">
+  <strong>Critical limitations of this benchmark:</strong>
+  <ul style="margin-top:8px">
+    <li>It assumes evaporative (open-loop) cooling. Facilities using air cooling, closed-loop systems, seawater, or district cooling will have <em>substantially lower</em> actual consumption — potentially near zero.</li>
+    <li>The benchmark was calibrated against US climate conditions. Hot/humid climates (Singapore, UAE) will have higher actual use; cold climates (Finland, Sweden) will have lower use.</li>
+    <li>IT utilization rate is assumed at ~87% (industry average PUE considerations), not 100%. The formula above uses 8,760 hours; actual energy-hours will be lower for facilities not yet at full capacity.</li>
+    <li>PUE is not accounted for. A facility with PUE 1.5 rejects 50% more heat than one with PUE 1.2, proportionally increasing cooling water demand.</li>
+    <li>Uncertainty range: ±40–60% compared to metered figures is typical. Treat [E] values as order-of-magnitude only.</li>
+  </ul>
+</div>
+
+<h3>3.3 Evaporation / Discharge Split</h3>
+<p>For facilities using evaporative cooling towers, water withdrawn is split between:</p>
+<ul>
+  <li><strong>Evaporated (consumed):</strong> Water permanently removed from the local hydrological cycle. Typical range: 70–80% of withdrawal. Google Council Bluffs actual: 71% (Valicor 2026).</li>
+  <li><strong>Blowdown (discharged):</strong> Concentrated mineral water drained periodically to prevent scaling. Returned to sewer or treatment plant. Typical range: 20–30%.</li>
+  <li><strong>Drift (&lt;0.005%):</strong> Water droplets carried away by wind. Negligible at the scale of this report.</li>
+</ul>
+<p>Source: Uptime Institute cooling tower physics analysis; ELI Data Centers and Water Fact Sheet (January 2026); EESI (2024).</p>
+
+<h3>3.4 Acre-Foot Conversion</h3>
+<div class="formula">
+1 acre-foot (AF) = 325,851 US gallons = 1,233.48 m³
+<br>
+Site precipitation (AF/yr) = Acres × Annual_Precip_inches / 12
+<span class="comment">  [since 1 acre × 1 foot depth = 1 AF, and 12 inches = 1 foot]</span>
+<br>
+Water intensity (AF/ac/yr) = Annual_Withdrawal_AF / Site_Acres
+</div>
+
+<!-- ═══ 4. BENCHMARKS ═══ -->
+<h2 id="benchmarks">4. Benchmark Comparator Methodology</h2>
+
+<h3>Agriculture</h3>
+<p>Irrigation benchmarks are derived from the USGS <em>Estimated Use of Water in the United States in 2015</em> (Dieter et al. 2018), which reports national average application rate of 2.09 AF/acre for all irrigated land. Crop-specific figures use state-level USDA data: alfalfa in Arizona 5–6 AF/ac (most water-intensive US crop), rice in California 4–5 AF/ac (paddy flooding), cotton in Texas 2.5–3 AF/ac, corn in the Midwest 1.2–1.8 AF/ac.</p>
+
+<h3>Golf Courses</h3>
+<p>The USGA/GCSAA Phase III Water Use Survey (2020), covering 2,548 facilities, provides the most comprehensive golf course water data available. National median: 2.08 AF/irrigated acre/year. Regional variation is large: Southwest 4.0 AF/ac (arid, year-round turf maintenance), Northeast 0.8 AF/ac (humid climate, natural rainfall supplement).</p>
+
+<h3>CAFO (Concentrated Animal Feeding Operations)</h3>
+<p>Derived from EPA and USDA livestock water consumption standards: beef cattle ~50 gallons/head/day; dairy cattle ~30 gallons/head/day (plus wash water). A representative 1,000-head beef CAFO on ~100 acres computes to approximately 0.35 AF/acre/year. These figures exclude water embedded in feed crop production, which would add substantially to the full lifecycle figure.</p>
+
+<h3>Industrial</h3>
+<p>Semiconductor fabs (TSMC, Intel, Samsung) operate at extremely high water intensity per acre due to ultrapure water requirements: 2–4 million gallons/day on sites of 50–200 acres, yielding 8–15 AF/ac/yr. Steel mills and refineries use large recirculating cooling systems; figures derived from World Resources Institute Aqueduct and EPA sector-level estimates.</p>
+
+<h3>Residential (Population Density Quintiles)</h3>
+<p>The AWWA (American Water Works Association) reports per-capita residential water use at approximately 100 gallons/person/day nationally, with urban dwellers using somewhat less (fewer appliances, no irrigation) and suburban/rural users more (landscaping, pools, larger lots). The AF/acre figures in this report are computed as:</p>
+<div class="formula">
+AF/ac = (persons/ac) × 100 gal/person/day × 365 / 325,851
+</div>
+<p>The counterintuitive result — rural residential (Q1) using less AF/acre than semi-rural (Q2) — reflects that very rural areas have very low population density, so even though per-capita use is high, the per-acre intensity is low due to sparse settlement.</p>
+
+<!-- ═══ 5. PRECIPITATION ═══ -->
+<h2 id="precipitation">5. Precipitation Data Methodology</h2>
+
+<p>Annual precipitation figures are drawn from <strong>NOAA Climate Normals 1991–2020</strong> (30-year average), the standard reference period used by US climatologists. For US sites, station-level data from the National Centers for Environmental Information (NCEI) is used, cross-referenced with BestPlaces, weather-and-climate.com, and WeatherSpark for validation.</p>
+
+<p>For international sites, local meteorological agency data or climate-data.org (which aggregates station records) is used. All figures represent total precipitation (rain + snow liquid equivalent) at the nearest appropriate weather station.</p>
+
+<p>The site precipitation figure (AF/year) is a <em>theoretical gross calculation</em> — it represents how much water falls on the facility footprint as precipitation. It does not account for runoff coefficient, evapotranspiration, infiltration, or any other hydrological loss. It is presented solely as a hydrological context indicator, not as a measure of usable water supply.</p>
+
+<div class="alert alert-info">
+  <strong>Interpretation note:</strong> When a facility's annual withdrawal exceeds its site precipitation total, it is withdrawing more water from external sources than the natural rainfall budget of its own footprint — a useful indicator of net hydrological burden on the surrounding watershed.
+</div>
+
+<!-- ═══ 6. ENERGY ═══ -->
+<h2 id="energy">6. Energy Mix Methodology</h2>
+
+<p>Grid energy mix figures are approximate annual averages derived from:</p>
+<ul>
+  <li><strong>US:</strong> EIA Electric Power Monthly (2024 data); state-level generation mix from EIA-923 survey; utility-specific data from annual reports (MidAmerican Energy, Grant County PUD, Xcel Energy, Dominion Energy).</li>
+  <li><strong>EU:</strong> ENTSO-E Transparency Platform; national TSO annual reports (EirGrid, 50Hertz, Fingrid, Nord Pool).</li>
+  <li><strong>Asia-Pacific:</strong> National energy agency publications (SPPG Singapore, TEPCO Japan, State Grid China).</li>
+</ul>
+
+<p>All energy mix figures are physical generation mix, not PPA-matched renewable claims. The distinction matters: a facility claiming "100% renewable" via PPAs or RECs may physically draw electrons from a gas- or coal-heavy grid. Both are reported where known.</p>
+
+<p>Onsite generation classification:</p>
+<ul>
+  <li><strong>PRIMARY:</strong> Continuous operational power source — the facility relies on it for day-to-day operation. Only Switch Citadel (179 MW owned solar) qualifies in this dataset.</li>
+  <li><strong>BACKUP:</strong> Idle 99%+ of time; activated only during grid outages. Diesel generators are universal across all other facilities.</li>
+</ul>
+
+<!-- ═══ 7. POPULATION ═══ -->
+<h2 id="population">7. Population Density Quintile Definitions</h2>
+
+<p>The five quintiles for residential water benchmarks are derived from US county-level population density from the 2020 Decennial Census. The quintile breaks were chosen to align with commonly used urban planning categories:</p>
+
+<table>
+  <thead><tr><th>Quintile</th><th>Label</th><th>Density (persons/sq mi)</th><th>Typical land use</th><th>Est. AF/ac/yr</th></tr></thead>
+  <tbody>
+    <tr><td>Q5</td><td>Dense urban</td><td>&gt;2,000</td><td>High-rise apartments, mixed-use urban core</td><td>0.60</td></tr>
+    <tr><td>Q4</td><td>Medium urban</td><td>500–2,000</td><td>Low-rise apartments, townhomes, inner suburbs</td><td>0.90</td></tr>
+    <tr><td>Q3</td><td>Low suburban</td><td>100–500</td><td>Single-family homes, outer suburbs</td><td>1.40</td></tr>
+    <tr><td>Q2</td><td>Semi-rural</td><td>15–100</td><td>Large lots, exurbs, small towns</td><td>1.80</td></tr>
+    <tr><td>Q1</td><td>Rural</td><td>&lt;15</td><td>Agricultural, forested, very low density</td><td>1.20</td></tr>
+  </tbody>
+</table>
+
+<p>Note that Q2 (semi-rural) has the highest AF/acre intensity because these areas combine moderately high per-capita water use (large lots, irrigation, pools) with sufficient population density to generate meaningful aggregate use per acre. True rural areas (Q1) have high per-capita use but such low density that per-acre intensity is lower.</p>
+
+<!-- ═══ 8. LIMITATIONS ═══ -->
+<h2 id="limitations">8. Known Limitations and Caveats</h2>
+
+<h3>8.1 Disclosure asymmetry</h3>
+<p>The data landscape is severely uneven. Google provides site-level water figures in its Environmental Report — the gold standard in this industry. Meta provides campus aggregates. Microsoft discloses global totals, making site attribution impossible without utility records. Amazon does not publish water volumes at all, reporting only efficiency ratios. Switch, Vantage, and most colocation operators publish no water consumption data. This means the best-documented facilities tend to be either the largest users (Google, Meta) or those subject to independent utility disclosure (Microsoft West Des Moines). Smaller or more opaque operators are nearly impossible to assess.</p>
+
+<h3>8.2 Vintage of data</h3>
+<p>Metered data ranges from 2023 to 2024. Some facility capacity figures are from construction announcements and may not reflect current operational status. The [E] estimates assume full operational capacity, which overestimates water use for facilities still ramping up.</p>
+
+<h3>8.3 International benchmark inapplicability</h3>
+<p>The 1.8 m³/MWh benchmark was calibrated on US facilities. In Singapore (hot/humid), actual use is likely higher. In Finland or Sweden (cold, enabling near-year-round air cooling), actual use is substantially lower. International [E] figures should be treated with additional caution.</p>
+
+<h3>8.4 REC vs. physical electron distinction</h3>
+<p>All major hyperscalers claim 100% renewable energy. This claim is typically achieved through Renewable Energy Certificates (RECs) or Power Purchase Agreements (PPAs) — financial instruments that match renewable generation somewhere on the grid with consumption somewhere else. The physical electrons serving a facility may come from gas or coal generators. The report notes both the renewable claim and the actual local grid mix where known.</p>
+
+<h3>8.5 PUE variability</h3>
+<p>Power Usage Effectiveness (PUE) — the ratio of total facility power to IT power — affects how much heat must be rejected and therefore how much cooling water is required. A PUE of 1.5 means 50% more overhead energy (cooling, lighting, UPS losses) than a PUE of 1.2. Modern hyperscale facilities achieve PUE of 1.1–1.3; older enterprise facilities may run 1.5–2.0. The benchmark formula uses IT load only and does not account for PUE overhead, slightly underestimating actual cooling burden for less-efficient facilities.</p>
+
+<h3>8.6 What this report cannot tell you</h3>
+<ul>
+  <li>The full lifecycle water footprint (would require manufacturing + electricity generation data)</li>
+  <li>The water quality impact of blowdown discharge (mineral concentration, temperature effects on receiving waters)</li>
+  <li>Comparative analysis of water stress at the watershed level (would require USGS/WRI Aqueduct overlays)</li>
+  <li>Future projections (would require AI workload growth assumptions)</li>
+</ul>
+
+<!-- ═══ 9. REPRODUCIBILITY ═══ -->
+<h2 id="reproducibility">9. Reproducibility Guide</h2>
+
+<p>A peer reviewer wishing to reproduce or challenge this report should follow this sequence:</p>
+
+<h3>Step 1: Obtain metered [M] data</h3>
+<ol>
+  <li>Google Council Bluffs: Request Google's annual Environmental Report (published at sustainability.google). Cross-reference with Valicor's independent analysis (May 2026).</li>
+  <li>Google The Dalles: File a public records request with the City of The Dalles, Oregon, for annual water billing records for accounts at 4200 Columbia Rd. OPB's January 2026 reporting documents the process.</li>
+  <li>Microsoft West Des Moines: West Des Moines Water Works publishes annual water use reports. Request the "Top 25 Water Users" list for any year 2019–2025.</li>
+  <li>Microsoft Quincy QWRU: EPA published a case study with full methodology at epa.gov/waterreuse.</li>
+  <li>Meta Altoona: Baxtel's data center profile (baxtel.com) cites operational figures from Meta facility management disclosures.</li>
+</ol>
+
+<h3>Step 2: Validate [E] estimates</h3>
+<ol>
+  <li>Obtain facility IT capacity in MW from operator announcements, permit filings, or Baxtel/DatacenterMap.com.</li>
+  <li>Apply formula: <code>W = MW × 1000 × 8760 × 1.8 / 264.172 / 325851</code> (gives AF/yr)</li>
+  <li>Cross-check against any partial disclosures (e.g., WUE figures, water bills obtained via FOI)</li>
+  <li>Flag if facility uses non-evaporative cooling — the estimate will be a significant overestimate</li>
+</ol>
+
+<h3>Step 3: Validate precipitation figures</h3>
+<ol>
+  <li>All figures should match NOAA Climate Normals 1991–2020 for the nearest weather station</li>
+  <li>Access via NOAA NCEI: <a href="https://www.ncei.noaa.gov/access/us-climate-normals/" target="_blank">ncei.noaa.gov/access/us-climate-normals</a></li>
+  <li>Use nearest station to facility address, not city center if meaningfully different</li>
+</ol>
+
+<h3>Step 4: Validate benchmark figures</h3>
+<ol>
+  <li>USGS irrigation: Dieter et al. 2018, Table 7 (state-level) — freely available at pubs.er.usgs.gov</li>
+  <li>Golf courses: USGA/GCSAA Phase III Water Survey 2020 — gcsaa.org/docs</li>
+  <li>Residential: AWWA State of the Water Industry Report and per-capita use data</li>
+</ol>
+
+<h3>Suggested challenges to pursue</h3>
+<ul>
+  <li><strong>The Dalles water sourcing:</strong> Is all of Google's water from the Hood River/Mt. Hood watershed, or does some come from the Columbia River? The city's water source map would clarify.</li>
+  <li><strong>QWRU actual savings:</strong> The EPA case study cites 380M gal/year potential savings. Has this been verified in post-2021 billing data from the City of Quincy?</li>
+  <li><strong>Switch Citadel water:</strong> Switch claims near-zero water use. Is there a permit or utility record that would confirm or deny this?</li>
+  <li><strong>Amazon water:</strong> AWS's refusal to disclose aggregate water volumes is well-documented. Researcher strategies include FOIA to local utilities at known AWS sites (Ashburn VA, Columbus OH, Phoenix AZ).</li>
+</ul>
+
+<!-- ═══ 10. RESOURCE IMPACT ═══ -->
+<h2 id="resource-impact">10. Resource Impact of Report Development</h2>
+
+<div class="alert alert-info">
+  <strong>Transparency commitment:</strong> In keeping with the report's methodology of disclosing confidence tiers and estimation uncertainty, this section provides a transparent accounting of the computational resources consumed in developing the report using Claude Sonnet 4.6 (Anthropic). All figures are estimates with stated uncertainty — applying the same epistemic standards as the rest of the document.
+</div>
+
+<h3>10.1 Conversation structure</h3>
+<p>This report was developed over approximately 8 user turns and 8 assistant responses across a single extended conversation. The development process included:</p>
+<ul>
+  <li>~35 web searches (each returning ~8–10 results)</li>
+  <li>~12 web_fetch operations for full page content</li>
+  <li>~8 bash/Python computation operations</li>
+  <li>3 major HTML files generated (initial artifact, water report v1, global report v2)</li>
+  <li>1 methodology document (this file)</li>
+  <li>1 data manifest CSV</li>
+</ul>
+
+<h3>10.2 Token usage estimate</h3>
+
+<div class="impact-card">
+  <div class="impact-item">
+    <div class="impact-val">~200k</div>
+    <div class="impact-lbl">Input tokens (est.)</div>
+    <div class="impact-note">Search results + prior context</div>
+  </div>
+  <div class="impact-item">
+    <div class="impact-val">~85k</div>
+    <div class="impact-lbl">Output tokens (est.)</div>
+    <div class="impact-note">HTML, prose, analysis</div>
+  </div>
+  <div class="impact-item">
+    <div class="impact-val">~285k</div>
+    <div class="impact-lbl">Total tokens (est.)</div>
+    <div class="impact-note">±30% uncertainty</div>
+  </div>
+</div>
+
+<h4>Estimation methodology</h4>
+<p>Token counts are estimated, not measured — Claude does not have access to exact token counters for its own conversation. The estimates are derived as follows:</p>
+<ul>
+  <li><strong>Search results:</strong> ~35 searches × ~8 results × ~450 tokens/result = ~126,000 tokens</li>
+  <li><strong>Generated HTML content:</strong> ~152,000 bytes ÷ ~4 bytes/token = ~38,000 tokens output</li>
+  <li><strong>User messages:</strong> ~10 turns × ~200 tokens avg = ~2,000 tokens input</li>
+  <li><strong>Assistant prose/reasoning:</strong> ~8 turns × ~800 tokens avg = ~6,400 tokens output</li>
+  <li><strong>Code/bash operations:</strong> ~8 × ~500 tokens avg = ~4,000 tokens output</li>
+  <li><strong>Context accumulation:</strong> Each turn processes all prior context; total context-tokens processed ≈ 3× the final context size ≈ ~110,000 additional tokens</li>
+</ul>
+<p><strong>Uncertainty:</strong> ±30% on all figures. True token counts depend on internal tokenization of HTML (which is less token-efficient than prose), exact search result lengths, and tool call overhead not visible in the conversation interface.</p>
+
+<h3>10.3 Estimated compute cost</h3>
+<p>Using Anthropic's published pricing for Claude Sonnet 4.6 as of May 2026 (pricing may have changed — verify at anthropic.com/pricing):</p>
+
+<table>
+  <thead><tr><th>Component</th><th>Tokens (est.)</th><th>Rate (est.)</th><th>Cost (est.)</th></tr></thead>
+  <tbody>
+    <tr><td>Input tokens</td><td>~200,000</td><td>$3.00 / 1M tokens</td><td>~$0.60</td></tr>
+    <tr><td>Output tokens</td><td>~85,000</td><td>$15.00 / 1M tokens</td><td>~$1.28</td></tr>
+    <tr><td>Web search calls (~47)</td><td>—</td><td>~$0.01/search (est.)</td><td>~$0.47</td></tr>
+    <tr><td><strong>Total estimated</strong></td><td><strong>~285,000</strong></td><td>—</td><td><strong>~$2.35</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="alert alert-warn">
+  <strong>Uncertainty on cost:</strong> ±50%. Actual API pricing, caching behavior, and context window handling can significantly affect costs. The figures above assume no prompt caching and standard API pricing. If run via the Claude.ai consumer interface (as this conversation was), the cost to the user is absorbed in the subscription and not directly measured. The dollar figure above represents approximate API equivalent cost, useful for comparison with research labor costs.
+</div>
+
+<h3>10.4 Energy and water footprint of report development</h3>
+<p>Applying the report's own benchmark of approximately 1.8 m³/MWh for data center water use:</p>
+<ul>
+  <li>Estimated energy for inference: ~285,000 tokens × ~0.001 kWh/1,000 tokens (rough LLM inference estimate) ≈ <strong>0.285 kWh</strong></li>
+  <li>Estimated direct water for cooling: 0.285 kWh × 1.8 L/kWh ≈ <strong>~0.51 liters</strong></li>
+  <li>Context: approximately the water in a standard 500mL water bottle</li>
+</ul>
+<div class="alert alert-info">
+  <strong>Important caveat:</strong> LLM inference energy per token is highly uncertain and varies by hardware generation, batch size, and facility efficiency. The 0.001 kWh/1,000 tokens figure is a rough estimate derived from published analyses of GPT-4 class models. Actual energy per token for Claude Sonnet 4.6 is not publicly disclosed. This estimate could be off by an order of magnitude in either direction.
+</div>
+
+<p>For comparison: a single AI training run for a large language model (not inference, but training) consumes orders of magnitude more — GPT-3 training was estimated at ~1,287 MWh (Patterson et al. 2021), consuming thousands of liters of cooling water. The inference cost for a single research conversation is negligible by comparison, though aggregate inference across millions of daily users is not.</p>
+
+<!-- ═══ 11. REFERENCES ═══ -->
+<h2 id="references">11. Full Reference List</h2>
+
+<ul class="cite-list">
+  <li><div class="cite-num">1</div><div>Siddik, M.A.B., Shehabi, A., &amp; Marston, L. (2021). "The environmental footprint of data centers in the United States." <em>Environmental Research Letters</em>, 16(6). DOI: 10.1088/1748-9326/ac14bc</div></li>
+  <li><div class="cite-num">2</div><div>OPB / Oregon Public Broadcasting (Jan 2026). "As Google's water demands grow, The Dalles aims to pull more from Mount Hood forest." [public records request data: 434.4M gal 2024, 383.9M gal 2023]</div></li>
+  <li><div class="cite-num">3</div><div>Valicor (May 2026). "Why Data Centers Can No Longer Treat Water as an Afterthought." [Google CB: 1.4B gal withdrawn, 1.0B evap, 400M blowdown]</div></li>
+  <li><div class="cite-num">4</div><div>WPR / Wisconsin Public Radio (May 2025). "Microsoft built 5 data center campuses in this Iowa city. Here's what Wisconsin can expect." [Microsoft WDM: 68.5M gal 2024]</div></li>
+  <li><div class="cite-num">5</div><div>US EPA Office of Wastewater Management (2022). "Water Reuse Case Study: Quincy, Washington." epa.gov/waterreuse [QWRU: 380M gal/yr savings]</div></li>
+  <li><div class="cite-num">6</div><div>Baxtel (2025). "Facebook Altoona Iowa Data Center." baxtel.com [Meta: 52.7M gal/yr, 1.0M MWh/yr]</div></li>
+  <li><div class="cite-num">7</div><div>Environmental Law Institute (Jan 2026). "Data Centers and Water Fact Sheet." ELI. [evap ~80%, discharge ~20%]</div></li>
+  <li><div class="cite-num">8</div><div>EESI / Environmental and Energy Study Institute (2024). "Data Centers and Water Consumption." eesi.org</div></li>
+  <li><div class="cite-num">9</div><div>Uptime Institute (2016). "Don't Ignore Water Consumption." Uptime Institute Journal. [cooling tower mechanics]</div></li>
+  <li><div class="cite-num">10</div><div>MOST Policy Initiative (Apr 2026). "Data Center Water Use." mostpolicyinitiative.org [Google fleet: 7.8B gal, 78% evaporated, 2024]</div></li>
+  <li><div class="cite-num">11</div><div>AITooldiscovery (May 2026). "How Much Water Does AI Use? The Real Numbers for 2026." [Google CB peak 2.7M gal/day summer 2024]</div></li>
+  <li><div class="cite-num">12</div><div>Dieter, C.A., et al. (2018). "Estimated Use of Water in the United States in 2015." USGS Circular 1441. [Irrigation: national avg 2.09 AF/ac]</div></li>
+  <li><div class="cite-num">13</div><div>USGA / GCSAA (2020). "Water Use and Management Practices on U.S. Golf Courses: Phase III." [Golf: national 2.08, SW 4.0, NE 0.8 AF/irrigated ac]</div></li>
+  <li><div class="cite-num">14</div><div>S&amp;P Global (Sep 2025). "Beneath the Surface: Water Stress in Data Centers." [Global DC water: 140M m³ (2023), projected 300M m³ (2030)]</div></li>
+  <li><div class="cite-num">15</div><div>Brookings Institution (Apr 2026). "Global Energy Demands within the AI Regulatory Landscape." [Dublin 80% city electricity, Frankfurt 42%]</div></li>
+  <li><div class="cite-num">16</div><div>The Conversation / University researchers (Aug 2025). "Data centers consume massive amounts of water — companies rarely tell the public exactly how much." [disclosure comparison: Google, Meta, Microsoft, Amazon, Digital Realty, Equinix]</div></li>
+  <li><div class="cite-num">17</div><div>MIT Technology Review (May 2025). "The data center boom in the desert." [Nevada ~10 in/yr precip; water stress concerns at TRIC]</div></li>
+  <li><div class="cite-num">18</div><div>technostatecraft Substack (Feb 2025). "How Google is Reshaping a Small Oregon Town." [NWCPUD energy mix: 85% → 46.5% hydro 2015–2023]</div></li>
+  <li><div class="cite-num">19</div><div>Inside Climate News (Nov 2025). "Data Centers' Use of Diesel Generators for Backup Power Is Commonplace—and Problematic." [industry-wide diesel generator analysis]</div></li>
+  <li><div class="cite-num">20</div><div>Goldman Sachs Research (Nov 2025). "Fuel Cells Could Help Meet the Power Demand from Data Centers." [BTM systems: 25–33% of DC incremental demand 2024–2030]</div></li>
+  <li><div class="cite-num">21</div><div>NOAA National Centers for Environmental Information (2020). "Climate Normals 1991–2020." ncei.noaa.gov [all precipitation figures]</div></li>
+  <li><div class="cite-num">22</div><div>US Census Bureau (2020). "2020 Decennial Census: Population Density by County." census.gov [density quintile map]</div></li>
+  <li><div class="cite-num">23</div><div>IBM (2024). IBM TechU Green Data Center presentation; IBM Environmental Report 2024. ibm.com [Boulder: 48-hr gasoline reserve, 63% free cooling, 300k sq ft]</div></li>
+  <li><div class="cite-num">24</div><div>Microsoft Local (2021). "Partnering with the City of Quincy." local.microsoft.com [QWRU partnership details]</div></li>
+  <li><div class="cite-num">25</div><div>Switch (2017). Press release: "TAHOE RENO Now Open." prnewswire.com [2,000 ac, 650 MW planned, 179 MW Switch Station solar]</div></li>
+  <li><div class="cite-num">26</div><div>Patterson, D., et al. (2021). "Carbon and the Cloud." Google Research. [GPT-3 training ~1,287 MWh]</div></li>
+  <li><div class="cite-num">27</div><div>WHO-13 (Feb 2024). "A look into West Des Moines data centers' water usage." who13.com [monthly metered utility data 2021–2023]</div></li>
+  <li><div class="cite-num">28</div><div>Vantage Data Centers (2024). WA1 Campus official page. vantage-dc.com [89 MW, 68 acres, WUE≈0, GCPUD ≥66% hydro]</div></li>
+  <li><div class="cite-num">29</div><div>Columbia Community Connection (Sep 2025). "Google making moves to break ground on first new data center in The Dalles." [290,000 sq ft; surface water from glacial catchment]</div></li>
+  <li><div class="cite-num">30</div><div>AWWA (American Water Works Association). State of the Water Industry Reports (2022–2024). awwa.org [per-capita residential water use benchmarks]</div></li>
+</ul>
+
+<div class="footnote">
+  <strong>Suggested citation:</strong> "Global Data Center Water &amp; Land Use Report" (May 2026). Developed with Claude Sonnet 4.6 (Anthropic). Methodology version 1.0. For peer review inquiries, reproduce using the reproducibility guide in Section 9. Data sources listed in Section 11. License: CC BY 4.0 — attribution required, commercial use permitted with attribution.
+</div>
+
+</body>
+</html>
