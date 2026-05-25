@@ -385,43 +385,48 @@ const FACILITIES=[
 ];
 
 // ════════════════ BENCHMARKS ════════════════
+// afPerAc = IRRIGATION withdrawal only (AF/ac/yr)
+// precip = local annual precipitation (inches/yr); precipAf = precip/12 = AF/ac from rainfall
+// totalAf = afPerAc + precipAf (total water on the land from all sources)
+// src breakdown includes precipitation as a separate category
 const BENCHMARKS=[
   // DATA CENTERS (selected for intensity comparison)
-  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,color:'#e05550',notes:'434M gal/yr ÷ 190 ac. Most intensive DC per acre in dataset.',src:{sw:100,gw:0,note:'Hood River / Mt. Hood watershed surface water via City of The Dalles municipal system'}},
-  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,color:'#e05550',notes:'1,400M gal/yr ÷ 1,000 ac.',src:{sw:100,gw:0,note:'Missouri River basin surface water via Council Bluffs Water Works'}},
-  {id:'dc-sg',name:'Google Singapore (est.)',cat:'data-center',afPerAc:2.12,color:'#e05550',notes:'Estimated from MW capacity.',src:{sw:0,gw:0,rec:60,desal:40,note:'~60% NEWater (reclaimed wastewater), ~40% desalinated seawater; PUB Singapore'}},
+  // Note: data centers have no meaningful precipitation contribution to their process water
+  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,precipIn:16,color:'#e05550',notes:'434M gal/yr / 190 ac. Most intensive DC per acre. Precipitation irrelevant to DC water supply.',src:{sw:100,gw:0,note:'Hood River / Mt. Hood watershed surface water via City of The Dalles municipal system. 16 in/yr local precip falls on campus but is not a water source for the DC.'}},
+  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,precipIn:33,color:'#e05550',notes:'1,400M gal/yr / 1,000 ac. Withdraws 1.56x more water than falls on its campus as rain.',src:{sw:100,gw:0,note:'Missouri River basin surface water via Council Bluffs Water Works. Campus receives ~2,750 AF/yr rainfall but DC draws 4,296 AF from municipal system.'}},
+  {id:'dc-sg',name:'Google Singapore (est.)',cat:'data-center',afPerAc:2.12,precipIn:92,color:'#e05550',notes:'Estimated from MW. Singapore receives 92 in/yr rain but DC draws from PUB reclaimed/desalinated.',src:{sw:0,gw:0,rec:60,desal:40,note:'~60% NEWater (reclaimed), ~40% desalinated seawater. 92 in/yr precipitation is irrelevant to DC operations.'}},
   // CALIFORNIA AGRICULTURE
-  {id:'ag-almond-ca',name:'CA almonds (San Joaquin Valley)',cat:'agriculture',afPerAc:3.7,color:'#34c978',notes:'3–4.5 AF/ac/yr (UC Davis / DWR; avg ~44–48 in/yr evapotranspiration). C-WIN 2024: statewide almond water use 4.7–5.5M AF/yr total. CRS R44093: tree nuts 3–4 AF/ac. 70% of harvest exported.',src:{sw:40,gw:60,note:'~60% groundwater (SJV chronic overdraft, SGMA); ~40% surface water via CVP/SWP and local irrigation districts (Kings R., San Joaquin R., Friant-Kern Canal). Groundwater share rises to 80-90% in drought years. PPIC 2024.'}},
-  {id:'ag-alfalfa',name:'Irrigated alfalfa (CA / AZ)',cat:'agriculture',afPerAc:5.5,color:'#34c978',notes:'Most water-intensive common US crop. USGS 2015; CRS R44093: CA alfalfa >5 AF/ac.',src:{sw:55,gw:45,note:'CA Central Valley: ~55% surface water (Sacramento R. diversions, Delta-Mendota Canal, CVP); ~45% groundwater. AZ: ~60% Colorado River surface water via CAP / irrigation districts; ~40% groundwater (Salt River / Verde R. basin). USGS NWIS.'}},
-  {id:'ag-rice',name:'Irrigated rice (Sacramento Valley, CA)',cat:'agriculture',afPerAc:4.5,color:'#34c978',notes:'USGS / CRS R44093: CA rice 4–5 AF/ac. Paddy flooding; Sacramento Valley.',src:{sw:90,gw:10,note:'~90% Sacramento River surface water via Tehama-Colusa Canal and local water districts; ~10% groundwater. Sacramento Valley rice is among the most surface-water-dependent crops in CA — historically the primary beneficiary of senior water rights on the Sacramento R. PPIC; DWR.'}},
-  {id:'ag-cotton',name:'Irrigated cotton (San Joaquin Valley, CA)',cat:'agriculture',afPerAc:2.8,color:'#34c978',notes:'USGS 2015; CRS R44093: CA cotton 3–4 AF/ac (acreage declining).',src:{sw:35,gw:65,note:'~65% groundwater (SJV west side; historically high groundwater reliance as CVP allocations cut); ~35% surface water (San Joaquin R., CVP contractors, Westlands Water District). Cotton acreage has declined sharply since 2000s as water costs rose. USGS; PPIC.'}},
-  {id:'ag-corn',name:'Irrigated corn (US Midwest / CA)',cat:'agriculture',afPerAc:1.5,color:'#34c978',notes:'USGS national avg ~2.09 AF/ac; Midwest corn lower. CA corn silage (SJV): ~2.5 AF/ac.',src:{sw:60,gw:40,note:'Midwest: ~60% surface water (irrigation canals from Missouri R., Platte R., Arkansas R.); ~40% groundwater (Ogallala / High Plains aquifer). CA corn silage (SJV dairies): ~50% groundwater / ~50% surface water. USGS NWIS 2015.'}},
-  {id:'ag-dry',name:'Dryland farming (no irrigation)',cat:'agriculture',afPerAc:0,color:'#34c978',notes:'Precipitation only; no irrigation withdrawal.',src:{sw:0,gw:0,note:'No irrigation draw. Entirely precipitation-dependent. Includes most US wheat, dryland corn/sorghum (Great Plains), and dry-farmed wine grapes (Sonoma / Napa coastal CA).'}},
+  {id:'ag-almond-ca',name:'CA almonds (San Joaquin Valley)',cat:'agriculture',afPerAc:3.7,precipIn:11,color:'#34c978',notes:'3-4.5 AF/ac irrigation. SJV receives ~11 in/yr precip (0.92 AF/ac). Total water budget ~4.6 AF/ac; only 20% from rainfall. C-WIN 2024; UC Davis/DWR.',src:{sw:40,gw:60,precip:20,note:'~60% Ogallala — wait, SJV: ~60% groundwater (SJV chronic overdraft, SGMA restricted); ~40% surface water (CVP/SWP, Kings R., San Joaquin R.). Precipitation supplies ~20% of total crop water need (11 in/yr vs. 44-48 in ET demand). Groundwater share rises to 80-90% in drought years.'}},
+  {id:'ag-alfalfa',name:'Irrigated alfalfa (CA / AZ)',cat:'agriculture',afPerAc:5.5,precipIn:11,color:'#34c978',notes:'5.5 AF/ac irrigation. Only ~11 in/yr precip in SJV (0.92 AF/ac = 14% of total need). USGS 2015; CRS R44093.',src:{sw:55,gw:45,precip:14,note:'CA Central Valley: ~55% surface water (Sacramento R., Delta-Mendota Canal, CVP); ~45% groundwater. AZ: ~60% Colorado R. (CAP). Precipitation is only ~14% of total crop water need in arid growing regions.'}},
+  {id:'ag-rice',name:'Irrigated rice (Sacramento Valley, CA)',cat:'agriculture',afPerAc:4.5,precipIn:18,color:'#34c978',notes:'4.5 AF/ac irrigation + 1.5 AF/ac precip = 6.0 AF/ac total. Sacramento Valley gets 18 in/yr; precip is ~25% of total crop water.',src:{sw:90,gw:10,precip:25,note:'~90% Sacramento River surface water (senior water rights; Tehama-Colusa Canal); ~10% groundwater. 18 in/yr precipitation supplies ~25% of total paddy water requirement. Rice paddies act as groundwater recharge zones during flooding season. PPIC; DWR.'}},
+  {id:'ag-cotton',name:'Irrigated cotton (SJV, CA)',cat:'agriculture',afPerAc:2.8,precipIn:11,color:'#34c978',notes:'2.8 AF/ac irrigation + 0.92 AF/ac precip = 3.72 AF/ac total. Precip is ~25% of total. Acreage declining sharply.',src:{sw:35,gw:65,precip:25,note:'~65% groundwater (SJV west side; CVP allocations cut); ~35% surface water (Westlands Water District). ~25% of crop water from precipitation in SJV. USGS; PPIC.'}},
+  {id:'ag-corn',name:'Irrigated corn (Midwest)',cat:'agriculture',afPerAc:1.5,precipIn:35,color:'#34c978',notes:'1.5 AF/ac irrigation + 2.9 AF/ac precip = 4.4 AF/ac total. Midwest corn gets ~35 in/yr rain — 66% of total crop water from precipitation. USGS 2015.',src:{sw:60,gw:40,precip:66,note:'Midwest: ~60% surface water (Missouri R., Platte R. canals); ~40% groundwater (Ogallala / High Plains). Crucially, 35 in/yr precipitation provides ~2.9 AF/ac — 66% of total corn water budget. Irrigation supplements where and when rainfall is insufficient. USGS NWIS 2015; USDA ERS 2022.'}},
+  {id:'ag-dry',name:'Dryland farming (no irrigation)',cat:'agriculture',afPerAc:0,precipIn:25,color:'#34c978',notes:'No irrigation. Entirely precipitation-dependent. ~25 in/yr (Great Plains avg) = ~2.1 AF/ac total water; 100% from rainfall.',src:{sw:0,gw:0,precip:100,note:'100% precipitation. No irrigation withdrawal. Includes most Great Plains wheat, dryland corn/sorghum (central KS/NE), and dry-farmed wine grapes (coastal CA). 25 in shown as Great Plains representative; varies 15-50 in by location.'}},
   // HIGH PLAINS / OGALLALA SUB-GROUP
-  {id:'ag-hp-corn',name:'Center-pivot corn — W. Kansas (Ogallala)',cat:'agriculture',afPerAc:2.2,color:'#50c870',notes:'Western KS center-pivot irrigated corn (GMD3/GMD4). Range 1.8–2.5 AF/ac; drought years higher. USGS DS-981 (2013 KS data); K-State SRP-536; USGS SIR 2006-5069. Corn consumes ~95% of center-pivot water by volume despite ~82% of irrigated acres in GMD3.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater (world largest fossil aquifer; recharge ~0.5 in/yr vs. pumping ~18–24 in/yr for corn). ~3% surface water (limited canal districts: USBR Arkansas R. basin in SW KS). USGS 2015: KS and NE are among the few western states where GW exceeds SW for irrigation. Aquifer will be economically depleted in some SW KS counties by 2040s at current rates. KGS; USGS.'}},
-  {id:'ag-hp-soy',name:'Center-pivot soybeans — W. Kansas / NE',cat:'agriculture',afPerAc:1.6,color:'#50c870',notes:'Center-pivot irrigated soybeans; W. Kansas range 1.3–1.9 AF/ac; NE ~1.0–1.4 AF/ac. USGS DS-981; K-State Extension. Soy is less water-intensive than corn but acreage expanding rapidly in KS/NE as corn insurance costs rise.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater. Same aquifer system as corn. Nebraska leads US in irrigated soy acres. USGS 2015; USDA ERS 2022.'}},
-  {id:'ag-hp-wheat',name:'Center-pivot winter wheat — W. Kansas',cat:'agriculture',afPerAc:0.75,color:'#50c870',notes:'Supplemental-irrigated winter wheat; W. Kansas range 0.5–1.0 AF/ac. Substantially less water than corn or soy — wheat is often deficit-irrigated (pre-plant + 1–2 applications). USGS DS-981; USGS SIR 2006-5069. Wheat acreage declining as farmers shift to higher-value corn.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater. Winter wheat has lower consumptive water requirement (cooler growing season, Oct–June) and is commonly managed with minimum supplemental irrigation in western KS. USGS; K-State Research and Extension.'}},
+  {id:'ag-hp-corn',name:'Center-pivot corn — W. Kansas (Ogallala)',cat:'agriculture',afPerAc:2.2,precipIn:17,color:'#50c870',notes:'2.2 AF/ac irrigation + 1.4 AF/ac precip = 3.6 AF/ac total. W. Kansas gets ~17 in/yr; precipitation is ~39% of total corn water budget. USGS DS-981; K-State.',src:{sw:3,gw:97,precip:39,note:'~97% Ogallala groundwater (recharge ~0.5 in/yr vs pumping ~18-24 in/yr). ~3% surface water (limited canal districts). W. Kansas precipitation (~17 in/yr = 1.42 AF/ac) supplies ~39% of total corn water need — the rest pumped from a fossil aquifer depleting at 1-3 ft/yr. KGS; USGS.'}},
+  {id:'ag-hp-soy',name:'Center-pivot soybeans — W. Kansas / NE',cat:'agriculture',afPerAc:1.6,precipIn:20,color:'#50c870',notes:'1.6 AF/ac irrigation + 1.67 AF/ac precip = 3.27 AF/ac total. Precipitation supplies ~51% of total soybean water budget. Wetter than corn region.',src:{sw:3,gw:97,precip:51,note:'~97% Ogallala groundwater; ~3% surface water. ~20 in/yr precipitation (1.67 AF/ac) supplies roughly half of total crop water need for soybeans in this region. Soybeans are more drought-tolerant than corn, partly explaining lower irrigation intensity. USGS 2015; USDA ERS.'}},
+  {id:'ag-hp-wheat',name:'Center-pivot winter wheat — W. Kansas',cat:'agriculture',afPerAc:0.75,precipIn:17,color:'#50c870',notes:'0.75 AF/ac irrigation + 1.42 AF/ac precip = 2.17 AF/ac total. Precipitation is ~65% of total wheat water! Winter wheat planted Oct, harvested June — taps cool-season rainfall efficiently.',src:{sw:3,gw:97,precip:65,note:'~97% Ogallala groundwater; ~3% surface water. ~17 in/yr precipitation (1.42 AF/ac) supplies ~65% of total water need for winter wheat. Cool-season growth cycle (Oct-June) aligns well with Great Plains precipitation pattern, minimizing supplemental irrigation. This is why wheat is far less Ogallala-intensive than corn. USGS; K-State.'}},
   // LIVESTOCK
-  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water; intensive.',src:{sw:40,gw:60,note:'Varies widely. Midwest dairy: ~50% groundwater / ~50% municipal or surface water. CA Central Valley dairy (San Joaquin / Tulare): ~60–70% groundwater (SGMA-impacted); ~30–40% surface water via local irrigation districts. USDA NASS.'}},
-  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,color:'#e8a032',notes:'EPA; ~50 gal/head/day; 1,000-head representative lot.',src:{sw:20,gw:80,note:'Typical feedlot (TX / KS / NE Panhandle): ~80% groundwater (Ogallala aquifer); ~20% surface water or municipal. High Plains feedlot density is a primary driver of Ogallala depletion. EPA; USDA.'}},
+  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,precipIn:null,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water. Precipitation not included: feedlot pad runoff is managed waste, not a water supply.',src:{sw:40,gw:60,note:'Varies. CA Central Valley dairy: ~60-70% groundwater (SGMA-impacted); ~30-40% surface water via irrigation districts. Midwest dairy: ~50% GW / ~50% municipal or surface water.'}},
+  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,precipIn:null,color:'#e8a032',notes:'EPA; ~50 gal/head/day; feedlot pad is impervious — precipitation is collected as regulated wastewater, not a usable supply.',src:{sw:20,gw:80,note:'Typical High Plains feedlot (TX/KS/NE): ~80% Ogallala groundwater; ~20% surface water or municipal. Precipitation on feedlot pad flows to lined retention ponds as regulated waste. EPA; USDA.'}},
   // INDUSTRY
-  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,color:'#9d72e8',notes:'TSMC/Intel; ultrapure water; 2–4M gal/day per facility on small footprint.',src:{sw:30,gw:30,rec:40,note:'Varies by location. TSMC Arizona: ~40% reclaimed wastewater (EPCOR / City of Chandler); ~30% surface water (SRP/CAP); ~30% groundwater. Intel Chandler: similar mix. Taiwan fabs: primarily surface water (reservoirs) + reclaimed. Water recycling rates 75–85%.'}},
-  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,color:'#9d72e8',notes:'WRI; recirculating cooling tower dominated.',src:{sw:70,gw:30,note:'Typically river surface water (once-through historically; now recirculating). US integrated mills (Gary IN: Lake Michigan; Pittsburgh: Monongahela R.; Burns Harbor: Lake Michigan). ~70% surface water; ~30% municipal or groundwater. EPA TRI; WRI Aqueduct.'}},
-  {id:'in-ref',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,color:'#9d72e8',notes:'API/EPA; cooling tower dominated.',src:{sw:65,gw:35,note:'Gulf Coast refineries: ~65% surface water (bayou / river intakes); ~35% municipal or groundwater. CA refineries: mix varies (Richmond: San Francisco Bay; Carson: LA Aqueduct). EPA TRI; API.'}},
-  {id:'in-lmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,color:'#9d72e8',notes:'EPA/USGS; process water + HVAC.',src:{sw:20,gw:30,rec:10,muni:40,note:'Predominantly municipal supply (~40%); remainder varies by region. EPA Sector Facility Indexing Project.'}},
-  {id:'in-wh',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,color:'#9d72e8',notes:'Minimal; sanitary + HVAC only.',src:{sw:0,gw:0,muni:100,note:'100% municipal potable (sanitary use only; no process water). ASHRAE.'}},
+  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,precipIn:null,color:'#9d72e8',notes:'TSMC/Intel; ultrapure water; 2-4M gal/day. Precipitation irrelevant — process requires ultrapure municipal/reclaimed water.',src:{sw:30,gw:30,rec:40,note:'TSMC Arizona: ~40% reclaimed wastewater (EPCOR/Chandler); ~30% surface water (SRP/CAP); ~30% groundwater. Water recycling rates 75-85%.'}},
+  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,precipIn:null,color:'#9d72e8',notes:'WRI; recirculating cooling tower dominated. Precipitation irrelevant to process water supply.',src:{sw:70,gw:30,note:'Typically river surface water (recirculating). US mills (Gary IN: Lake Michigan; Pittsburgh: Monongahela R.). ~70% surface water; ~30% municipal or groundwater.'}},
+  {id:'in-ref',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,precipIn:null,color:'#9d72e8',notes:'API/EPA; cooling tower dominated. Process water from municipal/industrial supply only.',src:{sw:65,gw:35,note:'Gulf Coast refineries: ~65% surface water; ~35% municipal or groundwater. EPA TRI; API.'}},
+  {id:'in-lmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,precipIn:null,color:'#9d72e8',notes:'EPA/USGS; process water + HVAC.',src:{sw:20,gw:30,rec:10,muni:40,note:'Predominantly municipal supply. EPA Sector Facility Indexing Project.'}},
+  {id:'in-wh',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,precipIn:null,color:'#9d72e8',notes:'Minimal; sanitary + HVAC only.',src:{sw:0,gw:0,muni:100,note:'100% municipal potable (sanitary use only). ASHRAE.'}},
   // RECREATION
-  {id:'rec-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,color:'#30c8c8',notes:'USGA/GCSAA 2020; arid region.',src:{sw:20,gw:30,rec:50,note:'SW US: ~50% reclaimed wastewater (most AZ / NV / SoCal courses are required to use reclaimed water); ~30% groundwater; ~20% surface water. Phoenix / Tucson courses: typically 100% reclaimed by municipal ordinance. USGA; GCSAA 2020 survey.'}},
-  {id:'rec-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,color:'#30c8c8',notes:'USGA/GCSAA 2020.',src:{sw:35,gw:40,rec:25,note:'National median: ~40% groundwater, ~35% surface water, ~25% reclaimed. Highly variable by region and local ordinance. USGA/GCSAA 2020 Water Survey.'}},
-  {id:'rec-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,color:'#30c8c8',notes:'USGA; humid climate.',src:{sw:50,gw:40,rec:10,note:'Northeast: ~50% surface water (ponds, streams); ~40% groundwater (on-site wells); ~10% reclaimed. Lower overall use due to natural rainfall supplement. USGA/GCSAA.'}},
-  {id:'rec-cp',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,color:'#30c8c8',notes:'NYC DEP; 843 ac; ~125M gal/yr irrigation + fountains.',src:{sw:100,gw:0,note:'100% NYC DEP municipal supply (Delaware / Catskill / Croton aqueduct system — surface water from protected Catskill/Delaware watersheds). No groundwater or reclaimed water used. NYC DEP.'}},
-  {id:'rec-st',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,color:'#30c8c8',notes:'~82 events/yr; concessions, restrooms, field irrigation; ~20 ac footprint.',src:{sw:0,gw:0,muni:100,note:'100% municipal potable. Field turf (natural grass) irrigation typically reclaimed or potable municipal. Concessions and restrooms: municipal. EPA WaterSense.'}},
+  {id:'rec-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,precipIn:8,color:'#30c8c8',notes:'4.0 AF/ac irrigation + 0.67 AF/ac precip = 4.67 AF/ac total. SW desert gets only ~8 in/yr; precipitation just 14% of total. USGA/GCSAA 2020.',src:{sw:20,gw:30,rec:50,precip:14,note:'SW US: ~50% reclaimed wastewater (required by municipal ordinance in AZ/NV/SoCal); ~30% groundwater; ~20% surface water. 8 in/yr precipitation (0.67 AF/ac) is only ~14% of total water on the turf. USGA/GCSAA 2020.'}},
+  {id:'rec-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,precipIn:35,color:'#30c8c8',notes:'2.08 AF/ac irrigation + 2.9 AF/ac precip = 5.0 AF/ac total. National median site gets ~35 in/yr; precipitation is ~58% of total turf water budget.',src:{sw:35,gw:40,rec:25,precip:58,note:'National median: ~40% GW, ~35% surface, ~25% reclaimed. 35 in/yr precipitation (2.9 AF/ac) supplies ~58% of total turf water. The national median golf course actually receives more water from rain than from irrigation. USGA/GCSAA 2020 Water Survey.'}},
+  {id:'rec-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,precipIn:46,color:'#30c8c8',notes:'0.8 AF/ac irrigation + 3.83 AF/ac precip = 4.63 AF/ac total. Northeast gets ~46 in/yr; precipitation is 83% of total turf water. Irrigation is purely supplemental.',src:{sw:50,gw:40,rec:10,precip:83,note:'Northeast: ~50% surface water (ponds, streams); ~40% groundwater (on-site wells); ~10% reclaimed. 46 in/yr precipitation (3.83 AF/ac) supplies 83% of total turf water. Low irrigation reflects humid climate — courses irrigate mainly during summer dry spells. USGA/GCSAA.'}},
+  {id:'rec-cp',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,precipIn:50,color:'#30c8c8',notes:'0.40 AF/ac municipal irrigation + 4.17 AF/ac precip = 4.57 AF/ac total. 91% from NYC rainfall. Park irrigation is a tiny supplement to abundant natural precipitation.',src:{sw:100,gw:0,precip:91,note:'100% NYC DEP municipal supply for irrigation (Delaware/Catskill/Croton aqueduct). 50 in/yr precipitation (4.17 AF/ac) supplies 91% of total water on the park. NYC DEP.'}},
+  {id:'rec-st',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,precipIn:40,color:'#30c8c8',notes:'0.05 AF/ac irrigation + 3.33 AF/ac precip = 3.38 AF/ac total. Stadium fields mostly sustained by rainfall; irrigation is minimal supplemental.',src:{sw:0,gw:0,muni:100,precip:99,note:'100% municipal for irrigation/concessions (minimal). Natural turf fields receive ~40 in/yr precip in median US stadium location. EPA WaterSense.'}},
   // RESIDENTIAL
-  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments, no landscaping.',src:{sw:60,gw:15,rec:10,muni:15,note:'Large US cities: predominantly surface water (NYC: Catskill/Delaware; Chicago: Lake Michigan; LA: Owens Valley / Colorado R. aqueducts). NYC is ~100% surface; Phoenix is ~60% surface (CAP Colorado R.) + ~40% groundwater/reclaimed. AWWA; AMWA.'}},
-  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,color:'#6080f0',notes:'AWWA; 500–2,000/sq mi.',src:{sw:55,gw:30,rec:5,muni:10,note:'Mid-size cities: ~55% surface / ~30% groundwater / ~5% reclaimed. Varies greatly: Sun Belt cities rely more on groundwater (FL ~90% GW; TX cities ~60% GW + surface mix). AWWA State of Water Industry.'}},
-  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,color:'#6080f0',notes:'AWWA; 100–500/sq mi; single family + landscaping.',src:{sw:45,gw:45,rec:5,muni:5,note:'Outer suburbs: roughly equal surface and groundwater. Private wells more common. Lawn irrigation increases per-ac use. AWWA; USGS 2015 Estimated Use.'}},
-  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,color:'#6080f0',notes:'AWWA/USGS; 15–100/sq mi; large lots, irrigation.',src:{sw:25,gw:70,rec:0,muni:5,note:'Predominantly private groundwater wells (~70%); some small municipal systems drawing from surface water (~25%). Highest per-ac intensity due to large irrigated lots + low efficiency. USGS 2015.'}},
-  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,color:'#6080f0',notes:'USGS; <15/sq mi; wells, septic.',src:{sw:15,gw:80,rec:0,muni:5,note:'~80% private groundwater wells; ~15% small surface-water systems; ~5% hauled or municipal. Low population density means low per-acre totals despite high per-capita use. USGS 2015 Estimated Use of Water in the United States.'}},
+  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,precipIn:null,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments, no landscaping. Precipitation not counted: urban runoff is managed as stormwater, not a domestic supply.',src:{sw:60,gw:15,rec:10,muni:15,note:'Large US cities: predominantly surface water (NYC: Catskill/Delaware; Chicago: Lake Michigan; LA: Owens Valley / Colorado R. aqueducts). AWWA; AMWA.'}},
+  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,precipIn:null,color:'#6080f0',notes:'AWWA; 500-2,000/sq mi. Urban precipitation managed as stormwater.',src:{sw:55,gw:30,rec:5,muni:10,note:'Mid-size cities: ~55% surface / ~30% groundwater / ~5% reclaimed. AWWA State of Water Industry.'}},
+  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,precipIn:null,color:'#6080f0',notes:'AWWA; 100-500/sq mi. Note: lawn irrigation figure already partially reflects natural precipitation in accounting (lower irrigation in wetter climates).',src:{sw:45,gw:45,rec:5,muni:5,note:'Outer suburbs: ~equal surface and groundwater. AWWA; USGS 2015.'}},
+  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,precipIn:null,color:'#6080f0',notes:'AWWA/USGS; 15-100/sq mi; large lots, high irrigation.',src:{sw:25,gw:70,rec:0,muni:5,note:'Predominantly private groundwater wells (~70%). USGS 2015.'}},
+  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,precipIn:null,color:'#6080f0',notes:'USGS; <15/sq mi; wells, septic.',src:{sw:15,gw:80,rec:0,muni:5,note:'~80% private groundwater wells; ~15% small surface-water systems. USGS 2015.'}},
 ];
 
 // ════════════════ HELPERS ════════════════
@@ -688,59 +693,104 @@ function closeModal(e){
 
 // ════════════════ BENCHMARK ════════════════
 function buildBenchmarkChart(){
-  const sorted=[...BENCHMARKS].sort((a,b)=>b.afPerAc-a.afPerAc);
-  const max=sorted[0].afPerAc;
-  const catLabels={'data-center':'Data Centers','agriculture':'Agriculture (California unless noted)','livestock':'Livestock','industry':'Industry','recreation':'Recreation','residential':'Residential (US)','_hp':'High Plains / Ogallala Aquifer — Center-Pivot Row Crops (KS / NE)'};
-  // Source color key
-  const SC={sw:'#2080d0',gw:'#60a830',rec:'#30b870',desal:'#9060c0',muni:'#8080c0'};
-  const SL={sw:'Surface water',gw:'Groundwater',rec:'Reclaimed/reuse',desal:'Desalinated',muni:'Municipal (unspecified)'};
+  const sorted=[...BENCHMARKS].sort((a,b)=>{
+    const ta=a.afPerAc+(a.precipIn?a.precipIn/12:0);
+    const tb=b.afPerAc+(b.precipIn?b.precipIn/12:0);
+    return tb-ta;
+  });
+  const max=Math.max(...sorted.map(b=>b.afPerAc+(b.precipIn?b.precipIn/12:0)));
+  const catLabels={
+    'data-center':'Data Centers (irrigation withdrawal only; precipitation not a process water source)',
+    'agriculture':'Agriculture (California unless noted) — bars show TOTAL water: irrigation + precipitation',
+    'livestock':'Livestock — irrigation withdrawal only (precipitation is managed as regulated runoff)',
+    'industry':'Industry — process water withdrawal only',
+    'recreation':'Recreation — bars show TOTAL water: irrigation + annual precipitation on turf',
+    'residential':'Residential (US) — municipal/well withdrawal only',
+  };
+  const SC={sw:'#2080d0',gw:'#60a830',rec:'#30b870',desal:'#9060c0',muni:'#8080c0',precip:'#4040c0'};
+  const SL={sw:'Surface water',gw:'Groundwater',rec:'Reclaimed/reuse',desal:'Desalinated',muni:'Municipal',precip:'Precipitation'};
 
   let html='',lastCat='',lastHPShown=false;
   // Legend
-  html+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--s3);border-radius:4px;border:1px solid var(--b1)">' +
-    '<span style="font-family:DM Mono,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-right:4px">Water source:</span>' +
-    Object.entries(SC).map(([k,c])=>'<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><span style="width:10px;height:10px;border-radius:2px;background:'+c+';display:inline-block"></span>'+SL[k]+'</span>').join('') +
+  html+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--s3);border-radius:4px;border:1px solid var(--b1)">'+
+    '<span style="font-family:DM Mono,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-right:4px">Source:</span>'+
+    Object.entries(SC).map(([k,c])=>'<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--t2)"><span style="width:10px;height:10px;border-radius:2px;background:'+c+';display:inline-block;flex-shrink:0"></span>'+SL[k]+'</span>').join('')+
   '</div>';
 
   sorted.forEach(b=>{
     if(b.cat!==lastCat){
-      html+='<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:12px 0 5px;border-top:1px solid var(--b1);margin-top:4px">'+(catLabels[b.cat]||b.cat)+'</div>';
+      html+='<div style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:12px 0 5px;border-top:1px solid var(--b1);margin-top:4px;line-height:1.5">'+(catLabels[b.cat]||b.cat)+'</div>';
       lastCat=b.cat;
       lastHPShown=false;
     }
     if(b.id&&b.id.startsWith('ag-hp-')&&!lastHPShown){
-      html+='<div style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--te);padding:8px 0 2px 10px;border-left:2px solid var(--te);margin:6px 0 2px;opacity:0.8">High Plains / Ogallala — Center-Pivot KS / NE — ~97% Ogallala groundwater</div>';
+      html+='<div style="font-family:DM Mono,monospace;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--te);padding:6px 0 2px 10px;border-left:2px solid var(--te);margin:4px 0 2px;opacity:0.8">High Plains / Ogallala — Center-Pivot KS / NE — ~97% Ogallala groundwater</div>';
       lastHPShown=true;
     }
-    const pct=b.afPerAc/max*100;
-    // Build source bar segments
+    const precipAf=b.precipIn?b.precipIn/12:0;
+    const totalAf=b.afPerAc+precipAf;
+    const irrPct=totalAf>0?b.afPerAc/totalAf*100:100;
+    const precPct=totalAf>0?precipAf/totalAf*100:0;
+    const pctOfMax=totalAf/max*100;
     const s=b.src||{};
-    const total=(s.sw||0)+(s.gw||0)+(s.rec||0)+(s.desal||0)+(s.muni||0);
+    // Source bar: split irrigation withdrawal portion by source type, then add precip segment
+    const irrTotal=(s.sw||0)+(s.gw||0)+(s.rec||0)+(s.desal||0)+(s.muni||0);
     let srcBar='';
-    if(total>0){
-      if(s.sw)srcBar+='<div style="width:'+(s.sw/100*100)+'%;background:'+SC.sw+';height:100%;display:inline-block"></div>';
-      if(s.gw)srcBar+='<div style="width:'+(s.gw/100*100)+'%;background:'+SC.gw+';height:100%;display:inline-block"></div>';
-      if(s.rec)srcBar+='<div style="width:'+(s.rec/100*100)+'%;background:'+SC.rec+';height:100%;display:inline-block"></div>';
-      if(s.desal)srcBar+='<div style="width:'+(s.desal/100*100)+'%;background:'+SC.desal+';height:100%;display:inline-block"></div>';
-      if(s.muni)srcBar+='<div style="width:'+(s.muni/100*100)+'%;background:'+SC.muni+';height:100%;display:inline-block"></div>';
+    if(irrPct>0&&irrTotal>0){
+      const iW=irrPct/100; // irrigation fraction of total bar
+      if(s.sw)srcBar+='<div style="width:'+(s.sw/100*iW*100)+'%;background:'+SC.sw+';height:100%;display:inline-block" title="Surface water (irrigation)"></div>';
+      if(s.gw)srcBar+='<div style="width:'+(s.gw/100*iW*100)+'%;background:'+SC.gw+';height:100%;display:inline-block" title="Groundwater (irrigation)"></div>';
+      if(s.rec)srcBar+='<div style="width:'+(s.rec/100*iW*100)+'%;background:'+SC.rec+';height:100%;display:inline-block" title="Reclaimed (irrigation)"></div>';
+      if(s.desal)srcBar+='<div style="width:'+(s.desal/100*iW*100)+'%;background:'+SC.desal+';height:100%;display:inline-block" title="Desalinated (irrigation)"></div>';
+      if(s.muni)srcBar+='<div style="width:'+(s.muni/100*iW*100)+'%;background:'+SC.muni+';height:100%;display:inline-block" title="Municipal (irrigation)"></div>';
+    }
+    // Add precipitation segment
+    if(precPct>0){
+      srcBar+='<div style="width:'+precPct+'%;background:'+SC.precip+';height:100%;display:inline-block;opacity:0.7" title="Precipitation ('+precipAf.toFixed(2)+' AF/ac)"></div>';
     }
 
-    html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--b1);font-size:11px" title="'+(b.src&&b.src.note?b.src.note:b.notes||'')+'">' +
-      '<div style="width:230px;min-width:230px;color:var(--t2);font-size:10.5px;padding-top:2px">'+(b.name.includes('almond')||b.name.includes('CA ')||b.name.includes('Sacramento')||b.name.includes('San Joaquin')?'<span style="color:var(--te);font-size:9px;font-family:DM Mono,monospace">CA</span> ':'') + b.name+'</div>' +
-      '<div style="flex:1">' +
-        '<div style="height:17px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:3px">' +
-          '<div style="width:'+pct+'%;height:100%;border-radius:3px;background:'+b.color+';display:flex;align-items:center;padding-left:5px;font-size:9px;font-family:DM Mono,monospace;color:rgba(255,255,255,.8)">'+(pct>15?b.afPerAc+' AF/ac':'')+'</div>' +
-        '</div>' +
-        (total>0?'<div style="height:5px;border-radius:2px;overflow:hidden;display:flex">'+srcBar+'</div>':'') +
-        (b.src&&b.src.note?'<div style="font-size:9px;color:var(--t4);margin-top:2px;line-height:1.3">'+b.src.note.slice(0,90)+(b.src.note.length>90?'…':'')+'</div>':'') +
-      '</div>' +
-      '<div style="width:75px;text-align:right;font-family:DM Mono,monospace;font-size:10px;color:var(--t3);white-space:nowrap;padding-top:2px">'+b.afPerAc+' <span style="font-size:9px;color:var(--t4)">AF/ac/yr</span></div>' +
+    const noteTooltip=(b.src&&b.src.note?b.src.note:b.notes||'').replace(/"/g,'&quot;');
+    const caTag=(b.name.includes('almond')||b.name.includes('CA ')||b.name.includes('Sacramento')||b.name.includes('San Joaquin'))
+      ?'<span style="color:var(--te);font-size:8.5px;font-family:DM Mono,monospace;margin-right:3px">CA</span>':'';
+    const hpTag=(b.id&&b.id.startsWith('ag-hp-'))
+      ?'<span style="color:var(--te);font-size:8px;font-family:DM Mono,monospace;opacity:.7;margin-right:3px">HP</span>':'';
+
+    // Dual label: irrigation bar value + total line
+    const irrBarPct=b.afPerAc/max*100;
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--b1)" title="'+noteTooltip+'">'+
+      '<div style="width:200px;min-width:200px;color:var(--t2);font-size:10.5px;line-height:1.3">'+caTag+hpTag+b.name+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        // Main bar: shows irrigation only, scaled to max total
+        '<div style="height:16px;background:var(--b1);border-radius:3px;overflow:hidden;position:relative;margin-bottom:2px">'+
+          // Precipitation extent (lighter, behind)
+          (precipAf>0?'<div style="width:'+pctOfMax+'%;height:100%;background:#2a2a4a;border-radius:3px;position:absolute;top:0;left:0"></div>':'')+
+          // Irrigation bar (on top)
+          '<div style="width:'+irrBarPct+'%;height:100%;background:'+b.color+';border-radius:3px;position:absolute;top:0;left:0;opacity:0.9"></div>'+
+          // Value label
+          (irrBarPct>18?'<span style="position:absolute;left:'+Math.min(irrBarPct-1,95)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:4px;font-size:8px;font-family:DM Mono,monospace;color:rgba(255,255,255,.9);white-space:nowrap;pointer-events:none">'+b.afPerAc+' irr</span>':'')+
+          // Precip label at end of total bar
+          (precipAf>0&&pctOfMax>irrBarPct+8?'<span style="position:absolute;left:'+Math.min(pctOfMax-0.5,99)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:3px;font-size:7.5px;font-family:DM Mono,monospace;color:rgba(180,180,220,.8);white-space:nowrap;pointer-events:none">+'+precipAf.toFixed(2)+' rain</span>':'')+
+        '</div>'+
+        // Source strip
+        (srcBar?'<div style="height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:1px">'+srcBar+'</div>':'')+
+      '</div>'+
+      '<div style="width:80px;min-width:80px;text-align:right;font-family:DM Mono,monospace;font-size:10px;white-space:nowrap">'+
+        (precipAf>0?
+          '<span style="color:var(--t1)">'+totalAf.toFixed(2)+'</span><span style="color:var(--t4);font-size:8px"> AF tot</span><br><span style="color:var(--t3);font-size:9px">'+b.afPerAc+' irr</span>':
+          '<span style="color:var(--t3)">'+b.afPerAc+'</span><span style="color:var(--t4);font-size:8px"> AF</span>')+
+      '</div>'+
     '</div>';
   });
 
-  document.getElementById('benchmark-chart').innerHTML='<div class="bc">'+html+'</div>' +
-    '<div class="info" style="margin-top:14px"><strong>Key finding:</strong> California almonds (3.7 AF/ac/yr, ~60% groundwater) and Google The Dalles (7.02 AF/ac/yr, 100% surface water) bracket the upper end of agricultural and industrial water intensity. The Dalles withdraws more per acre than any crop in this dataset except semiconductor fabs. Southwest golf courses, required to use reclaimed water in most jurisdictions, now rival almond orchards in intensity while drawing on a non-potable source. Dense urban residential land (0.6 AF/ac, mostly surface water via aqueduct) is the most efficient land use in this dataset by far. The colored bars below each entry show estimated water source mix: blue=surface, green=groundwater, teal=reclaimed, purple=desalinated.</div>';
+  document.getElementById('benchmark-chart').innerHTML='<div class="bc">'+html+'</div>'+
+    '<div class="info" style="margin-top:14px">'+
+    '<strong>How to read this chart:</strong> For agriculture and outdoor recreation, bars show TOTAL water on the land (darker colored segment = irrigation withdrawal; dark blue extension = precipitation contribution). The right column shows total AF/ac and irrigation-only AF/ac. The source strip below each bar shows the proportional mix. '+
+    'Key insight: A Northeast golf course (0.8 AF/ac irrigation) and a Southwest golf course (4.0 AF/ac irrigation) receive nearly identical <em>total</em> water — ~4.6 AF/ac — but the Northeast course gets 83% from rainfall while the Southwest course gets only 14%. '+
+    'HP winter wheat (0.75 AF/ac irrigation) gets 65% of its water from Great Plains precipitation. '+
+    'Data centers (no precipitation segment) show raw withdrawal intensity for comparison.'+
+    '</div>';
 }
+
 
 // ════════════════ COMPARE ════════════════
 function buildCompareSelects(){
@@ -784,7 +834,6 @@ function renderCompare(){
       </div>`;
     }
   });
-  // Bars
   const aVal=getAFpa(a)||0,bVal=getAFpa(b)||0;
   const fields=a&&a._t==='f'&&b&&b._t==='f'?[
     {label:'AF/ac/yr',av:aVal,bv:bVal,color:'#e8a032'},
@@ -793,16 +842,16 @@ function renderCompare(){
     {label:'Precip (in/yr)',av:a.precip||0,bv:b.precip||0,color:'#9d72e8'},
   ]:[{label:'Water intensity (AF/ac/yr)',av:aVal,bv:bVal,color:'#e8a032'}];
   const an=a?a.name||'A':'A',bn=b?b.name||'B':'B';
-  document.getElementById('compare-bars').innerHTML=`<div class="bc">
-    ${fields.map(row=>{
+  document.getElementById('compare-bars').innerHTML='<div class="bc">'+
+    fields.map(row=>{
       const mx=Math.max(row.av,row.bv,0.01);
       return`<div style="margin-bottom:12px">
         <div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">${row.label}</div>
         <div class="br"><div class="bn" style="width:170px;min-width:170px">${an.slice(0,22)}</div><div class="bw"><div class="bb" style="width:${row.av/mx*100}%;background:${row.color}">${row.av>0?row.av:''}</div></div><div class="bv">${row.av||'—'}</div></div>
         <div class="br"><div class="bn" style="width:170px;min-width:170px">${bn.slice(0,22)}</div><div class="bw"><div class="bb" style="width:${row.bv/mx*100}%;background:${row.color}90">${row.bv>0?row.bv:''}</div></div><div class="bv">${row.bv||'—'}</div></div>
       </div>`;
-    }).join('')}
-  </div>`;
+    }).join('')+
+  '</div>';
 }
 
 // ════════════════ DENSITY MAP ════════════════
@@ -812,15 +861,13 @@ function buildDensityMap(){
   function q(d){if(d<15)return 0;if(d<100)return 1;if(d<500)return 2;if(d<2000)return 3;return 4;}
   const qC=['#182030','#1e3a5a','#1a5080','#1080c0','#30b0e8'];
   const qL=['Q1 Rural <15','Q2 Semi-rural 15-100','Q3 Low suburban 100-500','Q4 Med urban 500-2k','Q5 Dense urban >2k'];
-  // Approximate US state grid layout [col, row, abbr]
   const grid=[[0,6,'WA'],[0,7,'OR'],[0,8,'CA'],[1,6,'ID'],[1,7,'NV'],[1,8,'AZ'],[2,5,'MT'],[2,6,'WY'],[2,7,'UT'],[2,8,'NM'],[3,5,'ND'],[3,6,'SD'],[3,7,'NE'],[3,8,'KS'],[3,9,'OK'],[3,10,'TX'],[4,4,'MN'],[4,5,'WI'],[4,6,'IA'],[4,7,'MO'],[4,8,'AR'],[4,9,'LA'],[5,4,'MI'],[5,5,'IL'],[5,6,'IN'],[5,7,'KY'],[5,8,'TN'],[5,9,'MS'],[5,10,'AL'],[6,4,'OH'],[6,5,'WV'],[6,6,'VA'],[6,7,'NC'],[6,8,'SC'],[6,9,'GA'],[6,10,'FL'],[7,3,'PA'],[7,4,'MD'],[7,5,'DE'],[7,6,'NJ'],[8,2,'NY'],[8,3,'CT'],[8,4,'RI'],[9,1,'MA'],[9,2,'VT'],[9,3,'NH'],[9,4,'ME'],[0,10,'HI'],[0,0,'AK']];
   const CW=58,CH=38,G=2;
   const cols=10,rows=11;
   const W=cols*(CW+G)+G,Ht=rows*(CH+G)+G;
   let svg=`<svg viewBox="0 0 ${W} ${Ht}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">`;
   grid.forEach(([col,row,ab])=>{
-    const d=density[ab]||1;
-    const qi=q(d);
+    const d=density[ab]||1;const qi=q(d);
     const x=col*(CW+G)+G,y=row*(CH+G)+G;
     svg+=`<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="3" fill="${qC[qi]}" stroke="#080a0f" stroke-width="1"/>
       <text x="${x+CW/2}" y="${y+CH/2-4}" text-anchor="middle" dominant-baseline="middle" fill="#dde4f0" font-family="DM Mono,monospace" font-size="9.5" font-weight="500">${ab}</text>
@@ -842,244 +889,117 @@ function buildSources(){
     ['Siddik et al. 2021, ERL','Benchmark: 1.8 m3/MWh median direct water, US evap-cooled DCs','https://iopscience.iop.org/article/10.1088/1748-9326/ac14bc'],
     ['ELI (Jan 2026)','Evap ~80%, discharge ~20% for evaporative cooling','https://www.eli.org/sites/default/files/files-pdf/Data%20Centers%20and%20Water%20Fact%20Sheet%20ELI%20January%202026%20(1).pdf'],
     ['Data Center Frontier (2024)','AWS Susquehanna: $650M, 960 MW, 1,200-acre nuclear campus','https://www.datacenterfrontier.com/hyperscale/article/33038288/aws-eyes-960-mw-for-newly-acquired-nuclear-power-data-center-in-pennsylvania'],
-    ['Talen Energy SEC (2024)','AWS/Cumulus milestones, 300 MW ISA, FERC proceedings','https://www.sec.gov/Archives/edgar/data/0001622536/000162828024038388/a20240826pressreleasecumul.htm'],
     ['AirTrunk (2021-2025)','SYD1+SYD3: 450+ MW, 80% less water; PUE 1.15','https://airtrunk.com/airtrunk-opens-second-sydney-hyperscale-data-centre/'],
-    ['Markets and Markets (2024)','Google Norway (Skien): $624M, 385 MW, hydro + heat reuse','https://www.marketsandmarkets.com/Market-Reports/hyperscale-data-center-market-26026183.html'],
-    ['USGS (2015)','Irrigation water use: national avg 2.09 AF/ac; crop benchmarks','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
+    ['USGS DS-981 (2013)','Kansas irrigation water use by crop type: corn, soy, wheat application rates','https://pubs.usgs.gov/ds/0981/ds981.pdf'],
+    ['USGS SIR 2006-5069','Kansas GMD irrigation trends 1991-2005; corn 95% of water by volume in GMD3','https://pubs.usgs.gov/sir/2006/5069'],
+    ['Kenny & Juracek (2013), USGS FS-2013-3094','Irrigation trends in Kansas 1991-2011; drop nozzle center pivot dominance','https://pubs.usgs.gov/fs/2013/3094'],
+    ['Kansas Geological Survey','High Plains Aquifer: recharge ~0.5 in/yr; depletion history; economic impact','https://kgs.ku.edu/high-plains-aquifer'],
+    ['C-WIN (2024)','California almond water use: 4.7-5.5M AF/yr; 14.4% of CA agricultural demand','https://www.c-win.org/cwin-water-blog/2024/9/23/california-almond-water-usage-updated'],
+    ['Pacific Institute (2015)','Almond water requirement: 44-48 in/yr average (UC Davis/DWR)','https://pacinst.org/national-geographic-scienceblogs-the-california-drought-almonds-and-the-bigger-picture/'],
+    ['PPIC (2024)','Water use in California agriculture: perennial crop expansion, GW share by crop','https://www.ppic.org/publication/water-use-in-californias-agriculture/'],
+    ['CRS R44093 (2015)','California crop irrigation rates: alfalfa >5 AF/ac, rice 4-5, tree nuts 3-4 AF/ac','https://www.congress.gov/crs_external_products/R/PDF/R44093/R44093.4.pdf'],
+    ['USGS (2015)','National irrigation: avg 2.09 AF/ac; groundwater vs surface water by state','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
     ['USGA/GCSAA (2020)','Golf course water: national 2.08, SW 4.0, NE 0.8 AF/irrigated ac','https://www.usga.org/content/usga/home-page/course-care/green-section-record/63/issue-06/introducing-the-course-coefficient---a-water-use-benchmarking-to.html'],
     ['MOST Policy Initiative (Apr 2026)','Google fleet: 7.8B gal withdrawn, 78% evaporated (2024)','https://mostpolicyinitiative.org/science-note/data-center-water-use/'],
-    ['Brookings (Apr 2026)','Dublin 80% city electricity; Frankfurt 42%','https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/'],
-    ['technostatecraft (Feb 2025)','NWCPUD mix: 85%->46.5% hydro at The Dalles 2015-2023','https://www.technostatecraft.com/p/how-google-is-reshaping-a-small-oregon'],
-    ['CBRE Global DC Trends 2025','Atlanta 1,279 MW; Northern VA +523 MW; Frankfurt/Paris growth','https://www.cbre.com/insights/reports/global-data-center-trends-2025'],
     ['Missouri Governor (May 2026)','Google Montgomery County: $15B, air cooling, water to kitchens only','https://governor.mo.gov/press-releases/archive/missouri-secures-15-billion-investment-google-montgomery-county'],
     ['DataCenter Dynamics (May 2026)','Google KC Clay County (Project Mica): 500 ac, 700 MW, $10B tax breaks','https://www.datacenterdynamics.com/en/news/construction-begins-at-googles-second-data-center-campus-in-kansas-city-missouri/'],
-    ['DataCenter Dynamics (May 2026)','Nebius 800 MW Independence campus; dedicated gas power plant','https://www.datacenterdynamics.com/en/news/nebius-plans-800mw-data-center-campus-in-kansas-city-missouri/'],
     ['NOAA Climate Normals 1991-2020','All precipitation and climate figures','https://www.ncei.noaa.gov/access/us-climate-normals/'],
     ['en.climate-data.org','Koppen-Geiger classifications by site','https://en.climate-data.org'],
     ['US Census 2020','State population density for quintile map','https://www.census.gov'],
     ['IBM.com','Boulder: 48-hr gasoline reserve, 63% free cooling, 300k sq ft raised floor','https://www.ibm.com/support/pages/ibmtechu-ibm-storage-university-washington-dc-day-2-green-data-center'],
-    ['Microsoft Local','Quincy QWRU: adiabatic cooling, 97% potable reduction','https://local.microsoft.com/blog/partnering-with-the-city-of-quincy-to-open-washingtons-first-industrial-water-reuse-center/'],
     ['Switch PR Newswire (2017)','Citadel: 2,000 ac, 650 MW, 100% solar (179 MW owned)','https://www.prnewswire.com/news-releases/switch-tahoe-reno-now-open-largest-most-advanced-data-center-campus-in-the-world-300407648.html'],
-    ['AWWA','Residential water use benchmarks; 100 gal/person/day','https://www.awwa.org'],
-    ['Inside Climate News (Nov 2025)','DC diesel generators; Microsoft phase-out commitment by 2030','https://insideclimatenews.org/news/12112025/data-center-diesel-generators-noise-pollution/'],
-    ['Mifflin-St Jeor (1990)','BMR formula for 100 kg adult male; metabolic rate scaling','https://pubmed.ncbi.nlm.nih.gov/2305711/'],
-    ['National Academies of Sciences (2005)','Dietary Reference Intakes for Water: 3.7 L/day total water for adult males','https://www.ncbi.nlm.nih.gov/books/NBK56068/'],
-    ['ASHRAE Fundamentals Handbook','Insensible water loss (respiratory + transepidermal) at various T and RH','https://www.ashrae.org/technical-resources/ashrae-handbook'],
-    ['Dempsey et al. (2005), J Physiol','Human respiratory CO2: ~200 mL/min at rest (70 kg); scaled to 100 kg','https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1464490/'],
+    ['Mifflin-St Jeor (1990)','BMR formula for 100 kg adult male','https://pubmed.ncbi.nlm.nih.gov/2305711/'],
+    ['National Academies of Sciences (2005)','Dietary Reference Intakes for Water: 3.7 L/day for adult males','https://www.ncbi.nlm.nih.gov/books/NBK56068/'],
+    ['ASHRAE Fundamentals Handbook','Insensible water loss at various temperature and RH','https://www.ashrae.org/technical-resources/ashrae-handbook'],
     ['Patterson et al. (2021), arXiv','GPT-3 training energy: ~1,287 MWh; per-token inference scaling','https://arxiv.org/abs/2104.10350'],
-    ['Lannelongue et al. (2021), GigaScience','Green Algorithms: AI compute carbon methodology','https://doi.org/10.1093/gigascience/giab030'],
   ];
 
-  const rows = [
-    {
-      res:'Energy input',col:'#e8a032',
-      human:'333 kcal\n= 0.387 kWh food energy',
-      ai:'~0.285 kWh electrical\n(inference only)',
-      ratio:'~1:1\nremarkably similar',
-      rc:'#34c978',
-      note:'Human: 2,000 kcal/day \u00d7 4/24 hrs. AI: 285k tokens \u00d7 0.001 kWh/1k [E, \u00b11 OOM]. Energy types differ fundamentally: chemical food energy vs. electrical.'
-    },
-    {
-      res:'CO\u2082 exhaled / emitted',col:'#e05550',
-      human:'113 g CO\u2082\nexhaled (biogenic)',
-      ai:'~120 g CO\u2082\ngrid emissions (fossil)',
-      ratio:'~1:1\nbut different carbon',
-      rc:'#e8a032',
-      note:'Human: 255 mL CO\u2082/min \u00d7 240 min \u00d7 1.842 g/L (22\u00b0C density). AI: 0.285 kWh \u00d7 0.42 kg CO\u2082/kWh (US avg grid). Human CO\u2082 is biogenic (short carbon cycle); AI CO\u2082 is fossil (net atmospheric addition).'
-    },
-    {
-      res:'Water vapor exhaled / evaporated',col:'#4f86f7',
-      human:'67 mL respiratory\n+120 mL skin TEWL\n= 187 mL total vapor',
-      ai:'~513 mL\nevaporated in DC cooling',
-      ratio:'Human 0.36\u00d7\nDC evaps ~2.7\u00d7 more',
-      rc:'#e8a032',
-      note:'Human respiratory: 400 mL/day insensible \u00d7 4/24 (100 kg, 72\u00b0F/40%RH, ASHRAE). Transepidermal (TEWL): 30 mL/hr thermoneutral sedentary. AI: 0.285 kWh \u00d7 1.8 L/kWh benchmark (Siddik 2021).'
-    },
-    {
-      res:'Wastewater discharged',col:'#4f86f7',
-      human:'233 mL\nurine + fecal water\n(pro-rated 4 hrs)',
-      ai:'~185 mL\nDC blowdown\n(~27% of withdrawal)',
-      ratio:'Human 1.3\u00d7\nsimilar order',
-      rc:'#34c978',
-      note:'Human: 1,200 mL urine + 100 mL fecal water/day (NAS 2005) \u00d7 4/24 hrs. AI: total withdrawal ~698 mL; blowdown ~27% = ~185 mL returned to sewer/treatment.'
-    },
-    {
-      res:'Total water input (withdrawal)',col:'#34c978',
-      human:'667 mL\n(4.0 L/day recommended,\npro-rated)',
-      ai:'~698 mL\nwithdrawn from source',
-      ratio:'~1:1\nremarkably similar',
-      rc:'#34c978',
-      note:'Human: NAS 3.7 L/day (male); 4.0 L used for 100 kg. AI: 0.285 kWh \u00d7 1.8 L/kWh total withdrawal (evap + blowdown). Includes both consumed and returned fractions.'
-    },
-    {
-      res:'Heat output',col:'#e8a032',
-      human:'97 W average\n= 388 Wh over 4 hrs',
-      ai:'~71 W average\n= 285 Wh (server heat)',
-      ratio:'Human 1.4\u00d7\nhumans run warmer',
-      rc:'#34c978',
-      note:'Human: 2000 kcal/day \u00f7 (24 \u00d7 0.860 kcal/Wh) = 97W. Cognitive work has ~0% mechanical efficiency; virtually all food energy becomes heat. AI server: electrical input essentially all converted to heat.'
-    },
+  const rows=[
+    {res:'Energy input',col:'#e8a032',human:'333 kcal = 0.387 kWh',ai:'~0.285 kWh electrical',ratio:'~1:1',rc:'#34c978',note:'Human: 2,000 kcal/day x 4/24 hrs. AI: 285k tokens x 0.001 kWh/1k [E, ±1 OOM].'},
+    {res:'CO₂ exhaled / emitted',col:'#e05550',human:'113 g CO₂ exhaled (biogenic)',ai:'~120 g CO₂ grid emissions (fossil)',ratio:'~1:1 but different carbon',rc:'#e8a032',note:'Human: 255 mL CO₂/min x 240 min x 1.842 g/L. AI: 0.285 kWh x 0.42 kg CO₂/kWh (US avg grid). Human CO₂ is biogenic; AI CO₂ is fossil net-new.'},
+    {res:'Water vapor exhaled',col:'#4f86f7',human:'67 mL respiratory + 120 mL skin = 187 mL',ai:'~513 mL evaporated in DC cooling',ratio:'Human 0.36× (DC evaps 2.7×)',rc:'#e8a032',note:'Human: 400 mL/day insensible x 4/24 (ASHRAE, 72°F/40%RH) + 30 mL/hr TEWL. AI: 0.285 kWh x 1.8 L/kWh (Siddik 2021).'},
+    {res:'Wastewater discharged',col:'#4f86f7',human:'233 mL urine + fecal water',ai:'~185 mL DC blowdown (~27%)',ratio:'Human 1.3×',rc:'#34c978',note:'Human: 1,300 mL/day (NAS 2005) x 4/24. AI: ~27% of 698 mL withdrawal = ~185 mL blowdown.'},
+    {res:'Total water input',col:'#34c978',human:'667 mL (4.0 L/day, pro-rated)',ai:'~698 mL withdrawn from source',ratio:'~1:1',rc:'#34c978',note:'Human: NAS 3.7 L/day (male); 4.0 L for 100 kg. AI: 0.285 kWh x 1.8 L/kWh total.'},
+    {res:'Heat output',col:'#e8a032',human:'97 W avg = 388 Wh over 4 hrs',ai:'~71 W avg = 285 Wh (server heat)',ratio:'Human 1.4×',rc:'#34c978',note:'Human: 2000 kcal/day ÷ (24 x 0.860 kcal/Wh) = 97W. Cognitive work is ~0% mechanically efficient.'},
   ];
 
-  const tableRows = rows.map(r => {
-    const humanLines = r.human.split('\n');
-    const aiLines = r.ai.split('\n');
-    return '<tr style="border-bottom:1px solid var(--b1)">' +
-      '<td style="padding:8px 11px;color:'+r.col+';font-weight:500;vertical-align:top">' + r.res + '</td>' +
-      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--t1);vertical-align:top">' +
-        humanLines.map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
-      '</td>' +
-      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--t1);vertical-align:top">' +
-        aiLines.map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
-      '</td>' +
-      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:'+r.rc+';vertical-align:top">' +
-        r.ratio.split('\n').map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
-      '</td>' +
-      '<td style="padding:8px 11px;font-size:10px;color:var(--t3);vertical-align:top">' + r.note + '</td>' +
-    '</tr>';
-  }).join('');
+  const tableRows=rows.map(r=>'<tr style="border-bottom:1px solid var(--b1)">'+
+    '<td style="padding:8px 11px;color:'+r.col+';font-weight:500;vertical-align:top">'+r.res+'</td>'+
+    '<td style="padding:8px 11px;font-family:DM Mono,monospace;font-size:11px;color:var(--t1);vertical-align:top">'+r.human+'</td>'+
+    '<td style="padding:8px 11px;font-family:DM Mono,monospace;font-size:11px;color:var(--t1);vertical-align:top">'+r.ai+'</td>'+
+    '<td style="padding:8px 11px;font-family:DM Mono,monospace;font-size:11px;color:'+r.rc+';vertical-align:top">'+r.ratio+'</td>'+
+    '<td style="padding:8px 11px;font-size:10px;color:var(--t3);vertical-align:top">'+r.note+'</td>'+
+  '</tr>').join('');
 
-  const humanHTML =
-    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Session Resource Consumption Comparison<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>' +
-
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' +
-    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human (this session)</div>' +
-    '<div style="font-size:11px;color:var(--t2);line-height:1.9">' +
-    'Duration: <span style="color:var(--t1);font-weight:500">~4 hours</span> estimated engagement<br>' +
-    'Body mass: <span style="color:var(--t1);font-weight:500">100 kg adult male</span><br>' +
-    'Caloric budget: <span style="color:var(--t1);font-weight:500">2,000 kcal/day</span><br>' +
-    'Ambient: <span style="color:var(--t1);font-weight:500">72&deg;F, 40% RH</span><br>' +
-    'Activity: <span style="color:var(--t1);font-weight:500">1.2 MET</span> (seated cognitive work)' +
-    '</div></div>' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">AI session (Claude Sonnet 4.6)</div>' +
-    '<div style="font-size:11px;color:var(--t2);line-height:1.9">' +
-    'Est. tokens: <span style="color:var(--t1);font-weight:500">~285,000</span> input + output<br>' +
-    'Energy rate: <span style="color:var(--t1);font-weight:500">~0.001 kWh / 1k tokens</span> <span style="color:var(--t3);font-size:10px">[E, &plusmn;1 OOM]</span><br>' +
-    'DC water benchmark: <span style="color:var(--t1);font-weight:500">1.8 L/kWh</span> (Siddik 2021)<br>' +
-    'Grid CO&sup2;: <span style="color:var(--t1);font-weight:500">0.42 kg CO&sup2;/kWh</span> (US avg)<br>' +
-    'Confidence: <span style="color:var(--am);font-weight:500">order-of-magnitude only</span>' +
-    '</div></div></div>' +
-
-    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px">' +
-    '<table style="width:100%;border-collapse:collapse;font-size:11.5px">' +
-    '<thead><tr style="background:var(--s1)">' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Resource</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Human (4 hrs)</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">AI Session (est.)</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Ratio</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Methodology</th>' +
-    '</tr></thead><tbody>' + tableRows + '</tbody></table></div>' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">' +
-    '<strong style="color:var(--am)">The striking finding:</strong> Over ~4 hours, a 100 kg adult male and the Claude inference that served him consumed remarkably similar quantities of energy (~0.39 vs ~0.29 kWh), produced nearly identical CO\u2082 (~113 vs ~120 g), and required similar total water (~667 vs ~698 mL). The human\'s CO\u2082 is biogenic \u2014 cycling through food chains, not adding net carbon. The AI\'s CO\u2082 is from fossil combustion and is a net atmospheric addition. The DC cooling system evaporated ~2.7\u00d7 more water to atmosphere than the human did through breath and skin. The human discharged ~1.3\u00d7 more liquid wastewater. At the scale of a 400 MW data center running continuously, these ratios invert dramatically: the facility consumes the annual water budget of tens of thousands of people.<br><br>' +
-    '<strong style="color:var(--t3)">Uncertainty:</strong> AI energy per token is the most uncertain figure \u2014 \u00b11 order of magnitude is plausible. Human metabolic figures carry \u00b115% individual variation. The comparison is illustrative, not precise. The token energy estimate could be lower on modern efficient hardware or higher with long context windows and tool use overhead.' +
+  const humanHTML=
+    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">'+
+    '<div style="font-family:DM Mono,monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Session Resource Consumption Comparison<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">'+
+    '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human (this session)</div>'+
+    '<div style="font-size:11px;color:var(--t2);line-height:1.9">Duration: <strong style="color:var(--t1)">~4 hours</strong><br>Body mass: <strong style="color:var(--t1)">100 kg adult male</strong><br>Caloric budget: <strong style="color:var(--t1)">2,000 kcal/day</strong><br>Ambient: <strong style="color:var(--t1)">72°F, 40% RH</strong><br>Activity: <strong style="color:var(--t1)">1.2 MET</strong> (seated cognitive)</div></div>'+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">'+
+    '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">AI Session (Claude Sonnet 4.6)</div>'+
+    '<div style="font-size:11px;color:var(--t2);line-height:1.9">Est. tokens: <strong style="color:var(--t1)">~285,000</strong><br>Energy rate: <strong style="color:var(--t1)">~0.001 kWh/1k tokens</strong> <span style="color:var(--t3);font-size:10px">[E, ±1 OOM]</span><br>DC water: <strong style="color:var(--t1)">1.8 L/kWh</strong> (Siddik 2021)<br>Grid CO₂: <strong style="color:var(--t1)">0.42 kg/kWh</strong> US avg<br>Confidence: <span style="color:var(--am)">order-of-magnitude</span></div></div></div>'+
+    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px"><table style="width:100%;border-collapse:collapse;font-size:11.5px">'+
+    '<thead><tr style="background:var(--s1)"><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Resource</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Human (4 hrs)</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">AI Session</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Ratio</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Methodology</th></tr></thead>'+
+    '<tbody>'+tableRows+'</tbody></table></div>'+
+    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">'+
+    '<strong style="color:var(--am)">The striking finding:</strong> Over ~4 hours, a 100 kg adult male and the Claude inference that served him consumed remarkably similar quantities of energy (~0.39 vs ~0.29 kWh), produced nearly identical CO₂ (~113 vs ~120 g), and required similar total water (~667 vs ~698 mL). The human CO₂ is biogenic; the AI CO₂ is fossil net-new. The DC cooling system evaporated ~2.7× more water than the human did through breath and skin.<br><br>'+
+    '<strong style="color:var(--t3)">Uncertainty:</strong> AI energy per token is ±1 order of magnitude. Human figures carry ±15% individual variation.'+
     '</div></div>';
 
+  const laborRows=[
+    ['Literature search &amp; source identification','Identifying metered water data, utility records, sustainability reports across 55+ facilities',15,25],
+    ['Data extraction &amp; verification','Reading and tabulating from primary sources: Baxtel, OPB FOIA, SEC filings, EPA studies',20,35],
+    ['Unit conversions &amp; calculations','Spreadsheet work: AF/acre/yr, precipitation budgets, evap/discharge splits',4,8],
+    ['Benchmark research','USGS irrigation, USGA golf, AWWA residential, ELI cooling methodology, CAFO, industrial',8,12],
+    ['Köppen climate classification','Looking up code for each of 55 facility locations via NOAA / climate-data.org',3,5],
+    ['Energy grid mix research','EIA, ENTSO-E, and national TSO data for 16 countries',6,10],
+    ['Missouri &amp; Kansas facility research','News, planning records, SEC filings, state commerce announcements',4,6],
+    ['Human metabolic calculations','Mifflin-St Jeor BMR, ASHRAE water loss, CO₂ rate scaling, unit conversions',2,4],
+    ['Interactive application development','HTML/CSS/JS: sortable table, modals, D3 Sankey, donut charts, compare tool, density map <em>(would require hiring a frontend developer)</em>',40,80],
+    ['Iteration &amp; revision','12+ rounds of feature additions, UI changes, bug fixes, GitHub deployment',10,20],
+    ['Methodology document','Technical writing: confidence tiers, formula documentation, reproducibility guide',4,8],
+  ];
 
-  const laborHTML =
-    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Research & Development Labor Analysis<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>' +
+  const laborTableRows=laborRows.map(r=>'<tr style="border-bottom:1px solid var(--b1)">'+
+    '<td style="padding:8px 11px;color:var(--t1);font-weight:500;vertical-align:top">'+r[0]+'</td>'+
+    '<td style="padding:8px 11px;color:var(--t2);font-size:10.5px;vertical-align:top">'+r[1]+'</td>'+
+    '<td style="padding:8px 11px;font-family:DM Mono,monospace;font-size:11px;color:var(--am);text-align:right;vertical-align:top;white-space:nowrap">'+r[2]+'–'+r[3]+' hrs</td>'+
+  '</tr>').join('');
 
-    '<div style="font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:16px">' +
-    'Estimated equivalent labor for a skilled non-developer researcher (research analyst / data journalist level; comfortable with spreadsheets and basic web tools; no software engineering background) to independently produce this report.' +
-    '</div>' +
+  const laborHTML=
+    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">'+
+    '<div style="font-family:DM Mono,monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Research & Development Labor Analysis<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>'+
+    '<div style="font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:16px">Estimated equivalent labor for a skilled non-developer researcher to independently produce this report.</div>'+
+    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px"><table style="width:100%;border-collapse:collapse;font-size:11.5px">'+
+    '<thead><tr style="background:var(--s1)"><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1);min-width:160px">Task</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Manual equivalent</th><th style="font-family:DM Mono,monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:right;border-bottom:1px solid var(--b1)">Est. hrs</th></tr></thead>'+
+    '<tbody>'+laborTableRows+
+    '<tr style="background:var(--s1)"><td style="padding:9px 11px;font-weight:600;color:var(--t1)" colspan="2">Total estimated manual labor</td><td style="padding:9px 11px;font-family:DM Mono,monospace;font-size:12px;font-weight:600;color:var(--am);text-align:right">116–213 hours</td></tr>'+
+    '<tr style="background:var(--s1)"><td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Equivalent calendar time (full-time researcher)</td><td style="padding:6px 11px;font-family:DM Mono,monospace;font-size:10.5px;color:var(--t3);text-align:right">3–5 weeks</td></tr>'+
+    '<tr style="background:var(--s1)"><td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Estimated cost at $70–90/hr (research analyst rate)</td><td style="padding:6px 11px;font-family:DM Mono,monospace;font-size:10.5px;color:var(--t3);text-align:right">$8,000–$18,000</td></tr>'+
+    '</tbody></table></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px"><div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">This AI session cost</div><div style="font-size:20px;font-weight:600;color:var(--t1)">~$2.35</div><div style="font-size:10px;color:var(--t3)">API-equivalent compute</div><div style="font-size:11px;color:var(--t2);margin-top:8px">+ ~4 hrs of your time directing</div></div>'+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px"><div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human-hours saved</div><div style="font-size:20px;font-weight:600;color:var(--g)">~112–209</div><div style="font-size:10px;color:var(--t3)">vs. manual equivalent</div></div>'+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px"><div style="font-family:DM Mono,monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Leverage ratio</div><div style="font-size:20px;font-weight:600;color:var(--ac)">30–50×</div><div style="font-size:10px;color:var(--t3)">human-hours saved per AI-hour</div></div>'+
+    '</div>'+
+    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">'+
+    '<strong style="color:var(--am)">Caveats:</strong> The software development component would realistically require hiring a frontend developer. Manual research over 3–5 weeks might exceed AI quality in one key respect: a patient researcher could file FOIA requests to obtain metered utility records for facilities currently marked [E] or [U], converting estimates into verified figures.'+
+    '</div></div>';
 
-    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px">' +
-    '<table style="width:100%;border-collapse:collapse;font-size:11.5px">' +
-    '<thead><tr style="background:var(--s1)">' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1);min-width:200px">Task</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Manual equivalent</th>' +
-    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:right;border-bottom:1px solid var(--b1);white-space:nowrap">Est. hours</th>' +
-    '</tr></thead><tbody>' +
-
-    [
-      ['Literature search &amp; source identification','Identifying metered water data, utility records, sustainability reports across 55+ facilities from academic, government, and industry sources. Contacting utilities for FOIA/open records requests.',15,25],
-      ['Data extraction &amp; verification','Reading and tabulating from primary sources: Baxtel, DataCenterDynamics, OPB FOIA data, SEC filings, EPA case studies, operator annual reports. Cross-referencing for consistency.',20,35],
-      ['Unit conversions &amp; calculations','Spreadsheet work: AF/acre/yr, site precipitation budgets, evap/discharge splits across 55 facilities. Benchmark cross-comparisons. Formula verification.',4,8],
-      ['Benchmark research','Literature review across 8 domains: USGS irrigation, USGA golf, AWWA residential quintiles, ELI/EESI cooling methodology, CAFO, industrial water intensity.',8,12],
-      ['Köppen climate classification','Looking up Köppen code for each of 55 facility locations individually via NOAA / climate-data.org. Verifying against regional climate literature.',3,5],
-      ['Energy grid mix research','EIA, ENTSO-E, and national TSO data for 16 countries / 15+ grid operators. Distinguishing physical mix from REC-matched claims.',6,10],
-      ['Missouri &amp; Kansas facility research','Recent news monitoring, local planning records, SEC filings (Talen/AWS), state commerce department announcements, city council minutes.',4,6],
-      ['Human metabolic calculations','Physiology literature: Mifflin-St Jeor BMR, ASHRAE insensible loss tables, respiratory CO₂ rate scaling, NAS dietary water intakes. Unit conversions and verification.',2,4],
-      ['Interactive application development','HTML/CSS/JavaScript: sortable table, modal drill-downs, D3.js Sankey diagrams, donut energy charts, benchmark bar chart, side-by-side compare tool, US density choropleth map, sidebar navigation. <em>This task alone would likely require hiring a frontend developer.</em>',40,80],
-      ['Iteration &amp; revision','12+ rounds of feature additions, UI changes, bug fixes, data corrections, GitHub deployment. Testing across devices.',10,20],
-      ['Methodology document','Technical writing: confidence tier definitions, formula documentation, reproducibility guide, limitations, peer review instructions.',4,8],
-    ].map(function(r){
-      return '<tr style="border-bottom:1px solid var(--b1)">' +
-        '<td style="padding:8px 11px;color:var(--t1);font-weight:500;vertical-align:top">' + r[0] + '</td>' +
-        '<td style="padding:8px 11px;color:var(--t2);font-size:10.5px;vertical-align:top">' + r[1] + '</td>' +
-        '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--am);text-align:right;vertical-align:top;white-space:nowrap">' + r[2] + '\u2013' + r[3] + ' hrs</td>' +
-      '</tr>';
-    }).join('') +
-
-    '<tr style="background:var(--s1)">' +
-    '<td style="padding:9px 11px;font-weight:600;color:var(--t1)" colspan="2">Total estimated manual labor</td>' +
-    '<td style="padding:9px 11px;font-family:\'DM Mono\',monospace;font-size:12px;font-weight:600;color:var(--am);text-align:right;white-space:nowrap">116\u2013213 hours</td>' +
-    '</tr>' +
-    '<tr style="background:var(--s1)">' +
-    '<td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Equivalent calendar time (full-time researcher)</td>' +
-    '<td style="padding:6px 11px;font-family:\'DM Mono\',monospace;font-size:10.5px;color:var(--t3);text-align:right;white-space:nowrap">3\u20135 weeks</td>' +
-    '</tr>' +
-    '<tr style="background:var(--s1)">' +
-    '<td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Estimated cost at $70\u201390/hr (research analyst / data journalist rate)</td>' +
-    '<td style="padding:6px 11px;font-family:\'DM Mono\',monospace;font-size:10.5px;color:var(--t3);text-align:right;white-space:nowrap">$8,000\u2013$18,000</td>' +
-    '</tr>' +
-    '</tbody></table></div>' +
-
-    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">This AI session cost</div>' +
-    '<div style="font-size:20px;font-weight:600;color:var(--t1);line-height:1">~$2.35</div>' +
-    '<div style="font-size:10px;color:var(--t3);margin-top:3px">API-equivalent compute</div>' +
-    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">+ ~4 hrs of your time<br>directing and reviewing</div>' +
-    '</div>' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human-hours saved</div>' +
-    '<div style="font-size:20px;font-weight:600;color:var(--g);line-height:1">~112\u2013209</div>' +
-    '<div style="font-size:10px;color:var(--t3);margin-top:3px">hours vs. manual equivalent</div>' +
-    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">4 hrs of direction<br>vs. 116\u2013213 hrs manual</div>' +
-    '</div>' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
-    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Leverage ratio</div>' +
-    '<div style="font-size:20px;font-weight:600;color:var(--ac);line-height:1">30\u201350\u00d7</div>' +
-    '<div style="font-size:10px;color:var(--t3);margin-top:3px">human-hours saved per AI-hour</div>' +
-    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">Most striking single<br>metric in this report</div>' +
-    '</div>' +
-
-    '</div>' +
-
-    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">' +
-    '<strong style="color:var(--am)">Important caveats on the comparison:</strong> ' +
-    'The software development task (interactive application, Sankey diagrams, choropleth map) is the dominant cost driver and would realistically require hiring a frontend developer rather than being within scope for a non-developer researcher. Without the application, the underlying data as a spreadsheet and written report would take roughly 60\u201380 hours of manual research. ' +
-    'Manual research done over 3\u20135 weeks, with time to verify sources and file FOIA requests, would likely <em>exceed</em> the quality of these estimates in at least one important respect: a patient researcher might obtain actual metered utility records for facilities currently marked [E] or [U], converting estimates into verified figures. ' +
-    'The AI session prioritized breadth and speed; a human researcher would likely achieve greater depth on fewer facilities. Both approaches are complementary.' +
-    '</div>' +
-
-    '</div>';
-
-  document.getElementById('sources-content').innerHTML = humanHTML + laborHTML +
-
-    '<div class="sg">' +
-    srcs.map(function(s){
-      return '<div class="si"><div class="sn">\u2192</div><div><a class="sl" href="'+s[2]+'" target="_blank">'+s[0]+'</a><div style="font-size:10px;color:var(--t3);margin-top:1px">'+s[1]+'</div></div></div>';
-    }).join('') +
-    '</div>' +
-    '<div class="disc">' +
-    '<strong>DC water estimation:</strong> [E] figures use W(AF/yr) = MW \u00d7 1000 \u00d7 8760 \u00d7 1.8 \u00f7 264.172 \u00f7 325851. Evaporative cooling only. Air-cooled, seawater, closed-loop = [U]. \u00b140\u201360% uncertainty.<br><br>' +
-    '<strong>Human metabolic sources:</strong> BMR via Mifflin-St Jeor (1990) for 100 kg male. CO\u2082 at 1.2 MET: 255 mL/min (Dempsey et al. 2005, scaled from 70 kg). Respiratory insensible water: 400 mL/day (ASHRAE, 72\u00b0F/40%RH). Transepidermal water loss (TEWL): 30 mL/hr thermoneutral sedentary. Wastewater: 1,300 mL/day urine+fecal (NAS 2005). Intake: 4.0 L/day (NAS 3.7 L for standard male, scaled for 100 kg).<br><br>' +
-    '<strong>AI token energy:</strong> ~0.001 kWh/1k tokens is a rough central estimate from Lannelongue et al. (2021) Green Algorithms and Patterson et al. (2021). Actual Anthropic infrastructure efficiency is not publicly disclosed. Treat as \u00b11 order of magnitude.<br><br>' +
-    '<strong>Energy mix:</strong> Physical generation mix from grid operator data, not PPA-matched renewable claims. The Dalles illustrates this gap (NWCPUD 85%\u219246% hydro as Google demand outpaced BPA allocation).' +
+  document.getElementById('sources-content').innerHTML=humanHTML+laborHTML+
+    '<div class="sg">'+
+    srcs.map(s=>'<div class="si"><div class="sn">\u2192</div><div><a class="sl" href="'+s[2]+'" target="_blank">'+s[0]+'</a><div style="font-size:10px;color:var(--t3);margin-top:1px">'+s[1]+'</div></div></div>').join('')+
+    '</div>'+
+    '<div class="disc">'+
+    '<strong>DC water estimation:</strong> [E] figures use W(AF/yr) = MW × 1000 × 8760 × 1.8 ÷ 264.172 ÷ 325851. Evaporative cooling only. Air-cooled, seawater, closed-loop = [U]. ±40–60% uncertainty.<br><br>'+
+    '<strong>Human metabolic:</strong> BMR via Mifflin-St Jeor (1990) for 100 kg male. CO₂ at 1.2 MET: 255 mL/min (Dempsey et al. 2005). Respiratory water: 400 mL/day (ASHRAE, 72°F/40%RH). TEWL: 30 mL/hr. Wastewater: 1,300 mL/day (NAS 2005). Intake: 4.0 L/day.<br><br>'+
+    '<strong>AI token energy:</strong> ~0.001 kWh/1k tokens is a rough central estimate. Actual Anthropic infrastructure efficiency not publicly disclosed. ±1 order of magnitude.<br><br>'+
+    '<strong>Energy mix:</strong> Physical generation mix from grid operator data, not PPA-matched renewable claims.'+
     '</div>';
 }
-
-
 
 // ════════════════ PANEL / INIT ════════════════
 function showPanel(id){
