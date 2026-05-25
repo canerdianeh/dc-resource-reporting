@@ -934,7 +934,93 @@ function buildSources(){
     '<strong style="color:var(--t3)">Uncertainty:</strong> AI energy per token is the most uncertain figure \u2014 \u00b11 order of magnitude is plausible. Human metabolic figures carry \u00b115% individual variation. The comparison is illustrative, not precise. The token energy estimate could be lower on modern efficient hardware or higher with long context windows and tool use overhead.' +
     '</div></div>';
 
-  document.getElementById('sources-content').innerHTML = humanHTML +
+
+  const laborHTML =
+    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Research & Development Labor Analysis<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>' +
+
+    '<div style="font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:16px">' +
+    'Estimated equivalent labor for a skilled non-developer researcher (research analyst / data journalist level; comfortable with spreadsheets and basic web tools; no software engineering background) to independently produce this report.' +
+    '</div>' +
+
+    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11.5px">' +
+    '<thead><tr style="background:var(--s1)">' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1);min-width:200px">Task</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Manual equivalent</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:right;border-bottom:1px solid var(--b1);white-space:nowrap">Est. hours</th>' +
+    '</tr></thead><tbody>' +
+
+    [
+      ['Literature search &amp; source identification','Identifying metered water data, utility records, sustainability reports across 55+ facilities from academic, government, and industry sources. Contacting utilities for FOIA/open records requests.',15,25],
+      ['Data extraction &amp; verification','Reading and tabulating from primary sources: Baxtel, DataCenterDynamics, OPB FOIA data, SEC filings, EPA case studies, operator annual reports. Cross-referencing for consistency.',20,35],
+      ['Unit conversions &amp; calculations','Spreadsheet work: AF/acre/yr, site precipitation budgets, evap/discharge splits across 55 facilities. Benchmark cross-comparisons. Formula verification.',4,8],
+      ['Benchmark research','Literature review across 8 domains: USGS irrigation, USGA golf, AWWA residential quintiles, ELI/EESI cooling methodology, CAFO, industrial water intensity.',8,12],
+      ['Köppen climate classification','Looking up Köppen code for each of 55 facility locations individually via NOAA / climate-data.org. Verifying against regional climate literature.',3,5],
+      ['Energy grid mix research','EIA, ENTSO-E, and national TSO data for 16 countries / 15+ grid operators. Distinguishing physical mix from REC-matched claims.',6,10],
+      ['Missouri &amp; Kansas facility research','Recent news monitoring, local planning records, SEC filings (Talen/AWS), state commerce department announcements, city council minutes.',4,6],
+      ['Human metabolic calculations','Physiology literature: Mifflin-St Jeor BMR, ASHRAE insensible loss tables, respiratory CO₂ rate scaling, NAS dietary water intakes. Unit conversions and verification.',2,4],
+      ['Interactive application development','HTML/CSS/JavaScript: sortable table, modal drill-downs, D3.js Sankey diagrams, donut energy charts, benchmark bar chart, side-by-side compare tool, US density choropleth map, sidebar navigation. <em>This task alone would likely require hiring a frontend developer.</em>',40,80],
+      ['Iteration &amp; revision','12+ rounds of feature additions, UI changes, bug fixes, data corrections, GitHub deployment. Testing across devices.',10,20],
+      ['Methodology document','Technical writing: confidence tier definitions, formula documentation, reproducibility guide, limitations, peer review instructions.',4,8],
+    ].map(function(r){
+      return '<tr style="border-bottom:1px solid var(--b1)">' +
+        '<td style="padding:8px 11px;color:var(--t1);font-weight:500;vertical-align:top">' + r[0] + '</td>' +
+        '<td style="padding:8px 11px;color:var(--t2);font-size:10.5px;vertical-align:top">' + r[1] + '</td>' +
+        '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--am);text-align:right;vertical-align:top;white-space:nowrap">' + r[2] + '\u2013' + r[3] + ' hrs</td>' +
+      '</tr>';
+    }).join('') +
+
+    '<tr style="background:var(--s1)">' +
+    '<td style="padding:9px 11px;font-weight:600;color:var(--t1)" colspan="2">Total estimated manual labor</td>' +
+    '<td style="padding:9px 11px;font-family:\'DM Mono\',monospace;font-size:12px;font-weight:600;color:var(--am);text-align:right;white-space:nowrap">116\u2013213 hours</td>' +
+    '</tr>' +
+    '<tr style="background:var(--s1)">' +
+    '<td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Equivalent calendar time (full-time researcher)</td>' +
+    '<td style="padding:6px 11px;font-family:\'DM Mono\',monospace;font-size:10.5px;color:var(--t3);text-align:right;white-space:nowrap">3\u20135 weeks</td>' +
+    '</tr>' +
+    '<tr style="background:var(--s1)">' +
+    '<td style="padding:6px 11px;color:var(--t3);font-size:10.5px" colspan="2">Estimated cost at $70\u201390/hr (research analyst / data journalist rate)</td>' +
+    '<td style="padding:6px 11px;font-family:\'DM Mono\',monospace;font-size:10.5px;color:var(--t3);text-align:right;white-space:nowrap">$8,000\u2013$18,000</td>' +
+    '</tr>' +
+    '</tbody></table></div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">This AI session cost</div>' +
+    '<div style="font-size:20px;font-weight:600;color:var(--t1);line-height:1">~$2.35</div>' +
+    '<div style="font-size:10px;color:var(--t3);margin-top:3px">API-equivalent compute</div>' +
+    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">+ ~4 hrs of your time<br>directing and reviewing</div>' +
+    '</div>' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human-hours saved</div>' +
+    '<div style="font-size:20px;font-weight:600;color:var(--g);line-height:1">~112\u2013209</div>' +
+    '<div style="font-size:10px;color:var(--t3);margin-top:3px">hours vs. manual equivalent</div>' +
+    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">4 hrs of direction<br>vs. 116\u2013213 hrs manual</div>' +
+    '</div>' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:11px 13px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Leverage ratio</div>' +
+    '<div style="font-size:20px;font-weight:600;color:var(--ac);line-height:1">30\u201350\u00d7</div>' +
+    '<div style="font-size:10px;color:var(--t3);margin-top:3px">human-hours saved per AI-hour</div>' +
+    '<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6">Most striking single<br>metric in this report</div>' +
+    '</div>' +
+
+    '</div>' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">' +
+    '<strong style="color:var(--am)">Important caveats on the comparison:</strong> ' +
+    'The software development task (interactive application, Sankey diagrams, choropleth map) is the dominant cost driver and would realistically require hiring a frontend developer rather than being within scope for a non-developer researcher. Without the application, the underlying data as a spreadsheet and written report would take roughly 60\u201380 hours of manual research. ' +
+    'Manual research done over 3\u20135 weeks, with time to verify sources and file FOIA requests, would likely <em>exceed</em> the quality of these estimates in at least one important respect: a patient researcher might obtain actual metered utility records for facilities currently marked [E] or [U], converting estimates into verified figures. ' +
+    'The AI session prioritized breadth and speed; a human researcher would likely achieve greater depth on fewer facilities. Both approaches are complementary.' +
+    '</div>' +
+
+    '</div>';
+
+  document.getElementById('sources-content').innerHTML = humanHTML + laborHTML +
+
     '<div class="sg">' +
     srcs.map(function(s){
       return '<div class="si"><div class="sn">\u2192</div><div><a class="sl" href="'+s[2]+'" target="_blank">'+s[0]+'</a><div style="font-size:10px;color:var(--t3);margin-top:1px">'+s[1]+'</div></div></div>';
