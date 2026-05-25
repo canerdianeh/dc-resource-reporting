@@ -809,7 +809,7 @@ function buildBenchmarkChart(){
     'recreation':'Recreation — bars show TOTAL water: irrigation + annual precipitation on turf',
     'residential':'Residential (US) — municipal/well withdrawal only',
   };
-  const SC={sw:'#2080d0',gw:'#60a830',rec:'#30b870',desal:'#9060c0',muni:'#8080c0',precip:'#4040c0'};
+  const SC={sw:'#2080d0',gw:'#60a830',rec:'#30b870',desal:'#9060c0',muni:'#8080c0',precip:'#7ec8e3'};
   const SL={sw:'Surface water',gw:'Groundwater',rec:'Reclaimed/reuse',desal:'Desalinated',muni:'Municipal',precip:'Precipitation'};
 
   let html='',lastCat='',lastHPShown=false;
@@ -848,7 +848,7 @@ function buildBenchmarkChart(){
     }
     // Add precipitation segment
     if(precPct>0){
-      srcBar+='<div style="width:'+precPct+'%;background:'+SC.precip+';height:100%;display:inline-block;opacity:0.7" title="Precipitation ('+precipAf.toFixed(2)+' AF/ac)"></div>';
+      srcBar+='<div style="width:'+precPct+'%;background:'+SC.precip+';height:100%;display:inline-block" title="Precipitation ('+precipAf.toFixed(2)+' AF/ac)"></div>';
     }
 
     const noteTooltip=(b.src&&b.src.note?b.src.note:b.notes||'').replace(/"/g,'&quot;');
@@ -865,7 +865,7 @@ function buildBenchmarkChart(){
         // Main bar: shows irrigation only, scaled to max total
         '<div style="height:16px;background:var(--b1);border-radius:3px;overflow:hidden;position:relative;margin-bottom:2px">'+
           // Precipitation extent (lighter, behind)
-          (precipAf>0?'<div style="width:'+pctOfMax+'%;height:100%;background:#2a2a4a;border-radius:3px;position:absolute;top:0;left:0"></div>':'')+
+          (precipAf>0?'<div style="width:'+pctOfMax+'%;height:100%;background:#1a4a5a;border-radius:3px;position:absolute;top:0;left:0"></div>':'')+
           // Irrigation bar (on top)
           '<div style="width:'+irrBarPct+'%;height:100%;background:'+b.color+';border-radius:3px;position:absolute;top:0;left:0;opacity:0.9"></div>'+
           // Value label
