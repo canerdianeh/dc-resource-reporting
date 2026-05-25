@@ -3,290 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Data Center & Land Use Water Report</title>
+<title>Global Data Center Water & Infrastructure Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080a0f;--s1:#0d1018;--s2:#111520;--s3:#161c2a;
-  --b1:#1e2535;--b2:#252d40;--b3:#2e3850;
+  --b1:#1e2535;--b2:#252d40;
   --t1:#dde4f0;--t2:#8a96b0;--t3:#4a5570;--t4:#2a3048;
-  --ac:#4f86f7;--ac2:#2a4a8a;
+  --ac:#4f86f7;--ac2:#1e2d55;
   --g:#34c978;--g2:#1a5535;
-  --am:#e8a032;--am2:#5a3a10;
-  --rd:#e05550;--rd2:#5a1a18;
-  --pu:#a070e8;--pu2:#3a2060;
-  --te:#30c8c8;--te2:#104040;
-  --yw:#e8d032;--yw2:#4a3a08;
+  --am:#e8a032;--am2:#3d2e10;
+  --rd:#e05550;--rd2:#3d1e1a;
+  --pu:#a070e8;--pu2:#2d2048;
+  --te:#30c8c8;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px;background:var(--bg);color:var(--t1);scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;min-height:100vh}
-a{color:var(--ac);text-decoration:none}
-a:hover{text-decoration:underline}
 
 /* LAYOUT */
 .shell{display:flex;min-height:100vh}
-.sidebar{width:260px;min-width:260px;background:var(--s1);border-right:1px solid var(--b1);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;display:flex;flex-direction:column}
-.main{margin-left:260px;flex:1;min-height:100vh;display:flex;flex-direction:column}
-.topbar{background:var(--s1);border-bottom:1px solid var(--b1);padding:14px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sidebar{width:250px;min-width:250px;background:var(--s1);border-right:1px solid var(--b1);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;display:flex;flex-direction:column}
+.main{margin-left:250px;flex:1}
+.topbar{background:var(--s1);border-bottom:1px solid var(--b1);padding:12px 24px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
 /* SIDEBAR */
-.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--b1)}
-.sb-logo-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ac);letter-spacing:.1em;text-transform:uppercase}
-.sb-logo-sub{font-size:10px;color:var(--t3);margin-top:3px}
-.sb-section{padding:10px 14px 4px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
-.sb-item{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:11.5px;color:var(--t2);cursor:pointer;border-left:2px solid transparent;transition:all .15s}
+.sb-logo{padding:18px 16px 12px;border-bottom:1px solid var(--b1)}
+.sb-logo-t{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ac);letter-spacing:.1em;text-transform:uppercase}
+.sb-logo-s{font-size:10px;color:var(--t3);margin-top:2px}
+.sb-sec{padding:9px 14px 3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.sb-item{display:flex;align-items:center;gap:8px;padding:5px 14px;font-size:11px;color:var(--t2);cursor:pointer;border-left:2px solid transparent;transition:all .12s}
 .sb-item:hover{background:var(--s2);color:var(--t1);border-left-color:var(--b2)}
 .sb-item.active{background:var(--s2);color:var(--ac);border-left-color:var(--ac)}
 .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.sb-search{padding:10px 14px}
-.sb-search input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:6px 10px;color:var(--t1);font-family:'DM Mono',monospace;font-size:11px;outline:none}
+.sb-search{padding:8px 14px}
+.sb-search input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:5px 9px;color:var(--t1);font-family:'DM Mono',monospace;font-size:10.5px;outline:none}
 .sb-search input:focus{border-color:var(--ac)}
 .sb-search input::placeholder{color:var(--t3)}
-.sb-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);padding:0 14px 8px;letter-spacing:.05em}
+.sb-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);padding:0 14px 6px}
 
 /* TOPBAR */
-.topbar-title{font-size:15px;font-weight:600;color:var(--t1);flex:1}
-.topbar-tabs{display:flex;gap:2px;flex-wrap:wrap}
-.ttab{font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border:1px solid var(--b1);border-radius:3px;background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
-.ttab:hover{background:var(--s2);color:var(--t1)}
-.ttab.active{background:var(--ac2);color:var(--ac);border-color:var(--ac)}
+.tb-title{font-size:14px;font-weight:600;color:var(--t1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{font-family:'DM Mono',monospace;font-size:10px;padding:5px 11px;border:1px solid var(--b1);border-radius:3px;background:none;color:var(--t2);cursor:pointer;transition:all .12s;white-space:nowrap}
+.tab:hover{background:var(--s2);color:var(--t1)}
+.tab.active{background:var(--ac2);color:var(--ac);border-color:var(--ac)}
 
-/* CONTENT PANELS */
-.panel{display:none;padding:24px 28px 80px;animation:fadeIn .2s ease}
+/* PANELS */
+.panel{display:none;padding:20px 24px 80px;animation:fi .18s ease}
 .panel.visible{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 
-/* TYPOGRAPHY */
-.page-h1{font-size:22px;font-weight:600;color:var(--t1);margin-bottom:6px}
-.page-sub{font-size:12px;color:var(--t2);margin-bottom:22px;line-height:1.6;max-width:700px}
-.sec-h{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.sec-h::after{content:'';flex:1;height:1px;background:var(--b1)}
-.info{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:12px 16px;font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:18px}
+/* TYPE */
+.ph1{font-size:20px;font-weight:600;color:var(--t1);margin-bottom:5px}
+.psub{font-size:11.5px;color:var(--t2);margin-bottom:18px;line-height:1.6;max-width:700px}
+.sh{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.sh::after{content:'';flex:1;height:1px;background:var(--b1)}
+.info{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:11px 15px;font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:16px}
 .info strong{color:var(--t1)}
 
-/* STAT CARDS */
-.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
-.stat{background:var(--s1);border:1px solid var(--b1);border-radius:5px;padding:12px 14px}
-.stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.06em;margin-bottom:4px}
-.stat-val{font-size:20px;font-weight:600;color:var(--t1);line-height:1}
-.stat-unit{font-size:11px;font-weight:300;color:var(--t2)}
-.stat-sub{font-size:10px;color:var(--t3);margin-top:3px}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px;margin-bottom:20px}
+.stat{background:var(--s1);border:1px solid var(--b1);border-radius:5px;padding:11px 13px}
+.stat-l{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.06em;margin-bottom:4px}
+.stat-v{font-size:19px;font-weight:600;color:var(--t1);line-height:1}
+.stat-u{font-size:11px;font-weight:300;color:var(--t2)}
+.stat-s{font-size:10px;color:var(--t3);margin-top:2px}
 
 /* TABLE */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--b1);border-radius:6px;margin-bottom:20px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--b1);border-radius:6px}
 table{width:100%;border-collapse:collapse;font-size:11.5px}
 thead tr{background:var(--s1)}
-th{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:9px 12px;text-align:left;border-bottom:1px solid var(--b1);white-space:nowrap;cursor:pointer;user-select:none}
+th{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1);white-space:nowrap;cursor:pointer;user-select:none}
 th:hover{color:var(--t2)}
-th.sorted-asc::after{content:' ↑';color:var(--ac)}
-th.sorted-desc::after{content:' ↓';color:var(--ac)}
+th.sa::after{content:' ↑';color:var(--ac)}
+th.sd::after{content:' ↓';color:var(--ac)}
 tbody tr{border-bottom:1px solid var(--b1);transition:background .1s;cursor:pointer}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--s2)}
-td{padding:9px 12px;vertical-align:top;line-height:1.5}
-.op-badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9.5px;font-weight:500;font-family:'DM Mono',monospace;white-space:nowrap}
-.conf-badge{display:inline-block;padding:1px 5px;border-radius:2px;font-size:8.5px;font-family:'DM Mono',monospace}
-.conf-m{background:#1a3a20;color:#50e878}
-.conf-e{background:#3a2010;color:#e88030}
-.conf-u{background:#2a2a2a;color:#808080}
-.row-name{font-weight:500;color:var(--t1)}
-.row-sub{font-size:10px;color:var(--t3);margin-top:1px}
-.bar-mini{height:4px;border-radius:2px;background:var(--b1);margin-top:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:2px}
-.tag{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;margin:1px;font-family:'DM Mono',monospace}
+td{padding:8px 11px;vertical-align:middle;line-height:1.4}
+.op-b{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9.5px;font-weight:500;font-family:'DM Mono',monospace;white-space:nowrap}
+.conf{display:inline-block;padding:1px 5px;border-radius:2px;font-family:'DM Mono',monospace;font-size:9px}
+.cm{background:#1a3a20;color:#50e878}
+.ce{background:#3a2010;color:#e88030}
+.cu{background:#222;color:#888}
+.rn{font-weight:500;color:var(--t1);font-size:12px}
+.rs{font-size:10px;color:var(--t3);margin-top:1px}
+.bm{height:4px;border-radius:2px;background:var(--b1);margin-top:3px;overflow:hidden;width:80px}
+.bf{height:100%;border-radius:2px}
+.tag{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-family:'DM Mono',monospace}
+.kc{display:inline-block;padding:1px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9.5px;font-weight:500;background:var(--s3);border:1px solid var(--b1);color:var(--te)}
 
-/* DRILL-DOWN MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;animation:fadeIn .15s ease}
-.modal{background:var(--s1);border:1px solid var(--b1);border-radius:8px;width:100%;max-width:900px;padding:0;overflow:hidden}
-.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.modal-close{background:none;border:1px solid var(--b2);border-radius:3px;color:var(--t2);padding:4px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap}
-.modal-close:hover{background:var(--s2);color:var(--t1)}
-.modal-body{padding:20px 24px;max-height:80vh;overflow-y:auto}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.modal-card{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:12px 14px}
-.modal-card-h{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
-.modal-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--b1);font-size:11px;gap:10px}
-.modal-row:last-child{border-bottom:none}
-.modal-key{color:var(--t3);flex-shrink:0}
-.modal-val{font-weight:500;text-align:right;font-family:'DM Mono',monospace;font-size:10.5px}
-
-/* SANKEY */
-.sankey-container{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:14px;margin-bottom:16px}
-.sankey-container h4{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
-#sankey-svg{width:100%;overflow:visible}
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:18px;overflow-y:auto}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:8px;width:100%;max-width:860px}
+.mhdr{padding:18px 22px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.mcls{background:none;border:1px solid var(--b2);border-radius:3px;color:var(--t2);padding:4px 9px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px}
+.mcls:hover{background:var(--s2);color:var(--t1)}
+.mbdy{padding:18px 22px;max-height:80vh;overflow-y:auto}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mc{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:11px 13px}
+.mch{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.mr{display:flex;justify-content:space-between;align-items:flex-start;padding:3px 0;border-bottom:1px solid var(--b1);font-size:11px;gap:8px}
+.mr:last-child{border-bottom:none}
+.mk{color:var(--t3);flex-shrink:0;padding-top:1px}
+.mv{font-weight:500;text-align:right;font-family:'DM Mono',monospace;font-size:10.5px;word-break:break-word;max-width:200px}
+.snk{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:12px 14px;margin-bottom:14px}
+.snk h4{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:9px}
+.donut-wrap{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:12px 14px;margin-bottom:14px}
+.donut-wrap h4{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:9px}
+.donut-inner{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donut-leg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.dl{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)}
+.dsw{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
 /* COMPARE */
-.compare-picker{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.cp-side{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:14px}
-.cp-side h3{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
-.cp-select{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:3px;color:var(--t1);padding:7px 10px;font-family:'DM Mono',monospace;font-size:11px;outline:none;margin-bottom:10px}
-.cp-select:focus{border-color:var(--ac)}
-.compare-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cp-card{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:14px;min-height:300px}
-
-/* MAP */
-.map-container{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:16px;margin-bottom:20px}
-.map-container h3{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
-#density-map{width:100%;height:420px}
-.map-legend{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;font-size:10px;color:var(--t2)}
-.map-legend-item{display:flex;align-items:center;gap:4px}
-.map-swatch{width:14px;height:10px;border-radius:2px;flex-shrink:0}
+.cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.cp-side{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:12px 14px}
+.cp-side h3{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.cp-sel{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:3px;color:var(--t1);padding:6px 9px;font-family:'DM Mono',monospace;font-size:10.5px;outline:none;margin-bottom:8px}
+.cp-sel:focus{border-color:var(--ac)}
 
 /* BENCHMARK */
-.bench-chart{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:16px;margin-bottom:20px}
-.bench-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--b1);font-size:11px}
-.bench-row:last-child{border-bottom:none}
-.bench-name{width:240px;min-width:240px;color:var(--t2);font-size:10.5px}
-.bench-bar-wrap{flex:1;height:18px;background:var(--b1);border-radius:3px;overflow:hidden;position:relative}
-.bench-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.8);white-space:nowrap;min-width:2px}
-.bench-val{width:80px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap}
-.bench-unit{font-size:9px;color:var(--t4)}
+.bc{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:14px}
+.br{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--b1);font-size:11px}
+.br:last-child{border-bottom:none}
+.bn{width:230px;min-width:230px;color:var(--t2);font-size:10.5px}
+.bw{flex:1;height:17px;background:var(--b1);border-radius:3px;overflow:hidden}
+.bb{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:5px;font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.8);white-space:nowrap;min-width:2px}
+.bv{width:75px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:var(--t3)}
 
-/* RESPONSIVE */
+/* MAP */
+.map-c{background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:14px;margin-bottom:18px}
+.map-c h3{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.map-leg{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;font-size:10px;color:var(--t2)}
+.mli{display:flex;align-items:center;gap:4px}
+.mlsw{width:12px;height:9px;border-radius:2px}
+
+/* SOURCES */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:4px 16px}
+.si{display:flex;gap:7px;align-items:baseline;font-size:11px;padding:4px 0;border-bottom:1px solid var(--b1)}
+.sn{font-family:'DM Mono',monospace;font-size:10px;color:var(--ac);min-width:26px;font-weight:600}
+.sl{color:#8ab4f8;text-decoration:none;line-height:1.4}
+.sl:hover{text-decoration:underline}
+.disc{margin-top:16px;background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:13px 16px;font-size:11px;color:var(--t2);line-height:1.7}
+.disc strong{color:var(--t1)}
+
 @media(max-width:768px){
-  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;overflow-x:auto}
+  .sidebar{width:100%;height:auto;position:relative}
   .main{margin-left:0}
-  .modal-grid,.compare-picker,.compare-panel{grid-template-columns:1fr}
+  .mg,.cp-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div class="shell">
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-title">DC · H₂O · Land</div>
-    <div class="sb-logo-sub">Global Infrastructure Monitor</div>
+    <div class="sb-logo-t">DC · H₂O · Land</div>
+    <div class="sb-logo-s">Global Infrastructure Monitor</div>
   </div>
   <div class="sb-search">
     <input type="text" id="sb-filter" placeholder="Search facilities…" oninput="filterSidebar(this.value)">
   </div>
-  <div class="sb-count" id="sb-count">Loading…</div>
-  <div class="sb-section">Data Centers</div>
+  <div class="sb-count" id="sb-count"></div>
+  <div class="sb-sec">Data Centers</div>
   <div id="sb-dc-list"></div>
-  <div class="sb-section" style="margin-top:8px">Benchmarks</div>
-  <div id="sb-bench-list"></div>
-  <div class="sb-section" style="margin-top:8px">Views</div>
+  <div class="sb-sec" style="margin-top:6px">Views</div>
   <div class="sb-item" onclick="showPanel('overview')"><span class="sb-dot" style="background:var(--ac)"></span>Overview Table</div>
   <div class="sb-item" onclick="showPanel('benchmark')"><span class="sb-dot" style="background:var(--g)"></span>Benchmark Chart</div>
   <div class="sb-item" onclick="showPanel('compare')"><span class="sb-dot" style="background:var(--am)"></span>Side-by-Side Compare</div>
   <div class="sb-item" onclick="showPanel('densitymap')"><span class="sb-dot" style="background:var(--pu)"></span>US Density Map</div>
   <div class="sb-item" onclick="showPanel('sources')"><span class="sb-dot" style="background:var(--te)"></span>Sources</div>
-  <div class="sb-section" style="margin-top:8px">Documents</div>
-  <a class="sb-item" href="methodology.html" style="text-decoration:none"><span class="sb-dot" style="background:#e8a032"></span>Methodology &amp; Peer Review</a>
-  <a class="sb-item" href="session_impact.html" style="text-decoration:none"><span class="sb-dot" style="background:#a070e8"></span>Session Resource Impact</a>
-  <a class="sb-item" href="data_manifest.csv" style="text-decoration:none"><span class="sb-dot" style="background:#34c978"></span>Data Manifest (CSV)</a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-title">Global Data Center Infrastructure &amp; Water Intelligence</div>
-  <div class="topbar-tabs">
-    <button class="ttab active" onclick="showPanel('overview')">Overview</button>
-    <button class="ttab" onclick="showPanel('benchmark')">Benchmarks</button>
-    <button class="ttab" onclick="showPanel('compare')">Compare</button>
-    <button class="ttab" onclick="showPanel('densitymap')">Density Map</button>
-    <button class="ttab" onclick="showPanel('sources')">Sources</button>
+  <div class="tb-title">Global Data Center Infrastructure &amp; Water Intelligence</div>
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('overview')">Overview</button>
+    <button class="tab" onclick="showPanel('benchmark')">Benchmarks</button>
+    <button class="tab" onclick="showPanel('compare')">Compare</button>
+    <button class="tab" onclick="showPanel('densitymap')">Density Map</button>
+    <button class="tab" onclick="showPanel('sources')">Sources</button>
   </div>
 </div>
 
-<!-- OVERVIEW PANEL -->
 <div class="panel visible" id="panel-overview">
-  <div class="page-h1">Global Data Center Water &amp; Land Inventory</div>
-  <div class="page-sub">35 facilities across 15 countries. Click any row for a detailed drill-down including Sankey water flow diagram. Water figures marked [M]=metered/reported, [E]=estimated from published benchmarks (1.8 m³/MWh, Siddik et al. 2021), [U]=undisclosed.</div>
+  <div class="ph1">Global Data Center Water &amp; Land Inventory</div>
+  <div class="psub">43 facilities across 16 countries. Click any row for a detailed drill-down with Sankey water flow and energy mix diagrams. <span class="conf cm">[M]</span>=metered &nbsp;<span class="conf ce">[E]</span>=estimated from 1.8 m³/MWh benchmark &nbsp;<span class="conf cu">[U]</span>=undisclosed. Click column headers to sort.</div>
   <div class="stats" id="stats-row"></div>
-  <div class="info">
-    <strong>Confidence tiers:</strong>
-    <span class="conf-badge conf-m">[M]</span> Metered/officially reported (utility records, sustainability reports).
-    <span class="conf-badge conf-e">[E]</span> Estimated from MW capacity using 1.8 m³/MWh benchmark (Siddik et al. 2021, ERL).
-    <span class="conf-badge conf-u">[U]</span> Undisclosed / no reliable estimate possible.
-    Click column headers to sort. Click any row for full drill-down.
-  </div>
   <div class="tbl-wrap"><table id="main-table">
     <thead><tr id="thead-row"></tr></thead>
     <tbody id="tbody"></tbody>
   </table></div>
 </div>
 
-<!-- BENCHMARK PANEL -->
 <div class="panel" id="panel-benchmark">
-  <div class="page-h1">Land &amp; Water Use Benchmarks</div>
-  <div class="page-sub">Water intensity (AF/acre/year) across data centers, agriculture, industry, recreation, and human habitation. Data centers at the Dalles and Council Bluffs rival or exceed the most water-intensive industrial land uses.</div>
+  <div class="ph1">Land &amp; Water Use Benchmarks</div>
+  <div class="psub">Water intensity (AF/acre/year) across data centers, agriculture, industry, recreation, and residential land use. Hover for source notes.</div>
   <div id="benchmark-chart"></div>
 </div>
 
-<!-- COMPARE PANEL -->
 <div class="panel" id="panel-compare">
-  <div class="page-h1">Side-by-Side Comparison</div>
-  <div class="page-sub">Select any two facilities or benchmark categories to compare their metrics directly.</div>
-  <div class="compare-picker">
-    <div class="cp-side">
-      <h3>Facility A</h3>
-      <select class="cp-select" id="cmp-a" onchange="renderCompare()"></select>
-      <div id="cmp-a-card"></div>
-    </div>
-    <div class="cp-side">
-      <h3>Facility B</h3>
-      <select class="cp-select" id="cmp-b" onchange="renderCompare()"></select>
-      <div id="cmp-b-card"></div>
-    </div>
+  <div class="ph1">Side-by-Side Comparison</div>
+  <div class="psub">Select any two facilities or benchmark categories.</div>
+  <div class="cp-grid">
+    <div class="cp-side"><h3>Facility A</h3><select class="cp-sel" id="cmp-a" onchange="renderCompare()"></select><div id="cmp-a-card"></div></div>
+    <div class="cp-side"><h3>Facility B</h3><select class="cp-sel" id="cmp-b" onchange="renderCompare()"></select><div id="cmp-b-card"></div></div>
   </div>
   <div id="compare-bars"></div>
 </div>
 
-<!-- DENSITY MAP PANEL -->
 <div class="panel" id="panel-densitymap">
-  <div class="page-h1">US Population Density Quintiles</div>
-  <div class="page-sub">County-level population density from 2020 Census, grouped into five quintiles. Used to categorize residential water use benchmarks. Hover counties for details.</div>
-  <div class="map-container">
-    <h3>Population Density by County — 2020 Census (persons/sq mi)</h3>
-    <div id="density-map"></div>
-    <div class="map-legend" id="map-legend"></div>
-  </div>
-  <div class="info">
-    <strong>Quintile definitions (persons/sq mi):</strong>
-    Q1 Rural &lt;15 · Q2 Semi-rural 15–100 · Q3 Low suburban 100–500 · Q4 Medium urban 500–2,000 · Q5 Dense urban &gt;2,000.
-    Water benchmarks: Rural ~0.9 AF/ac/yr (wells, large lots, irrigation) → Dense urban ~0.6 AF/ac/yr (apartments, no landscaping, efficient municipal supply).
-    The counterintuitive finding: rural residents often use <em>more</em> water per acre than dense urban dwellers due to irrigation, livestock, and less-efficient infrastructure.
-  </div>
+  <div class="ph1">US Population Density Quintiles</div>
+  <div class="psub">County-level 2020 Census density, grouped into five quintiles used for residential water benchmarks.</div>
+  <div class="map-c"><h3>Population Density by State — 2020 Census (persons/sq mi)</h3><div id="density-map" style="width:100%;height:380px"></div><div class="map-leg" id="map-legend"></div></div>
+  <div class="info"><strong>Quintile definitions:</strong> Q1 Rural &lt;15 · Q2 Semi-rural 15–100 · Q3 Low suburban 100–500 · Q4 Medium urban 500–2,000 · Q5 Dense urban &gt;2,000. The counterintuitive finding: rural land often has higher water intensity per acre than dense urban land, due to irrigation and large lots — yet lower than most hyperscale data centers.</div>
 </div>
 
-<!-- SOURCES PANEL -->
 <div class="panel" id="panel-sources">
-  <div class="page-h1">Sources &amp; Methodology</div>
-  <div class="page-sub">All 48+ citations, methodology notes, and confidence tier definitions.</div>
+  <div class="ph1">Sources &amp; Methodology</div>
+  <div class="psub">Primary citations. [E] estimates use Siddik et al. 2021: W = MW × 1000 × 8760 × 1.8 m³/MWh ÷ 264.17 ÷ 325,851 = AF/yr. ±40–60% uncertainty. Not applicable to air-cooled, seawater, or closed-loop facilities.</div>
   <div id="sources-content"></div>
 </div>
-
 </div><!-- /main -->
 </div><!-- /shell -->
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modal" style="display:none" onclick="closeModal(event)">
+<div class="ov" id="modal" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="modal-inner">
-    <div class="modal-header">
+    <div class="mhdr">
       <div>
-        <div id="modal-title" style="font-size:16px;font-weight:600;color:var(--t1)"></div>
-        <div id="modal-sub" style="font-size:11px;color:var(--t3);margin-top:3px"></div>
+        <div id="modal-title" style="font-size:15px;font-weight:600;color:var(--t1)"></div>
+        <div id="modal-sub" style="font-size:11px;color:var(--t3);margin-top:2px"></div>
       </div>
-      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      <button class="mcls" onclick="closeModal()">✕ Close</button>
     </div>
-    <div class="modal-body" id="modal-body"></div>
+    <div class="mbdy" id="modal-body"></div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════ DATA ═══════════════════════════
+// ════════════════ DATA ════════════════
+const AF=1/325851;
 
-const AF = 1/325851;
-const GAL_AF = 325851;
+// Köppen climate descriptions
+const KC={
+  'Dfa':'Humid continental — hot summer (Dfa)',
+  'Dfb':'Humid continental — warm summer (Dfb)',
+  'BSk':'Cold semi-arid / steppe (BSk)',
+  'BSh':'Hot semi-arid / steppe (BSh)',
+  'BWh':'Hot desert (BWh)',
+  'BWk':'Cold desert (BWk)',
+  'Csa':'Mediterranean — hot summer (Csa)',
+  'Csb':'Mediterranean — warm summer (Csb)',
+  'Cfa':'Humid subtropical (Cfa)',
+  'Cfb':'Oceanic / marine (Cfb)',
+  'Af':'Tropical rainforest (Af)',
+  'Am':'Tropical monsoon (Am)',
+  'Aw':'Tropical savanna (Aw)',
+  'ET':'Tundra (ET)',
+  'Dfc':'Subarctic (Dfc)',
+};
 
-// Operator color map
-const OC = {
+// Operator colors
+const OC={
   Google:{bg:'#1a2f5e',c:'#5b9ef0',b:'#2a4080'},
   Microsoft:{bg:'#0e2535',c:'#3ab0ef',b:'#1a4060'},
   Meta:{bg:'#1a2a50',c:'#4a78e8',b:'#2a3d78'},
@@ -299,365 +283,341 @@ const OC = {
   Vantage:{bg:'#0e2a20',c:'#3ec87a',b:'#1a4a32'},
   NTT:{bg:'#301a1a',c:'#e85050',b:'#501a1a'},
   Alibaba:{bg:'#3a1a00',c:'#f07820',b:'#602a00'},
-  'China Telecom':{bg:'#2a1818',c:'#e06060',b:'#401818'},
   EdgeConneX:{bg:'#101a30',c:'#5080d0',b:'#202840'},
-  Yondr:{bg:'#0a2020',c:'#40b0b0',b:'#1a3a3a'},
-  'QTS':{bg:'#1a1a30',c:'#7070e0',b:'#2a2a50'},
-  'CoreSite':{bg:'#2a0a20',c:'#d060b0',b:'#402030'},
-  'Interxion':{bg:'#102030',c:'#5090c0',b:'#1a3040'},
-  'Corelink':{bg:'#201a00',c:'#c0a020',b:'#403000'},
+  QTS:{bg:'#1a1a30',c:'#7070e0',b:'#2a2a50'},
+  CoreSite:{bg:'#2a0a20',c:'#d060b0',b:'#402030'},
+  Interxion:{bg:'#102030',c:'#5090c0',b:'#1a3040'},
+  AirTrunk:{bg:'#1a2a10',c:'#80d040',b:'#2a4018'},
+  Tencent:{bg:'#001a30',c:'#20a0e0',b:'#003050'},
   Other:{bg:'#1a1a1a',c:'#909090',b:'#303030'},
 };
-function opStyle(op){const s=OC[op]||OC.Other;return `background:${s.bg};color:${s.c};border:1px solid ${s.b}`}
+function opStyle(op){const s=OC[op]||OC.Other;return`background:${s.bg};color:${s.c};border:1px solid ${s.b}`}
 
-// ─── FACILITIES ───
-// Fields: id, name, op, region, country, city, opened, mw, acres, cooling,
-//   withdrawalGal, conf (M/E/U), evapPct, source, gridMix, onsiteGen, onsiteRole,
-//   waterSource, precip, notes, category
-const FACILITIES = [
+// Energy mix colors
+const EC={'Nuclear':'#6040c0','Hydro':'#2080e0','Wind':'#40b870','Solar':'#d0a020',
+  'Gas':'#c05020','Coal':'#605050','Geothermal':'#c06040','Other':'#606060',
+  'Renewables':'#30a060','Unspecified':'#504040'};
+
+// ════════════════ FACILITIES ════════════════
+const FACILITIES=[
   // ── USA ──
-  {id:'g-cb',name:'Council Bluffs Campus',op:'Google',region:'USA-MW',country:'USA',city:'Council Bluffs, IA',opened:2009,mw:400,acres:1000,cooling:'Evaporative towers',withdrawalGal:1400000000,conf:'M',evapPct:71,source:'Municipal surface (Missouri R.)',gridMix:'~60% wind, 25% gas, 10% coal',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Council Bluffs Water Works',precip:33,notes:'Google\'s largest water user. Peak 2.7M gal/day summer 2024. 1.0B gal evaporated, 400M blowdown.',cat:'hyperscale'},
-  {id:'g-td',name:'The Dalles Campus',op:'Google',region:'USA-PNW',country:'USA',city:'The Dalles, OR',opened:2006,mw:null,acres:190,cooling:'Evaporative towers',withdrawalGal:434400000,conf:'M',evapPct:75,source:'Municipal surface (Hood River/Mt Hood)',gridMix:'46% hydro, 47% unspecified (likely fossil)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'City of The Dalles',precip:16,notes:'Google\'s first custom DC. 316% water growth since 2012. Now 1/3 of city supply for pop. ~16,200.',cat:'hyperscale'},
-  {id:'ms-qcy',name:'Columbia DC — Quincy',op:'Microsoft',region:'USA-PNW',country:'USA',city:'Quincy, WA',opened:2007,mw:622,acres:270,cooling:'Adiabatic + QWRU closed-loop',withdrawalGal:null,conf:'U',evapPct:5,source:'Reclaimed (QWRU closed-loop)',gridMix:'≥66% hydro (Columbia R.), wind, gas',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Grant County PUD / QWRU',precip:8,notes:'QWRU saves 380M gal/yr. Near-zero WUE newest bldgs. Potable use cut ~97% post-2021.',cat:'hyperscale'},
-  {id:'ms-wdm',name:'West Des Moines (5 campuses)',op:'Microsoft',region:'USA-MW',country:'USA',city:'West Des Moines, IA',opened:2012,mw:null,acres:300,cooling:'Direct evaporative (~10%/yr)',withdrawalGal:68500000,conf:'M',evapPct:75,source:'Municipal surface (Des Moines R.)',gridMix:'~60% wind (MidAmerican)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'WDM Water Works',precip:37,notes:'5 campuses; GPT-4 training. WDM\'s #1 water user. Peak July 2022: 11.5M gal/mo.',cat:'hyperscale'},
-  {id:'meta-alt',name:'Altoona Campus',op:'Meta',region:'USA-MW',country:'USA',city:'Altoona, IA',opened:2013,mw:1401,acres:202,cooling:'Evaporative + liquid (AI phases)',withdrawalGal:52700000,conf:'M',evapPct:75,source:'Municipal surface (Des Moines R.)',gridMix:'100% wind PPAs (MidAmerican)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Altoona municipal',precip:38,notes:'5M+ sq ft. LLaMA AI training. Liquid cooling reduces per-MW water. 1.0M MWh/yr renewable.',cat:'hyperscale'},
-  {id:'sw-citadel',name:'Citadel Campus (Tahoe Reno)',op:'Switch',region:'USA-W',country:'USA',city:'Storey County, NV',opened:2017,mw:650,acres:2000,cooling:'Proprietary air (PRIME)',withdrawalGal:null,conf:'U',evapPct:5,source:'TRIC municipal (minimal)',gridMix:'100% solar (self-owned, 179 MW)',onsiteGen:'Switch Station 1+2 solar (179 MW)',onsiteRole:'PRIMARY',waterSource:'TRIC municipal',precip:10,notes:'Air-cooled by design. Switch legally exited NV Energy grid. 179 MW self-owned solar. Near-zero water.',cat:'hyperscale'},
-  {id:'vant-qcy',name:'WA1 Campus (Quincy)',op:'Vantage',region:'USA-PNW',country:'USA',city:'Quincy, WA',opened:2024,mw:89,acres:68,cooling:'Indirect evap + air-cooled chiller',withdrawalGal:null,conf:'U',evapPct:5,source:'Grant County PUD (Columbia R.)',gridMix:'≥66% hydro (GCPUD)',onsiteGen:'Diesel generators (EPA Tier II)',onsiteRole:'BACKUP',waterSource:'GCPUD / municipal',precip:8,notes:'WUE≈0 design. Closed-loop. $1B campus. WA13 uses air-cooled chiller.',cat:'enterprise'},
-  {id:'ibm-bld',name:'Boulder Campus DC',op:'IBM',region:'USA-W',country:'USA',city:'Boulder, CO',opened:1967,mw:null,acres:500,cooling:'Water economizer + hybrid air',withdrawalGal:null,conf:'U',evapPct:40,source:'Boulder municipal (~50% surface, 50% GW)',gridMix:'~35% wind, 30% gas, 15% coal (Xcel)',onsiteGen:'Gasoline generators (48-hr reserve)',onsiteRole:'BACKUP',waterSource:'City of Boulder',precip:20,notes:'IBM\'s oldest DC site (1967 plant). LEED Silver 2008. 300k sq ft raised floor. Free cooling 63%/yr.',cat:'enterprise'},
-  {id:'aws-blue',name:'Project Blue (planned)',op:'AWS',region:'USA-SW',country:'USA',city:'Tucson, AZ',opened:null,mw:600,acres:290,cooling:'TBD',withdrawalGal:null,conf:'U',evapPct:75,source:'Tucson Water (Colorado R. + GW)',gridMix:'~35% gas, 25% coal, 25% solar (TEP)',onsiteGen:'Diesel generators (expected)',onsiteRole:'BACKUP',waterSource:'Tucson Water',precip:11,notes:'Pre-operational. High water-stress region. At CB intensity, ~2,400 AF/yr withdrawal projected.',cat:'hyperscale'},
-  {id:'eqx-ash',name:'Ashburn Campus (DC1-DC15)',op:'Equinix',region:'USA-E',country:'USA',city:'Ashburn, VA',opened:2000,mw:450,acres:160,cooling:'Air + chilled water',withdrawalGal:84000000,conf:'E',evapPct:70,source:'Loudoun Water (surface)',gridMix:'~30% nuclear, 30% gas, 20% wind (Dominion)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Loudoun Water',precip:43,notes:'World\'s largest data center hub. 160 ac across multiple campus buildings. Dominion Energy territory.',cat:'colo'},
-  {id:'qts-aurora',name:'Aurora-Denver Campus',op:'QTS',region:'USA-W',country:'USA',city:'Aurora, CO',opened:2024,mw:177,acres:67,cooling:'Hybrid',withdrawalGal:32000000,conf:'E',evapPct:70,source:'Aurora Water (South Platte R.)',gridMix:'~35% wind, 30% gas, 15% coal (Xcel)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Aurora Water',precip:14,notes:'Xcel\'s largest industrial customer in CO. Will exceed Evraz Steel. $1B+ campus.',cat:'colo'},
-  {id:'dr-atl',name:'Atlanta Campus (55 Allen)',op:'Digital Realty',region:'USA-SE',country:'USA',city:'Atlanta, GA',opened:2001,mw:90,acres:35,cooling:'Air + chilled water',withdrawalGal:16000000,conf:'E',evapPct:70,source:'Atlanta city water (Chattahoochee R.)',gridMix:'~35% gas, 20% nuclear, 20% coal (GA Power)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'City of Atlanta',precip:52,notes:'Southeast colocation hub. Georgia Power territory. High humidity enables some air-side economization.',cat:'colo'},
-  {id:'cyrus-cb',name:'Council Bluffs Colo',op:'CyrusOne',region:'USA-MW',country:'USA',city:'Council Bluffs, IA',opened:2015,mw:100,acres:30,cooling:'Hybrid air + evap',withdrawalGal:18000000,conf:'E',evapPct:72,source:'Council Bluffs Water Works',gridMix:'~60% wind (MidAmerican)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Council Bluffs Water Works',precip:33,notes:'Colocation adjacent to Google campus. Benefits from same wind-heavy Iowa grid.',cat:'colo'},
-
+  {id:'g-cb',name:'Council Bluffs Campus',op:'Google',region:'USA-MW',country:'USA',city:'Council Bluffs, IA',opened:2009,mw:400,acres:1000,cooling:'Evaporative towers',withdrawalGal:1400000000,conf:'M',evapPct:71,source:'Municipal surface (Missouri R.)',gridMix:[{s:'Wind',p:60},{s:'Gas',p:25},{s:'Coal',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Council Bluffs Water Works',precip:33,koppen:'Dfa',notes:'Largest metered DC water user in dataset. 1.0B gal evap + 400M blowdown. Peak 2.7M gal/day summer 2024.',cat:'hyperscale'},
+  {id:'g-td',name:'The Dalles Campus',op:'Google',region:'USA-PNW',country:'USA',city:'The Dalles, OR',opened:2006,mw:null,acres:190,cooling:'Evaporative towers',withdrawalGal:434400000,conf:'M',evapPct:75,source:'Municipal surface (Hood River / Mt. Hood)',gridMix:[{s:'Hydro',p:46},{s:'Unspecified',p:47},{s:'Other',p:7}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'City of The Dalles',precip:16,koppen:'Csb',notes:"Google's first custom DC. 316% water growth since 2012. 1/3 of city supply for pop. ~16,200. NWCPUD energy mix shifted from 85% hydro in 2015 to 46% as Google growth outpaced BPA allocation.",cat:'hyperscale'},
+  {id:'ms-qcy',name:'Columbia DC — Quincy',op:'Microsoft',region:'USA-PNW',country:'USA',city:'Quincy, WA',opened:2007,mw:622,acres:270,cooling:'Adiabatic + QWRU closed-loop',withdrawalGal:null,conf:'U',evapPct:5,source:'Reclaimed (QWRU closed-loop)',gridMix:[{s:'Hydro',p:66},{s:'Wind',p:20},{s:'Gas',p:14}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Grant County PUD / QWRU',precip:8,koppen:'BSk',notes:'QWRU saves 380M gal/yr. Near-zero WUE newest bldgs. 97% reduction in potable use post-2021. EPA case study facility.',cat:'hyperscale'},
+  {id:'ms-wdm',name:'West Des Moines (5 campuses)',op:'Microsoft',region:'USA-MW',country:'USA',city:'West Des Moines, IA',opened:2012,mw:null,acres:300,cooling:'Direct evaporative (~10%/yr)',withdrawalGal:68500000,conf:'M',evapPct:75,source:'Municipal surface (Des Moines R.)',gridMix:[{s:'Wind',p:60},{s:'Gas',p:25},{s:'Coal',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'WDM Water Works',precip:37,koppen:'Dfa',notes:"5 campuses; GPT-4/OpenAI training. WDM's #1 water user in 2024. Peak July 2022: 11.5M gal/mo. Committed to phase out petroleum diesel by 2030.",cat:'hyperscale'},
+  {id:'meta-alt',name:'Altoona Campus',op:'Meta',region:'USA-MW',country:'USA',city:'Altoona, IA',opened:2013,mw:1401,acres:202,cooling:'Evaporative + liquid (AI phases)',withdrawalGal:52700000,conf:'M',evapPct:75,source:'Municipal surface (Des Moines R.)',gridMix:[{s:'Wind',p:60},{s:'Gas',p:25},{s:'Coal',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Altoona municipal',precip:38,koppen:'Dfa',notes:'5M+ sq ft. LLaMA AI training. Liquid cooling reduces per-MW water. 1.0M MWh/yr renewable. 225 MW Iowa wind PPA.',cat:'hyperscale'},
+  {id:'sw-citadel',name:'Citadel Campus (Tahoe Reno)',op:'Switch',region:'USA-W',country:'USA',city:'Storey County, NV',opened:2017,mw:650,acres:2000,cooling:'Proprietary air (PRIME system)',withdrawalGal:null,conf:'U',evapPct:5,source:'TRIC municipal (minimal)',gridMix:[{s:'Solar',p:100}],onsiteGen:'Switch Station 1+2 solar (179 MW owned)',onsiteRole:'PRIMARY',waterSource:'TRIC municipal',precip:10,koppen:'BSk',notes:'Air-cooled by design. Near-zero water. Switch legally exited NV Energy grid. 179 MW self-owned solar at Apex Industrial Park.',cat:'hyperscale'},
+  {id:'vant-qcy',name:'WA1 Campus (Quincy)',op:'Vantage',region:'USA-PNW',country:'USA',city:'Quincy, WA',opened:2024,mw:89,acres:68,cooling:'Indirect evap + air-cooled chiller',withdrawalGal:null,conf:'U',evapPct:5,source:'Grant County PUD (Columbia R.)',gridMix:[{s:'Hydro',p:66},{s:'Wind',p:20},{s:'Gas',p:14}],onsiteGen:'Diesel generators (EPA Tier II)',onsiteRole:'BACKUP',waterSource:'GCPUD / municipal',precip:8,koppen:'BSk',notes:'WUE≈0 design. Closed-loop. $1B campus. WA13 uses air-cooled chiller.',cat:'enterprise'},
+  {id:'ibm-bld',name:'Boulder Campus DC',op:'IBM',region:'USA-W',country:'USA',city:'Boulder, CO',opened:1967,mw:null,acres:500,cooling:'Water economizer + hybrid air',withdrawalGal:null,conf:'U',evapPct:40,source:'Boulder municipal (~50% surface, 50% GW)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:30},{s:'Coal',p:15},{s:'Solar',p:10},{s:'Other',p:10}],onsiteGen:'Gasoline generators (48-hr reserve)',onsiteRole:'BACKUP',waterSource:'City of Boulder',precip:20,koppen:'BSk',notes:"IBM's oldest DC site (1967 plant). LEED Silver 2008. 300k sq ft raised floor. Free cooling 63%/yr via air economizer. Low-sulfur fuel.",cat:'enterprise'},
+  {id:'aws-sus',name:'Susquehanna Campus (nuclear)',op:'AWS',region:'USA-E',country:'USA',city:'Salem Township, PA',opened:2025,mw:960,acres:1200,cooling:'TBD (co-located with nuclear plant)',withdrawalGal:null,conf:'U',evapPct:70,source:'Nuclear plant water intake (Susquehanna R.)',gridMix:[{s:'Nuclear',p:100}],onsiteGen:'Susquehanna nuclear plant (direct co-location)',onsiteRole:'PRIMARY',waterSource:'Nuclear plant cooling loop',precip:39,koppen:'Dfb',notes:"$650M acquisition from Talen Energy (Cumulus Data). 960 MW potential; 300 MW initial. First major behind-the-meter nuclear DC in US. FERC ISA dispute ongoing. 1,200-acre campus co-located with 2.2 GW Susquehanna Steam Electric Station.",cat:'hyperscale'},
+  {id:'aws-blue',name:'Project Blue (planned)',op:'AWS',region:'USA-SW',country:'USA',city:'Tucson, AZ',opened:null,mw:600,acres:290,cooling:'TBD',withdrawalGal:null,conf:'U',evapPct:75,source:'Tucson Water (Colorado R. CAP + GW)',gridMix:[{s:'Gas',p:35},{s:'Coal',p:25},{s:'Solar',p:25},{s:'Wind',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators (expected)',onsiteRole:'BACKUP',waterSource:'Tucson Water',precip:11,koppen:'BWh',notes:'Pre-operational. High water-stress region. At CB intensity, ~2,400 AF/yr projected. Arizona groundwater legally constrained.',cat:'hyperscale'},
+  {id:'eqx-ash',name:'Ashburn Campus (DC1-DC15)',op:'Equinix',region:'USA-E',country:'USA',city:'Ashburn, VA',opened:2000,mw:450,acres:160,cooling:'Air + chilled water',withdrawalGal:84000000,conf:'E',evapPct:70,source:'Loudoun Water (Goose Creek / Potomac)',gridMix:[{s:'Nuclear',p:30},{s:'Gas',p:30},{s:'Wind',p:20},{s:'Other',p:20}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Loudoun Water',precip:43,koppen:'Cfa',notes:"World's largest DC hub (Data Center Alley). Virginia DCs consume 25%+ of state electricity. Dominion Energy territory.",cat:'colo'},
+  {id:'qts-aurora',name:'Aurora-Denver Campus',op:'QTS',region:'USA-W',country:'USA',city:'Aurora, CO',opened:2024,mw:177,acres:67,cooling:'Hybrid',withdrawalGal:32000000,conf:'E',evapPct:70,source:'Aurora Water (South Platte R.)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:30},{s:'Coal',p:15},{s:'Solar',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Aurora Water',precip:14,koppen:'BSk',notes:"Xcel Colorado's largest industrial customer. $1B+ campus.",cat:'colo'},
+  {id:'dr-atl',name:'Atlanta Campus (55 Allen)',op:'Digital Realty',region:'USA-SE',country:'USA',city:'Atlanta, GA',opened:2001,mw:90,acres:35,cooling:'Air + chilled water',withdrawalGal:16000000,conf:'E',evapPct:70,source:'Atlanta city water (Chattahoochee R.)',gridMix:[{s:'Gas',p:35},{s:'Nuclear',p:20},{s:'Coal',p:20},{s:'Other',p:25}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'City of Atlanta',precip:52,koppen:'Cfa',notes:'Southeast colocation hub. Georgia Power territory. Warm humid climate enables some air-side economization.',cat:'colo'},
+  {id:'cyrus-cb',name:'Council Bluffs Colo',op:'CyrusOne',region:'USA-MW',country:'USA',city:'Council Bluffs, IA',opened:2015,mw:100,acres:30,cooling:'Hybrid air + evap',withdrawalGal:18000000,conf:'E',evapPct:72,source:'Council Bluffs Water Works',gridMix:[{s:'Wind',p:60},{s:'Gas',p:25},{s:'Coal',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Council Bluffs Water Works',precip:33,koppen:'Dfa',notes:'Colocation adjacent to Google campus. Iowa wind-heavy grid.',cat:'colo'},
+  {id:'eqx-ny',name:'New York Campus (NY1-NY11)',op:'Equinix',region:'USA-E',country:'USA',city:'New York, NY',opened:2000,mw:50,acres:12,cooling:'Air + chilled water (urban)',withdrawalGal:9000000,conf:'E',evapPct:65,source:'NYC DEP (Delaware / Catskill aqueducts)',gridMix:[{s:'Nuclear',p:30},{s:'Gas',p:25},{s:'Hydro',p:20},{s:'Wind',p:15},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'NYC DEP',precip:50,koppen:'Dfb',notes:'Dense urban colocation. Excellent fiber peering (NYIIX). Very small land footprint per MW.',cat:'colo'},
+  {id:'cs-den',name:'CoreSite Denver Campus',op:'CoreSite',region:'USA-W',country:'USA',city:'Denver, CO',opened:2006,mw:25,acres:6,cooling:'Air + partial evaporative',withdrawalGal:4500000,conf:'E',evapPct:68,source:'Denver Water (South Platte R.)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:30},{s:'Coal',p:15},{s:'Solar',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Denver Water',precip:15,koppen:'BSk',notes:'Urban enterprise colocation. Moderate scale. Denver tech hub.',cat:'enterprise'},
+  {id:'g-vir',name:'Loudoun County Campus',op:'Google',region:'USA-E',country:'USA',city:'Loudoun County, VA',opened:2015,mw:250,acres:120,cooling:'Chilled water + air',withdrawalGal:45000000,conf:'E',evapPct:70,source:'Loudoun Water (Goose Creek / Potomac)',gridMix:[{s:'Nuclear',p:30},{s:'Gas',p:30},{s:'Wind',p:15},{s:'Other',p:25}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Loudoun Water',precip:43,koppen:'Cfa',notes:'Northern Virginia cluster. Data Center Alley. Virginia DCs now consume 25%+ of state electricity.',cat:'hyperscale'},
+  {id:'edge-node',name:'Edge Node (generic US urban)',op:'Other',region:'USA',country:'USA',city:'Various',opened:2020,mw:2,acres:0.5,cooling:'Air-cooled (100%)',withdrawalGal:360000,conf:'E',evapPct:5,source:'Municipal',gridMix:[{s:'Gas',p:40},{s:'Coal',p:20},{s:'Renewables',p:20},{s:'Nuclear',p:12},{s:'Other',p:8}],onsiteGen:'UPS batteries + small diesel',onsiteRole:'BACKUP',waterSource:'Municipal',precip:null,koppen:null,notes:'Representative edge/CDN node. Typically <5,000 sq ft. Near-zero water. Often in carrier hotels.',cat:'edge'},
   // ── EUROPE ──
-  {id:'g-dub',name:'Dublin Campus',op:'Google',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2011,mw:500,acres:400,cooling:'Air-side economizer + evap',withdrawalGal:90000000,conf:'E',evapPct:65,source:'Irish Water (River Liffey)',gridMix:'~35% wind, 35% gas, 10% coal (EirGrid)',onsiteGen:'Diesel generators (EU rules limit use)',onsiteRole:'BACKUP',waterSource:'Irish Water / municipal',precip:30,notes:'Part of Dublin cluster consuming ~80% of city electricity. EU scrutiny on water/power. Atlantic climate aids air cooling.',cat:'hyperscale'},
-  {id:'ms-dub',name:'Dublin Grange Castle',op:'Microsoft',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2009,mw:250,acres:200,cooling:'Air-side economizer',withdrawalGal:45000000,conf:'E',evapPct:60,source:'Irish Water',gridMix:'~35% wind (Ireland), 35% gas',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,notes:'Azure EU West region. Ireland moratorium discussion on new DCs since 2022 due to power grid strain.',cat:'hyperscale'},
-  {id:'eqx-fr',name:'Frankfurt Campus (FR1-FR8)',op:'Equinix',region:'EUR-C',country:'Germany',city:'Frankfurt',opened:1999,mw:210,acres:80,cooling:'Air + chilled water',withdrawalGal:38000000,conf:'E',evapPct:65,source:'Frankfurt Stadtentwässerung (Main R.)',gridMix:'~35% renewables, 25% gas, 15% coal (50Hertz)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Frankfurt municipal',precip:25,notes:'Frankfurt is Europe\'s largest data center hub. 42% of city electricity from DCs. EU Data Act mandates reporting from 2024.',cat:'colo'},
-  {id:'ix-ams',name:'Amsterdam AMS1-AMS9',op:'Interxion',region:'EUR-W',country:'Netherlands',city:'Amsterdam',opened:2000,mw:180,acres:65,cooling:'Chilled water + partial free cooling',withdrawalGal:33000000,conf:'E',evapPct:65,source:'Waternet (Amsterdam)',gridMix:'~45% wind/solar, 30% gas, 5% nuclear',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Waternet',precip:31,notes:'AMS Science Park cluster. Netherlands proposed data center moratorium in 2022. Canal water heat exchange pilots.',cat:'colo'},
-  {id:'g-fin',name:'Hamina (Finland) Campus',op:'Google',region:'EUR-N',country:'Finland',city:'Hamina',opened:2011,mw:200,acres:175,cooling:'Seawater cooling (Gulf of Finland)',withdrawalGal:null,conf:'U',evapPct:10,source:'Seawater (Gulf of Finland); no municipal',gridMix:'~30% hydro, 25% nuclear, 25% wind (Fingrid)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Gulf of Finland (seawater)',precip:26,notes:'Former paper mill. Uses seawater from Gulf of Finland for cooling — near-zero freshwater. Innovative heat reuse pilot for city district heating.',cat:'hyperscale'},
-  {id:'ms-swe',name:'Gävle Data Center',op:'Microsoft',region:'EUR-N',country:'Sweden',city:'Gävle',opened:2021,mw:120,acres:110,cooling:'Air economizer (near-zero water)',withdrawalGal:null,conf:'U',evapPct:5,source:'Air-cooled; minimal municipal water',gridMix:'~45% hydro, 30% nuclear, 20% wind (Nord Pool)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Municipal (minimal)',precip:22,notes:'Nordic climate enables near-year-round air cooling. 100% renewable (Nordic hydro+wind). Cold climate = low cooling water need.',cat:'hyperscale'},
-
-  // ── ASIA-PACIFIC ──
-  {id:'g-sg',name:'Singapore Campus (Jurong)',op:'Google',region:'APAC',country:'Singapore',city:'Singapore',opened:2013,mw:200,acres:85,cooling:'Chilled water + partial cooling tower',withdrawalGal:36000000,conf:'E',evapPct:70,source:'PUB Singapore (NEWater + desalination)',gridMix:'~95% natural gas (SPPG)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'PUB Singapore',precip:92,notes:'Singapore imposed moratorium on new DCs 2019-2021 due to power/water. Resumed with strict WUE limits (<0.2 m³/MWh). Grid is almost entirely gas.',cat:'hyperscale'},
-  {id:'ms-sg',name:'Singapore DC Campus',op:'Microsoft',region:'APAC',country:'Singapore',city:'Singapore',opened:2014,mw:100,acres:40,cooling:'Chilled water system',withdrawalGal:18000000,conf:'E',evapPct:70,source:'PUB Singapore',gridMix:'~95% natural gas (SPPG)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'PUB Singapore',precip:92,notes:'Azure Southeast Asia. High power cost (gas-dominant grid) and strict WUE regulation. Hot+humid = challenging for air cooling.',cat:'hyperscale'},
-  {id:'ali-hz',name:'Hangzhou Data Center',op:'Alibaba',region:'APAC',country:'China',city:'Hangzhou',opened:2015,mw:300,acres:150,cooling:'Hybrid: cooling tower + partial liquid',withdrawalGal:54000000,conf:'E',evapPct:72,source:'Municipal (Qiantang R.)',gridMix:'~40% coal, 25% hydro, 20% wind (State Grid)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Hangzhou municipal',precip:56,notes:'Alibaba Cloud East China hub. China\'s grid still coal-heavy despite renewable build-out. Strict government mandates on PUE<1.3 since 2022.',cat:'hyperscale'},
-  {id:'ntt-tok',name:'Tokyo DC Campus (NTT Shinjuku)',op:'NTT',region:'APAC',country:'Japan',city:'Tokyo',opened:2000,mw:60,acres:8,cooling:'Air + chilled water (dense urban)',withdrawalGal:11000000,conf:'E',evapPct:65,source:'Tokyo Metropolitan Waterworks',gridMix:'~40% gas, 25% nuclear (TEPCO post-Fukushima)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Tokyo metro water',precip:61,notes:'Ultra-dense urban. High seismic risk requirements. Japan grid stabilizing post-Fukushima with nuclear restart. Very small land footprint per MW.',cat:'enterprise'},
-
-  // ── MIDDLE EAST / AFRICA ──
-  {id:'ms-uae',name:'UAE DC Campus (du partnership)',op:'Microsoft',region:'MEA',country:'UAE',city:'Dubai',opened:2025,mw:150,acres:120,cooling:'Adiabatic + district cooling',withdrawalGal:27000000,conf:'E',evapPct:80,source:'DEWA desalinated water',gridMix:'~99% gas + small solar (DEWA)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'DEWA desalinated',precip:4,notes:'$544.5M deal with du. Extreme heat = high cooling load. Desalinated water supply = high embodied energy in water itself. WUE is a critical regulatory concern.',cat:'hyperscale'},
-
-  // ── LATIN AMERICA ──
-  {id:'g-chile',name:'Cerrillos Campus (Santiago)',op:'Google',region:'LATAM',country:'Chile',city:'Santiago',opened:2023,mw:200,acres:90,cooling:'Hybrid: cooling tower + air',withdrawalGal:36000000,conf:'E',evapPct:74,source:'Aguas Andinas (Maipo R.)',gridMix:'~30% solar, 25% hydro, 25% gas (CDEC-SIC)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Aguas Andinas',precip:13,notes:'First Google DC in South America. Controversy over water use during Chile drought. Maipo River is stressed. $200M investment.',cat:'hyperscale'},
-  {id:'aws-bra',name:'São Paulo Region (AWS)',op:'AWS',region:'LATAM',country:'Brazil',city:'São Paulo',opened:2011,mw:180,acres:75,cooling:'Chilled water + cooling tower',withdrawalGal:32000000,conf:'E',evapPct:73,source:'SABESP (Guarapiranga / Cantareira)',gridMix:'~60% hydro, 20% wind, 10% gas (ONS)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'SABESP municipal',precip:57,notes:'AWS SA-East-1. São Paulo region faces periodic severe drought. Brazil\'s grid is heavily hydro but vulnerable to drought-induced power cuts.',cat:'hyperscale'},
-
-  // ── SMALLER / ENTERPRISE / EDGE ──
-  {id:'eqx-ny',name:'New York Campus (NY1-NY11)',op:'Equinix',region:'USA-E',country:'USA',city:'New York, NY',opened:2000,mw:50,acres:12,cooling:'Air + chilled water (dense urban)',withdrawalGal:9000000,conf:'E',evapPct:65,source:'NYC DEP (Delaware/Catskill aqueducts)',gridMix:'~30% nuclear, 25% gas, 20% hydro (NYISO)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'NYC DEP',precip:50,notes:'Dense urban colocation. Very high cost per sq ft. Excellent fiber peering (NYIIX). Very small land footprint.',cat:'colo'},
-  {id:'cs-den',name:'CoreSite Denver Campus',op:'CoreSite',region:'USA-W',country:'USA',city:'Denver, CO',opened:2006,mw:25,acres:6,cooling:'Air + partial evaporative',withdrawalGal:4500000,conf:'E',evapPct:68,source:'Denver Water (South Platte R.)',gridMix:'~35% wind, 30% gas (Xcel)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Denver Water',precip:15,notes:'Urban enterprise colocation. Moderate scale. Good fiber access (Denver tech hub). Xcel Energy territory.',cat:'enterprise'},
-  {id:'edge-node',name:'Edge Node (generic US urban)',op:'Other',region:'USA',country:'USA',city:'Various',opened:2020,mw:2,acres:0.5,cooling:'Air-cooled (100%)',withdrawalGal:360000,conf:'E',evapPct:5,source:'Municipal (city-specific)',gridMix:'US average: 40% gas, 20% coal, 20% renewables',onsiteGen:'UPS batteries + small diesel genset',onsiteRole:'BACKUP',waterSource:'Municipal',precip:null,notes:'Representative edge/CDN node. Typically a small building (<5,000 sq ft). Air-cooled. Near-zero water. Often in carrier hotels or office buildings.',cat:'edge'},
-  {id:'dr-lon',name:'London Campus (Sovereign House)',op:'Digital Realty',region:'EUR-W',country:'UK',city:'London',opened:2003,mw:55,acres:8,cooling:'Air + chilled water',withdrawalGal:10000000,conf:'E',evapPct:65,source:'Thames Water',gridMix:'~30% gas, 25% wind, 20% nuclear (National Grid)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Thames Water',precip:24,notes:'Dense urban London. Thames Water territory. UK grid rapidly decarbonizing — coal near zero. High real estate cost constrains land footprint.',cat:'colo'},
-  {id:'yondr-irl',name:'Yondr Dublin Campus',op:'Yondr',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2022,mw:60,acres:25,cooling:'Adiabatic (low water)',withdrawalGal:5000000,conf:'E',evapPct:60,source:'Irish Water',gridMix:'~35% wind, 35% gas (EirGrid)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,notes:'Smaller hyperscale campus. EirGrid moratorium pressure. Adiabatic cooling reduces water vs. evap towers.',cat:'enterprise'},
-  {id:'g-vir',name:'Loudoun County Campus (Reston)',op:'Google',region:'USA-E',country:'USA',city:'Loudoun County, VA',opened:2015,mw:250,acres:120,cooling:'Chilled water + air',withdrawalGal:45000000,conf:'E',evapPct:70,source:'Loudoun Water (Goose Creek / Potomac)',gridMix:'~30% nuclear, 30% gas, 15% wind (Dominion)',onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Loudoun Water',precip:43,notes:'Part of Northern Virginia (Ashburn) cluster. "Data Center Alley." Virginia DCs now consume 25%+ of state electricity.',cat:'hyperscale'},
+  {id:'g-dub',name:'Dublin Campus',op:'Google',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2011,mw:500,acres:400,cooling:'Air economizer + evap',withdrawalGal:90000000,conf:'E',evapPct:65,source:'Irish Water (River Liffey)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:35},{s:'Other',p:30}],onsiteGen:'Diesel generators (EU-restricted)',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,koppen:'Cfb',notes:'Part of Dublin cluster consuming ~80% of city electricity. Atlantic climate aids air cooling. Ireland moratorium pressure on new DCs.',cat:'hyperscale'},
+  {id:'ms-dub',name:'Dublin Grange Castle',op:'Microsoft',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2009,mw:250,acres:200,cooling:'Air economizer',withdrawalGal:45000000,conf:'E',evapPct:60,source:'Irish Water',gridMix:[{s:'Wind',p:35},{s:'Gas',p:35},{s:'Other',p:30}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,koppen:'Cfb',notes:'Azure EU West. Ireland power grid near capacity from DC demand.',cat:'hyperscale'},
+  {id:'eqx-fr',name:'Frankfurt Campus (FR1-FR8)',op:'Equinix',region:'EUR-C',country:'Germany',city:'Frankfurt',opened:1999,mw:210,acres:80,cooling:'Air + chilled water',withdrawalGal:38000000,conf:'E',evapPct:65,source:'Frankfurt Stadtentwässerung (Main R.)',gridMix:[{s:'Renewables',p:35},{s:'Gas',p:25},{s:'Coal',p:15},{s:'Nuclear',p:10},{s:'Other',p:15}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Frankfurt municipal',precip:25,koppen:'Cfb',notes:"Europe's largest DC hub. 42% of Frankfurt city electricity. EU Data Act mandates reporting from 2024.",cat:'colo'},
+  {id:'ix-ams',name:'Amsterdam AMS1-AMS9',op:'Interxion',region:'EUR-W',country:'Netherlands',city:'Amsterdam',opened:2000,mw:180,acres:65,cooling:'Chilled water + free cooling',withdrawalGal:33000000,conf:'E',evapPct:65,source:'Waternet (Amsterdam)',gridMix:[{s:'Wind',p:35},{s:'Solar',p:15},{s:'Gas',p:30},{s:'Nuclear',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Waternet',precip:31,koppen:'Cfb',notes:'Netherlands DC moratorium proposed 2022. Canal heat exchange pilots underway.',cat:'colo'},
+  {id:'g-fin',name:'Hamina Campus (Finland)',op:'Google',region:'EUR-N',country:'Finland',city:'Hamina',opened:2011,mw:200,acres:175,cooling:'Seawater cooling (Gulf of Finland)',withdrawalGal:null,conf:'U',evapPct:10,source:'Seawater (Gulf of Finland) — no municipal freshwater',gridMix:[{s:'Hydro',p:30},{s:'Nuclear',p:25},{s:'Wind',p:25},{s:'Other',p:20}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Gulf of Finland (seawater)',precip:26,koppen:'Dfb',notes:"Former paper mill. Seawater cooling = near-zero freshwater. District heating reuse pilot. Google's most sustainable DC design.",cat:'hyperscale'},
+  {id:'ms-swe',name:'Gävle Data Center',op:'Microsoft',region:'EUR-N',country:'Sweden',city:'Gävle',opened:2021,mw:120,acres:110,cooling:'Air economizer (near-zero water)',withdrawalGal:null,conf:'U',evapPct:5,source:'Air-cooled; minimal municipal water',gridMix:[{s:'Hydro',p:45},{s:'Nuclear',p:30},{s:'Wind',p:20},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Municipal (minimal)',precip:22,koppen:'Dfb',notes:'Near-year-round air cooling (Nordic climate). 100% renewable via Nord Pool hydro+wind.',cat:'hyperscale'},
+  {id:'dr-lon',name:'London Campus (Sovereign House)',op:'Digital Realty',region:'EUR-W',country:'UK',city:'London',opened:2003,mw:55,acres:8,cooling:'Air + chilled water',withdrawalGal:10000000,conf:'E',evapPct:65,source:'Thames Water',gridMix:[{s:'Gas',p:30},{s:'Wind',p:25},{s:'Nuclear',p:20},{s:'Other',p:25}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Thames Water',precip:24,koppen:'Cfb',notes:'Dense urban London. UK grid rapidly decarbonizing — coal near zero.',cat:'colo'},
+  {id:'g-nor',name:'Skien Campus (Norway)',op:'Google',region:'EUR-N',country:'Norway',city:'Skien',opened:2026,mw:385,acres:220,cooling:'Air + partial hydronic',withdrawalGal:null,conf:'U',evapPct:15,source:'Municipal + fjord cooling potential',gridMix:[{s:'Hydro',p:90},{s:'Wind',p:8},{s:'Other',p:2}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Municipal',precip:36,koppen:'Dfb',notes:'$624M investment announced 2024. 100% renewable hydropower. Heat reuse for district heating. Norway grid is ~90% hydro.',cat:'hyperscale'},
+  // ── APAC ──
+  {id:'g-sg',name:'Singapore Campus (Jurong)',op:'Google',region:'APAC',country:'Singapore',city:'Singapore',opened:2013,mw:200,acres:85,cooling:'Chilled water + cooling tower',withdrawalGal:36000000,conf:'E',evapPct:70,source:'PUB Singapore (NEWater + desalination)',gridMix:[{s:'Gas',p:95},{s:'Solar',p:4},{s:'Other',p:1}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'PUB Singapore',precip:92,koppen:'Af',notes:'Singapore imposed DC moratorium 2019-2021. Strict WUE limits (<0.2 m³/MWh) on resumption. Grid is ~95% natural gas.',cat:'hyperscale'},
+  {id:'ms-sg',name:'Singapore DC Campus',op:'Microsoft',region:'APAC',country:'Singapore',city:'Singapore',opened:2014,mw:100,acres:40,cooling:'Chilled water system',withdrawalGal:18000000,conf:'E',evapPct:70,source:'PUB Singapore',gridMix:[{s:'Gas',p:95},{s:'Solar',p:4},{s:'Other',p:1}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'PUB Singapore',precip:92,koppen:'Af',notes:'Azure Southeast Asia. Hot/humid = challenging for air cooling. Very high cooling load year-round.',cat:'hyperscale'},
+  {id:'ali-hz',name:'Hangzhou Data Center',op:'Alibaba',region:'APAC',country:'China',city:'Hangzhou',opened:2015,mw:300,acres:150,cooling:'Hybrid cooling tower + liquid',withdrawalGal:54000000,conf:'E',evapPct:72,source:'Qiantang River municipal',gridMix:[{s:'Coal',p:40},{s:'Hydro',p:25},{s:'Wind',p:20},{s:'Solar',p:10},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Hangzhou municipal',precip:56,koppen:'Cfa',notes:'Alibaba Cloud East China hub. PUE<1.3 mandated by Chinese government since 2022.',cat:'hyperscale'},
+  {id:'ntt-tok',name:'Tokyo DC Campus (Shinjuku)',op:'NTT',region:'APAC',country:'Japan',city:'Tokyo',opened:2000,mw:60,acres:8,cooling:'Air + chilled water (dense urban)',withdrawalGal:11000000,conf:'E',evapPct:65,source:'Tokyo Metropolitan Waterworks',gridMix:[{s:'Gas',p:40},{s:'Nuclear',p:25},{s:'Coal',p:15},{s:'Other',p:20}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Tokyo metro water',precip:61,koppen:'Cfa',notes:'Ultra-dense urban. Very small land footprint per MW. High seismic risk design requirements. Japan nuclear restarting post-Fukushima.',cat:'enterprise'},
+  {id:'air-syd',name:'Sydney Western Region (SYD1+SYD3)',op:'AirTrunk',region:'APAC',country:'Australia',city:'Western Sydney, NSW',opened:2017,mw:450,acres:25,cooling:'Weather-adaptive hybrid; 80% less water than traditional',withdrawalGal:null,conf:'U',evapPct:20,source:'Sydney Water (Warragamba Dam catchment)',gridMix:[{s:'Coal',p:45},{s:'Gas',p:20},{s:'Renewables',p:28},{s:'Other',p:7}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Sydney Water',precip:47,koppen:'Cfa',notes:'SYD1 (130+ MW) + SYD3 (320+ MW across 20.5 ac). 80% less water than traditional DC via real-time weather-adaptive cooling. PUE 1.15. Blackstone acquired AirTrunk for AUD 24B in 2024.',cat:'hyperscale'},
+  {id:'ten-sz',name:'Tencent Qianhai DC (Shenzhen)',op:'Tencent',region:'APAC',country:'China',city:'Shenzhen',opened:2018,mw:400,acres:90,cooling:'Sea water / chilled water hybrid',withdrawalGal:null,conf:'U',evapPct:30,source:'Seawater (Pearl River estuary) + municipal',gridMix:[{s:'Coal',p:35},{s:'Hydro',p:25},{s:'Nuclear',p:15},{s:'Renewables',p:20},{s:'Other',p:5}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Municipal + seawater',precip:69,koppen:'Cfa',notes:'Tencent Cloud South China hub. Seawater cooling reduces freshwater use. Guangdong grid shifting with new nuclear capacity (Daya Bay, Yangjiang).',cat:'hyperscale'},
+  // ── MEA ──
+  {id:'ms-uae',name:'UAE DC Campus (du partnership)',op:'Microsoft',region:'MEA',country:'UAE',city:'Dubai',opened:2025,mw:150,acres:120,cooling:'Adiabatic + district cooling',withdrawalGal:27000000,conf:'E',evapPct:80,source:'DEWA desalinated water',gridMix:[{s:'Gas',p:95},{s:'Solar',p:4},{s:'Other',p:1}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'DEWA desalinated',precip:4,koppen:'BWh',notes:'$544.5M deal with du. Extreme heat = very high cooling load. Desalinated water = high embodied energy in water supply itself.',cat:'hyperscale'},
+  // ── LATAM ──
+  {id:'g-chile',name:'Cerrillos Campus (Santiago)',op:'Google',region:'LATAM',country:'Chile',city:'Santiago',opened:2023,mw:200,acres:90,cooling:'Hybrid cooling tower + air',withdrawalGal:36000000,conf:'E',evapPct:74,source:'Aguas Andinas (Maipo R.)',gridMix:[{s:'Solar',p:30},{s:'Hydro',p:25},{s:'Gas',p:25},{s:'Wind',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Aguas Andinas',precip:13,koppen:'BSk',notes:'First Google DC in South America. Controversy over water use during Chile drought. Maipo River highly stressed.',cat:'hyperscale'},
+  {id:'aws-bra',name:'São Paulo Region',op:'AWS',region:'LATAM',country:'Brazil',city:'São Paulo',opened:2011,mw:180,acres:75,cooling:'Chilled water + cooling tower',withdrawalGal:32000000,conf:'E',evapPct:73,source:'SABESP (Guarapiranga / Cantareira)',gridMix:[{s:'Hydro',p:60},{s:'Wind',p:20},{s:'Gas',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'SABESP municipal',precip:57,koppen:'Cfa',notes:'AWS SA-East-1. São Paulo region faces periodic severe drought. Brazil grid heavily hydro but drought-vulnerable.',cat:'hyperscale'},
 ];
 
-// ─── BENCHMARKS ───
-const BENCHMARKS = [
-  // DATA CENTERS (selected)
-  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,color:'#e05550',notes:'434M gal/yr ÷ 190 ac. Most intensive DC per acre in this dataset.'},
-  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,color:'#e05550',notes:'1,400M gal/yr ÷ 1,000 ac.'},
-  {id:'dc-sg',name:'Google Singapore',cat:'data-center',afPerAc:2.12,color:'#e05550',notes:'Estimated from MW × 1.8 m³/MWh.'},
-  // AGRICULTURE
-  {id:'ag-alfalfa',name:'Irrigated alfalfa (AZ)',cat:'agriculture',afPerAc:5.5,color:'#34c978',notes:'Most water-intensive US crop. USGS 2015.'},
-  {id:'ag-rice',name:'Irrigated rice (CA)',cat:'agriculture',afPerAc:4.5,color:'#34c978',notes:'Paddy flooding. USGS.'},
-  {id:'ag-cotton',name:'Irrigated cotton (TX)',cat:'agriculture',afPerAc:2.8,color:'#34c978',notes:'USGS 2015.'},
-  {id:'ag-corn',name:'Irrigated corn (Midwest)',cat:'agriculture',afPerAc:1.5,color:'#34c978',notes:'National avg 2.09 AF/ac; Midwest corn lower. USGS.'},
-  {id:'ag-dryland',name:'Dryland farming',cat:'agriculture',afPerAc:0,color:'#34c978',notes:'Precipitation only; no irrigation withdrawal.'},
-  // LIVESTOCK
-  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water; intensive.'},
-  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,color:'#e8a032',notes:'EPA; ~50 gal/head/day; large 1,000-head lot.'},
-  // INDUSTRY
-  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,color:'#9d72e8',notes:'TSMC/Intel; ultra-pure water; 2-4M gal/day per facility on small footprint.'},
-  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,color:'#9d72e8',notes:'WRI; cooling tower dominated; varies.'},
-  {id:'in-refinery',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,color:'#9d72e8',notes:'API/EPA; cooling tower dominated.'},
-  {id:'in-lightmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,color:'#9d72e8',notes:'EPA/USGS; process water + HVAC.'},
-  {id:'in-warehouse',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,color:'#9d72e8',notes:'Minimal; sanitary + HVAC only.'},
-  // RECREATION
-  {id:'rec-golf-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,color:'#30c8c8',notes:'USGA/GCSAA 2020; arid region.'},
-  {id:'rec-golf-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,color:'#30c8c8',notes:'USGA/GCSAA 2020; 80 irrigated ac per 18-hole.'},
-  {id:'rec-golf-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,color:'#30c8c8',notes:'USGA; humid climate.'},
-  {id:'rec-centralpark',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,color:'#30c8c8',notes:'NYC DEP; 843 ac; ~125M gal/yr irrigation + fountains.'},
-  {id:'rec-stadium',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,color:'#30c8c8',notes:'~82 events/yr; concessions, irrigation; ~20 ac footprint.'},
-  // RESIDENTIAL (by density quintile)
-  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments, no landscaping; ~8 persons/ac.'},
-  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,color:'#6080f0',notes:'AWWA; 500-2,000/sq mi; mix apts/townhomes.'},
-  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,color:'#6080f0',notes:'AWWA; 100-500/sq mi; single family + landscaping.'},
-  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,color:'#6080f0',notes:'AWWA/USGS; 15-100/sq mi; large lots, irrigation.'},
-  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,color:'#6080f0',notes:'USGS; <15/sq mi; wells, septic; less municipal use per ac.'},
+// ════════════════ BENCHMARKS ════════════════
+const BENCHMARKS=[
+  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,color:'#e05550'},
+  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,color:'#e05550'},
+  {id:'dc-sg',name:'Google Singapore (est.)',cat:'data-center',afPerAc:2.12,color:'#e05550'},
+  {id:'ag-alfalfa',name:'Irrigated alfalfa (AZ)',cat:'agriculture',afPerAc:5.5,color:'#34c978',notes:'USGS 2015; most water-intensive US crop'},
+  {id:'ag-rice',name:'Irrigated rice (CA)',cat:'agriculture',afPerAc:4.5,color:'#34c978',notes:'USGS; paddy flooding'},
+  {id:'ag-cotton',name:'Irrigated cotton (TX)',cat:'agriculture',afPerAc:2.8,color:'#34c978'},
+  {id:'ag-corn',name:'Irrigated corn (Midwest)',cat:'agriculture',afPerAc:1.5,color:'#34c978'},
+  {id:'ag-dry',name:'Dryland farming',cat:'agriculture',afPerAc:0,color:'#34c978',notes:'Precipitation only; no irrigation'},
+  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water'},
+  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,color:'#e8a032'},
+  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,color:'#9d72e8',notes:'TSMC/Intel; ultrapure water; 2-4M gal/day'},
+  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,color:'#9d72e8'},
+  {id:'in-ref',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,color:'#9d72e8'},
+  {id:'in-lmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,color:'#9d72e8'},
+  {id:'in-wh',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,color:'#9d72e8'},
+  {id:'rec-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,color:'#30c8c8',notes:'USGA/GCSAA 2020'},
+  {id:'rec-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,color:'#30c8c8'},
+  {id:'rec-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,color:'#30c8c8'},
+  {id:'rec-cp',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,color:'#30c8c8',notes:'NYC DEP; 843 ac; ~125M gal/yr'},
+  {id:'rec-st',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,color:'#30c8c8'},
+  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments'},
+  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,color:'#6080f0'},
+  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,color:'#6080f0'},
+  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,color:'#6080f0'},
+  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,color:'#6080f0'},
 ];
 
-// Helper: get AF/year for a facility
+// ════════════════ HELPERS ════════════════
 function facilityAF(f){
-  if(f.withdrawalGal) return Math.round(f.withdrawalGal * AF * 10)/10;
-  if(f.mw && f.conf==='E') return Math.round(f.mw * 1000 * 1.8 * 0.000810714 * 10)/10; // 1.8 m³/MWh → AF
+  if(f.withdrawalGal) return Math.round(f.withdrawalGal*AF*10)/10;
+  if(f.mw&&f.conf==='E') return Math.round(f.mw*1000*1.8*0.000810714*10)/10;
   return null;
 }
 function facilityAFperAc(f){
-  const af = facilityAF(f);
-  if(af && f.acres) return Math.round(af/f.acres*100)/100;
-  return null;
+  const af=facilityAF(f);
+  return(af&&f.acres)?Math.round(af/f.acres*100)/100:null;
 }
 
-// ═══════════════════════════ UI ═══════════════════════════
+// ════════════════ TABLE ════════════════
+let sortCol=null,sortDir=1,currentFacilities=[...FACILITIES];
 
-let sortCol = null, sortDir = 1;
-let currentFacilities = [...FACILITIES];
-
-const COLS = [
-  {key:'name',label:'Facility',render:f=>`<div class="row-name">${f.name}</div><div class="row-sub">${f.city}</div>`},
+// COLUMNS — operator badge now next to facility name (merged cell)
+const COLS=[
+  {key:'name',label:'Facility',render:f=>`
+    <div style="display:flex;align-items:flex-start;gap:7px">
+      <span class="op-b" style="${opStyle(f.op)}">${f.op}</span>
+      <div>
+        <div class="rn">${f.name}</div>
+        <div class="rs">${f.city}</div>
+      </div>
+    </div>`},
   {key:'cat',label:'Type',render:f=>`<span class="tag" style="background:var(--s3);color:var(--t2)">${f.cat}</span>`},
-  {key:'country',label:'Country',render:f=>`<div style="font-size:11px">${f.country}</div>`},
+  {key:'country',label:'Country',render:f=>`<span style="font-size:11px">${f.country}</span>`},
   {key:'opened',label:'Est.',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t2)">${f.opened||'TBD'}</span>`},
-  {key:'mw',label:'MW',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--t1)">${f.mw?f.mw+'&thinsp;MW':'—'}</span>`},
+  {key:'mw',label:'MW',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:11px">${f.mw?f.mw+'&thinsp;MW':'—'}</span>`},
   {key:'acres',label:'Acres',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:11px">${f.acres?f.acres.toLocaleString():'—'}</span>`},
-  {key:'precip',label:'Precip (in/yr)',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:11px">${f.precip!=null?f.precip:'—'}</span>`},
+  {key:'koppen',label:'Climate',render:f=>f.koppen?`<span class="kc">${f.koppen}</span>`:'<span style="color:var(--t4)">—</span>'},
+  {key:'precip',label:'Precip (in)',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:11px">${f.precip!=null?f.precip:'—'}</span>`},
   {key:'af',label:'Withdrawal (AF/yr)',render:f=>{
     const af=facilityAF(f);
-    const badge=`<span class="conf-badge conf-${f.conf.toLowerCase()}">[${f.conf}]</span>`;
+    const badge=`<span class="conf c${f.conf.toLowerCase()}">[${f.conf}]</span>`;
     if(!af)return`<span style="color:var(--t3);font-size:10px">[U] undisclosed</span>`;
     const pct=(f.precip&&f.acres)?Math.round(af/(f.acres*f.precip/12)*100):null;
-    return`<div>${badge} <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--am)">${af.toLocaleString()}</span></div>${pct?`<div class="row-sub">${pct>100?'<span style="color:var(--rd)">':''}${pct}% of site precip${pct>100?'</span>':''}</div>`:''}`;
+    return`<div>${badge} <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--am)">${af.toLocaleString()}</span></div>
+    ${pct?`<div class="rs">${pct>100?`<span style="color:var(--rd)">`:''}${pct}% of site precip${pct>100?'</span>':''}</div>`:''}`;
   }},
-  {key:'afPerAc',label:'AF/ac/yr',render:f=>{
+  {key:'afpa',label:'AF/ac/yr',render:f=>{
     const v=facilityAFperAc(f);
-    if(!v)return`<span style="color:var(--t3);font-size:10px">—</span>`;
+    if(!v)return`<span style="color:var(--t4)">—</span>`;
     const col=v>4?'var(--rd)':v>2?'var(--am)':v>0.5?'var(--yw)':'var(--g)';
     return`<div style="font-family:'DM Mono',monospace;font-size:11px;color:${col}">${v}</div>
-    <div class="bar-mini"><div class="bar-fill" style="width:${Math.min(100,v/8*100)}%;background:${col}"></div></div>`;
+    <div class="bm"><div class="bf" style="width:${Math.min(100,v/8*100)}%;background:${col}"></div></div>`;
   }},
-  {key:'op',label:'Operator',render:f=>`<span class="op-badge" style="${opStyle(f.op)}">${f.op}</span>`},
-  {key:'cooling',label:'Cooling',render:f=>`<span style="font-size:10.5px;color:var(--t2)">${f.cooling}</span>`},
+  {key:'cooling',label:'Cooling',render:f=>`<span style="font-size:10px;color:var(--t2)">${f.cooling}</span>`},
 ];
 
 function buildTable(){
-  const thead=document.getElementById('thead-row');
-  thead.innerHTML=COLS.map((c,i)=>`<th onclick="sortTable('${c.key}')">${c.label}</th>`).join('');
-
-  renderTableBody();
+  document.getElementById('thead-row').innerHTML=
+    COLS.map(c=>`<th onclick="sortTable('${c.key}')">${c.label}</th>`).join('');
+  renderBody();
 }
-
-function renderTableBody(){
-  const tbody=document.getElementById('tbody');
-  tbody.innerHTML=currentFacilities.map(f=>`
-    <tr onclick="openModal('${f.id}')">
+function renderBody(){
+  document.getElementById('tbody').innerHTML=
+    currentFacilities.map(f=>`<tr onclick="openModal('${f.id}')">
       ${COLS.map(c=>`<td>${c.render(f)}</td>`).join('')}
     </tr>`).join('');
 }
-
 function sortTable(key){
-  if(sortCol===key) sortDir*=-1; else {sortCol=key;sortDir=1;}
-  const getVal=f=>{
-    if(key==='af') return facilityAF(f)||0;
-    if(key==='afPerAc') return facilityAFperAc(f)||0;
-    return f[key]||'';
-  };
-  currentFacilities.sort((a,b)=>{
-    const av=getVal(a),bv=getVal(b);
-    return typeof av==='number'?(av-bv)*sortDir:String(av).localeCompare(String(bv))*sortDir;
-  });
-  // Update header
+  if(sortCol===key)sortDir*=-1;else{sortCol=key;sortDir=1;}
+  const v=f=>key==='af'?facilityAF(f)||0:key==='afpa'?facilityAFperAc(f)||0:f[key]||'';
+  currentFacilities.sort((a,b)=>{const av=v(a),bv=v(b);return typeof av==='number'?(av-bv)*sortDir:String(av).localeCompare(String(bv))*sortDir;});
   document.querySelectorAll('#thead-row th').forEach((th,i)=>{
-    th.className=COLS[i].key===sortCol?(sortDir===1?'sorted-asc':'sorted-desc'):'';
+    th.className=COLS[i].key===sortCol?(sortDir===1?'sa':'sd'):'';
   });
-  renderTableBody();
+  renderBody();
 }
-
 function filterSidebar(q){
-  const lower=q.toLowerCase();
-  document.querySelectorAll('.sb-dc-item').forEach(el=>{
-    el.style.display=el.textContent.toLowerCase().includes(lower)?'':'none';
-  });
-  // Also filter main table
-  currentFacilities=FACILITIES.filter(f=>
-    !q||f.name.toLowerCase().includes(lower)||f.city.toLowerCase().includes(lower)||f.op.toLowerCase().includes(lower)||f.country.toLowerCase().includes(lower)
-  );
-  renderTableBody();
-  document.getElementById('sb-count').textContent=`${currentFacilities.length} of ${FACILITIES.length} facilities`;
+  const lo=q.toLowerCase();
+  document.querySelectorAll('.sb-dc-item').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(lo)?'':'none');
+  currentFacilities=FACILITIES.filter(f=>!q||[f.name,f.city,f.op,f.country].some(x=>x.toLowerCase().includes(lo)));
+  renderBody();
+  document.getElementById('sb-count').textContent=`${currentFacilities.length} of ${FACILITIES.length}`;
 }
 
+// ════════════════ SIDEBAR ════════════════
 function buildSidebar(){
-  const list=document.getElementById('sb-dc-list');
-  list.innerHTML=FACILITIES.map(f=>`
-    <div class="sb-item sb-dc-item" onclick="openModal('${f.id}')">
+  document.getElementById('sb-dc-list').innerHTML=
+    FACILITIES.map(f=>`<div class="sb-item sb-dc-item" onclick="openModal('${f.id}')">
       <span class="sb-dot" style="background:${(OC[f.op]||OC.Other).c}"></span>
-      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${f.name.length>28?f.name.slice(0,26)+'…':f.name}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px">${f.name.length>28?f.name.slice(0,26)+'…':f.name}</span>
     </div>`).join('');
-  document.getElementById('sb-bench-list').innerHTML=
-    `<div class="sb-item" onclick="showPanel('benchmark')"><span class="sb-dot" style="background:var(--g)"></span>Water intensity chart</div>
-     <div class="sb-item" onclick="showPanel('densitymap')"><span class="sb-dot" style="background:var(--pu)"></span>Density quintile map</div>`;
   document.getElementById('sb-count').textContent=`${FACILITIES.length} facilities`;
 }
 
+// ════════════════ STATS ════════════════
 function buildStats(){
-  const measured=FACILITIES.filter(f=>f.conf==='M');
-  const totalAF=measured.reduce((s,f)=>s+(facilityAF(f)||0),0);
-  const maxAF=Math.max(...FACILITIES.map(f=>facilityAF(f)||0));
-  const maxF=FACILITIES.find(f=>facilityAF(f)===maxAF);
+  const ms=FACILITIES.filter(f=>f.conf==='M');
+  const totAF=ms.reduce((s,f)=>s+(facilityAF(f)||0),0);
   document.getElementById('stats-row').innerHTML=`
-    <div class="stat"><div class="stat-lbl">Facilities</div><div class="stat-val">${FACILITIES.length} <span class="stat-unit">sites</span></div><div class="stat-sub">${FACILITIES.filter(f=>f.country==='USA').length} USA · ${FACILITIES.filter(f=>f.country!=='USA').length} international</div></div>
-    <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val">${new Set(FACILITIES.map(f=>f.country)).size} <span class="stat-unit">nations</span></div></div>
-    <div class="stat"><div class="stat-lbl">Measured withdrawal</div><div class="stat-val">${Math.round(totalAF/1000)}k <span class="stat-unit">AF/yr</span></div><div class="stat-sub">${measured.length} facilities reported</div></div>
-    <div class="stat"><div class="stat-lbl">Most water (AF/ac)</div><div class="stat-val">${facilityAFperAc(FACILITIES.find(f=>f.id==='g-td'))} <span class="stat-unit">AF/ac</span></div><div class="stat-sub">Google The Dalles</div></div>
-    <div class="stat"><div class="stat-lbl">Best water efficiency</div><div class="stat-val">Near 0 <span class="stat-unit">AF/yr</span></div><div class="stat-sub">MS Quincy (QWRU)</div></div>
-    <div class="stat"><div class="stat-lbl">Oldest facility</div><div class="stat-val">1967</div><div class="stat-sub">IBM Boulder (original plant)</div></div>
+    <div class="stat"><div class="stat-l">Facilities</div><div class="stat-v">${FACILITIES.length}<span class="stat-u"> sites</span></div><div class="stat-s">${FACILITIES.filter(f=>f.country==='USA').length} USA · ${FACILITIES.filter(f=>f.country!=='USA').length} international</div></div>
+    <div class="stat"><div class="stat-l">Countries</div><div class="stat-v">${new Set(FACILITIES.map(f=>f.country)).size}<span class="stat-u"> nations</span></div></div>
+    <div class="stat"><div class="stat-l">Measured withdrawal</div><div class="stat-v">${Math.round(totAF/1000)}k<span class="stat-u"> AF/yr</span></div><div class="stat-s">${ms.length} reported facilities</div></div>
+    <div class="stat"><div class="stat-l">Most intensive (AF/ac)</div><div class="stat-v">7.02<span class="stat-u"> AF/ac</span></div><div class="stat-s">Google The Dalles</div></div>
+    <div class="stat"><div class="stat-l">Best water efficiency</div><div class="stat-v">≈0<span class="stat-u"> AF/yr</span></div><div class="stat-s">MS Quincy (QWRU)</div></div>
+    <div class="stat"><div class="stat-l">Oldest facility</div><div class="stat-v">1967</div><div class="stat-s">IBM Boulder (original plant)</div></div>
   `;
 }
 
-// ═══════════════════════════ MODAL / DRILL-DOWN ═══════════════════════════
+// ════════════════ MODAL / DRILL-DOWN ════════════════
 function openModal(id){
-  const f=FACILITIES.find(x=>x.id===id);
-  if(!f)return;
+  const f=FACILITIES.find(x=>x.id===id);if(!f)return;
   document.getElementById('modal-title').textContent=f.name;
-  document.getElementById('modal-sub').textContent=`${f.city} · ${f.country} · ${f.cat} · Est. ${f.opened||'TBD'}`;
-
+  document.getElementById('modal-sub').textContent=`${f.city} · ${f.country} · ${f.cat} · Est. ${f.opened||'TBD'} · Köppen: ${f.koppen||'—'}`;
   const af=facilityAF(f);
-  const afPerAc=facilityAFperAc(f);
+  const afpa=facilityAFperAc(f);
   const sitePrec=f.precip&&f.acres?Math.round(f.acres*f.precip/12):null;
   const evapAF=af?Math.round(af*f.evapPct/100*10)/10:null;
   const dischAF=af?Math.round(af*(100-f.evapPct)/100*10)/10:null;
+  const kcDesc=f.koppen?(KC[f.koppen]||f.koppen):'Not classified';
+  const pilePrimary=f.onsiteRole==='PRIMARY';
 
   document.getElementById('modal-body').innerHTML=`
-    <div class="modal-grid">
-      <div class="modal-card">
-        <div class="modal-card-h">Infrastructure</div>
-        <div class="modal-row"><span class="modal-key">Operator</span><span class="modal-val"><span class="op-badge" style="${opStyle(f.op)}">${f.op}</span></span></div>
-        <div class="modal-row"><span class="modal-key">Country</span><span class="modal-val">${f.country}</span></div>
-        <div class="modal-row"><span class="modal-key">Capacity</span><span class="modal-val">${f.mw?f.mw+' MW':'Not disclosed'}</span></div>
-        <div class="modal-row"><span class="modal-key">Land</span><span class="modal-val">${f.acres?f.acres.toLocaleString()+' acres':'Not disclosed'}</span></div>
-        <div class="modal-row"><span class="modal-key">Cooling</span><span class="modal-val">${f.cooling}</span></div>
-        <div class="modal-row"><span class="modal-key">Category</span><span class="modal-val">${f.cat}</span></div>
+    <div class="mg">
+      <div class="mc">
+        <div class="mch">Infrastructure</div>
+        <div class="mr"><span class="mk">Operator</span><span class="mv"><span class="op-b" style="${opStyle(f.op)}">${f.op}</span></span></div>
+        <div class="mr"><span class="mk">Country</span><span class="mv">${f.country}</span></div>
+        <div class="mr"><span class="mk">Category</span><span class="mv">${f.cat}</span></div>
+        <div class="mr"><span class="mk">Capacity</span><span class="mv">${f.mw?f.mw+' MW':'Not disclosed'}</span></div>
+        <div class="mr"><span class="mk">Land</span><span class="mv">${f.acres?f.acres.toLocaleString()+' acres':'Not disclosed'}</span></div>
+        <div class="mr"><span class="mk">Cooling</span><span class="mv">${f.cooling}</span></div>
+        <div class="mr"><span class="mk">Onsite gen.</span><span class="mv">${f.onsiteGen}</span></div>
+        <div class="mr"><span class="mk">Gen. role</span><span class="mv"><span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:600;background:${pilePrimary?'var(--ac2)':'var(--am2)'};color:${pilePrimary?'var(--ac)':'var(--am)'};border:1px solid ${pilePrimary?'var(--ac)':'var(--am)'}">${f.onsiteRole}</span></span></div>
       </div>
-      <div class="modal-card">
-        <div class="modal-card-h">Water Summary</div>
-        <div class="modal-row"><span class="modal-key">Confidence</span><span class="modal-val"><span class="conf-badge conf-${f.conf.toLowerCase()}">[${f.conf}]</span> ${f.conf==='M'?'Metered/Reported':f.conf==='E'?'Estimated (1.8 m³/MWh)':'Undisclosed'}</span></div>
-        <div class="modal-row"><span class="modal-key">Annual withdrawal</span><span class="modal-val" style="color:var(--am)">${af?af.toLocaleString()+' AF/yr':'Undisclosed'}</span></div>
-        <div class="modal-row"><span class="modal-key">Evaporated (~${f.evapPct}%)</span><span class="modal-val" style="color:var(--rd)">${evapAF?evapAF.toLocaleString()+' AF':'—'}</span></div>
-        <div class="modal-row"><span class="modal-key">Discharged (~${100-f.evapPct}%)</span><span class="modal-val" style="color:var(--ac)">${dischAF?dischAF.toLocaleString()+' AF':'—'}</span></div>
-        <div class="modal-row"><span class="modal-key">Intensity (AF/ac/yr)</span><span class="modal-val">${afPerAc||'—'}</span></div>
-        <div class="modal-row"><span class="modal-key">Water source</span><span class="modal-val">${f.source}</span></div>
+      <div class="mc">
+        <div class="mch">Climate &amp; Location</div>
+        <div class="mr"><span class="mk">Köppen code</span><span class="mv"><span class="kc">${f.koppen||'—'}</span></span></div>
+        <div class="mr"><span class="mk">Climate type</span><span class="mv" style="font-family:'DM Sans',sans-serif;font-size:10.5px">${kcDesc}</span></div>
+        <div class="mr"><span class="mk">Annual precip.</span><span class="mv">${f.precip?f.precip+' in/yr':'—'}</span></div>
+        <div class="mr"><span class="mk">Site precip (AF)</span><span class="mv" style="color:var(--g)">${sitePrec?sitePrec.toLocaleString()+' AF/yr':'—'}</span></div>
+        <div class="mr"><span class="mk">Withdrawal / precip</span><span class="mv">${(af&&sitePrec)?`<span style="color:${af>sitePrec?'var(--rd)':'var(--g)'}"> ${Math.round(af/sitePrec*100)}%</span>`:'—'}</span></div>
+        <div class="mr"><span class="mk">Water source</span><span class="mv" style="font-family:'DM Sans',sans-serif;font-size:10.5px">${f.source}</span></div>
       </div>
-      <div class="modal-card">
-        <div class="modal-card-h">Precipitation Context</div>
-        <div class="modal-row"><span class="modal-key">Local precip</span><span class="modal-val">${f.precip?f.precip+' in/yr':'—'}</span></div>
-        <div class="modal-row"><span class="modal-key">Site precip (total)</span><span class="modal-val" style="color:var(--g)">${sitePrec?sitePrec.toLocaleString()+' AF/yr':'—'}</span></div>
-        <div class="modal-row"><span class="modal-key">Withdrawal / site precip</span><span class="modal-val">${(af&&sitePrec)?`<span style="color:${af>sitePrec?'var(--rd)':'var(--g)'}"> ${Math.round(af/sitePrec*100)}%</span>`:'—'}</span></div>
+      <div class="mc">
+        <div class="mch">Water Summary <span class="conf c${f.conf.toLowerCase()}">[${f.conf}]</span></div>
+        <div class="mr"><span class="mk">Annual withdrawal</span><span class="mv" style="color:var(--am)">${af?af.toLocaleString()+' AF/yr':'Undisclosed'}</span></div>
+        <div class="mr"><span class="mk">Evaporated (~${f.evapPct}%)</span><span class="mv" style="color:var(--rd)">${evapAF?evapAF.toLocaleString()+' AF':'—'}</span></div>
+        <div class="mr"><span class="mk">Discharged (~${100-f.evapPct}%)</span><span class="mv" style="color:var(--ac)">${dischAF?dischAF.toLocaleString()+' AF':'—'}</span></div>
+        <div class="mr"><span class="mk">AF/acre/year</span><span class="mv">${afpa||'—'}</span></div>
       </div>
-      <div class="modal-card">
-        <div class="modal-card-h">Energy</div>
-        <div class="modal-row"><span class="modal-key">Grid mix</span><span class="modal-val" style="max-width:170px;text-align:right;white-space:normal;line-height:1.3">${f.gridMix}</span></div>
-        <div class="modal-row"><span class="modal-key">Onsite generation</span><span class="modal-val">${f.onsiteGen}</span></div>
-        <div class="modal-row"><span class="modal-key">Role</span><span class="modal-val"><span class="${f.onsiteRole==='PRIMARY'?'pill-primary':'pill-backup'}" style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:600;background:${f.onsiteRole==='PRIMARY'?'var(--ac2)':'var(--am2)'};color:${f.onsiteRole==='PRIMARY'?'var(--ac)':'var(--am)'};border:1px solid ${f.onsiteRole==='PRIMARY'?'var(--ac)':'var(--am)'}">${f.onsiteRole}</span></span></div>
+      <div class="mc">
+        <div class="mch">Energy Grid</div>
+        ${f.gridMix.map(g=>`<div class="mr"><span class="mk">${g.s}</span><span class="mv" style="color:${EC[g.s]||'#888'}">${g.p}%</span></div>`).join('')}
       </div>
     </div>
-    ${af?`<div class="sankey-container">
-      <h4>Water Flow — Sankey Diagram</h4>
-      <svg id="sankey-svg" viewBox="0 0 700 200" style="max-height:200px"></svg>
-    </div>`:''}
+    ${af?`<div class="snk"><h4>Water Flow — Sankey</h4><svg id="snk-svg" viewBox="0 0 680 180" style="width:100%;max-height:180px"></svg></div>`:''}
+    <div class="donut-wrap"><h4>Energy Mix</h4><div class="donut-inner"><svg id="donut-svg" viewBox="-1 -1 102 102" style="width:160px;height:160px;flex-shrink:0"></svg><div class="donut-leg" id="donut-leg"></div></div></div>
     <div class="info">${f.notes}</div>
   `;
-  if(af) drawSankey(f,af,evapAF,dischAF,sitePrec);
+  if(af)drawSankey(f,af,evapAF,dischAF,sitePrec);
+  drawDonut(f);
   document.getElementById('modal').style.display='flex';
 }
 
 function drawSankey(f,af,evapAF,dischAF,sitePrec){
-  const svg=document.getElementById('sankey-svg');
-  if(!svg)return;
-  const W=700,H=180;
-  const nodeW=18,pad=6;
-  // Source → Withdrawal → [Evap + Discharge]
-  // Nodes
-  const nodes=[
-    {id:'src',label:f.source.split('(')[0].trim(),x:20,y:40,h:120,col:'#3ab0ef'},
-    {id:'wd',label:'Withdrawal '+af.toLocaleString()+' AF',x:280,y:40,h:120,col:'#e8a032'},
-    {id:'ev',label:'Evaporated',x:540,y:40,h:Math.round(120*f.evapPct/100),col:'#e05550'},
-    {id:'dc',label:'Discharged',x:540,y:40+Math.round(120*f.evapPct/100)+pad,h:Math.round(120*(100-f.evapPct)/100)-pad,col:'#4f86f7'},
-  ];
-  // Build SVG
+  const svg=document.getElementById('snk-svg');if(!svg)return;
+  const nw=16,H=160,totH=120,padY=20;
   let out='';
-  // Draw links
-  function bezier(x1,y1,h1,x2,y2,h2,col,opacity=0.35){
+  function bez(x1,y1,h1,x2,y2,h2,col){
     const mx=(x1+x2)/2;
-    return `<path d="M${x1+nodeW},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}
-                  L${x2},${y2+h2} C${mx},${y2+h2} ${mx},${y1+h1} ${x1+nodeW},${y1+h1} Z"
-      fill="${col}" opacity="${opacity}"/>`;
+    return`<path d="M${x1+nw},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}
+      L${x2},${y2+h2} C${mx},${y2+h2} ${mx},${y1+h1} ${x1+nw},${y1+h1} Z"
+      fill="${col}" opacity="0.38"/>`;
   }
-  out+=bezier(nodes[0].x,nodes[0].y,nodes[0].h,nodes[1].x,nodes[1].y,nodes[1].h,'#e8a032');
-  out+=bezier(nodes[1].x,nodes[1].y,Math.round(nodes[1].h*f.evapPct/100),nodes[2].x,nodes[2].y,nodes[2].h,'#e05550');
-  out+=bezier(nodes[1].x,nodes[1].y+Math.round(nodes[1].h*f.evapPct/100),Math.round(nodes[1].h*(100-f.evapPct)/100),nodes[3].x,nodes[3].y,nodes[3].h,'#4f86f7');
-
-  // Draw nodes
-  nodes.forEach(n=>{
-    out+=`<rect x="${n.x}" y="${n.y}" width="${nodeW}" height="${n.h}" rx="3" fill="${n.col}" opacity="0.9"/>`;
-    const ty=n.y+n.h/2;
-    const tx=n.id==='src'?n.x+nodeW+6:n.id==='wd'?n.x+nodeW+6:n.x-6;
-    const anchor=n.id==='ev'||n.id==='dc'?'end':'start';
-    const lx=n.id==='ev'||n.id==='dc'?n.x-4:n.x+nodeW+4;
-    out+=`<text x="${lx}" y="${ty+1}" dominant-baseline="middle" text-anchor="${anchor}" fill="#dde4f0" font-family="DM Mono,monospace" font-size="9">${n.label}</text>`;
+  const eh=Math.round(totH*f.evapPct/100);
+  const dh=totH-eh;
+  // Links
+  out+=bez(18,padY,totH,320,padY,totH,'#e8a032');
+  out+=bez(320+nw,padY,eh,540,padY,eh,'#e05550');
+  out+=bez(320+nw,padY+eh,dh,540,padY+eh,dh,'#4f86f7');
+  // Nodes
+  [[18,padY,totH,'#3ab0ef',f.source.split('(')[0].trim().slice(0,18)],[320,padY,totH,'#e8a032','Withdrawal'],[540,padY,eh,'#e05550','Evap ~'+f.evapPct+'%'],[540,padY+eh+2,dh-2,'#4f86f7','Discharge']].forEach(([x,y,h,col,lbl])=>{
+    out+=`<rect x="${x}" y="${y}" width="${nw}" height="${h}" rx="3" fill="${col}" opacity="0.9"/>`;
+    const tx=x<300?x+nw+4:x-4,anc=x<300?'start':'end';
+    out+=`<text x="${tx}" y="${y+h/2+1}" dominant-baseline="middle" text-anchor="${anc}" fill="#c8d0e0" font-family="DM Mono,monospace" font-size="8.5">${lbl}</text>`;
   });
-
-  // Precip context bar
-  if(sitePrec){
-    const ratio=Math.min(3,af/sitePrec);
-    out+=`<text x="350" y="175" text-anchor="middle" fill="#4a5570" font-family="DM Mono,monospace" font-size="8">Site precipitation: ${sitePrec.toLocaleString()} AF/yr · Withdrawal is ${Math.round(af/sitePrec*100)}% of site precip</text>`;
-  }
-
+  // Values
+  if(af)out+=`<text x="329" y="${padY+totH+14}" fill="#8a96b0" font-family="DM Mono,monospace" font-size="8">${af.toLocaleString()} AF/yr withdrawn</text>`;
+  if(sitePrec)out+=`<text x="340" y="${H-2}" text-anchor="middle" fill="#3a4255" font-family="DM Mono,monospace" font-size="7.5">Site precip: ${sitePrec.toLocaleString()} AF/yr · withdrawal = ${Math.round(af/sitePrec*100)}% of site rain</text>`;
   svg.innerHTML=out;
 }
 
-function closeModal(e){
-  if(!e||e.target===document.getElementById('modal')||e===undefined){
-    document.getElementById('modal').style.display='none';
-  }
+function drawDonut(f){
+  const svg=document.getElementById('donut-svg');
+  const leg=document.getElementById('donut-leg');
+  if(!svg||!leg||!f.gridMix||!f.gridMix.length)return;
+  const r=45,cx=50,cy=50,stroke=14;
+  let cumAngle=-Math.PI/2;
+  let arcs='';
+  f.gridMix.forEach(g=>{
+    const frac=g.p/100;
+    const angle=frac*2*Math.PI;
+    const x1=cx+r*Math.cos(cumAngle);
+    const y1=cy+r*Math.sin(cumAngle);
+    const x2=cx+r*Math.cos(cumAngle+angle);
+    const y2=cy+r*Math.sin(cumAngle+angle);
+    const large=angle>Math.PI?1:0;
+    const col=EC[g.s]||'#606060';
+    if(frac>0.001){
+      arcs+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${col}" opacity="0.85"/>`;
+    }
+    cumAngle+=angle;
+  });
+  // Donut hole
+  arcs+=`<circle cx="${cx}" cy="${cy}" r="${r-stroke}" fill="${'#111520'}"/>`;
+  // Center text
+  const top=f.gridMix.reduce((a,b)=>a.p>b.p?a:b);
+  arcs+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" dominant-baseline="middle" fill="#dde4f0" font-family="DM Mono,monospace" font-size="9" font-weight="500">${top.p}%</text>`;
+  arcs+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" dominant-baseline="middle" fill="#8a96b0" font-family="DM Mono,monospace" font-size="7">${top.s}</text>`;
+  svg.innerHTML=arcs;
+  leg.innerHTML=f.gridMix.map(g=>`<div class="dl"><div class="dsw" style="background:${EC[g.s]||'#606060'}"></div><span>${g.s} <strong style="color:var(--t1)">${g.p}%</strong></span></div>`).join('');
 }
 
-// ═══════════════════════════ BENCHMARK CHART ═══════════════════════════
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal'))document.getElementById('modal').style.display='none';
+}
+
+// ════════════════ BENCHMARK ════════════════
 function buildBenchmarkChart(){
   const sorted=[...BENCHMARKS].sort((a,b)=>b.afPerAc-a.afPerAc);
   const max=sorted[0].afPerAc;
-  const cats={
-    'data-center':'Data Centers',
-    'agriculture':'Agriculture',
-    'livestock':'Livestock',
-    'industry':'Industry',
-    'recreation':'Recreation',
-    'residential':'Residential',
-  };
-  let html='';
-  let lastCat='';
+  const catLabels={'data-center':'Data Centers','agriculture':'Agriculture','livestock':'Livestock','industry':'Industry','recreation':'Recreation','residential':'Residential'};
+  let html='',lastCat='';
   sorted.forEach(b=>{
     if(b.cat!==lastCat){
-      html+=`<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:14px 0 6px;border-top:1px solid var(--b1);margin-top:6px">${cats[b.cat]||b.cat}</div>`;
+      html+=`<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:12px 0 5px;border-top:1px solid var(--b1);margin-top:4px">${catLabels[b.cat]||b.cat}</div>`;
       lastCat=b.cat;
     }
     const pct=b.afPerAc/max*100;
-    html+=`<div class="bench-row" title="${b.notes}">
-      <div class="bench-name">${b.name}</div>
-      <div class="bench-bar-wrap">
-        <div class="bench-bar" style="width:${pct}%;background:${b.color}">
-          ${pct>18?b.afPerAc+' AF/ac':''}
-        </div>
-      </div>
-      <div class="bench-val">${b.afPerAc} <span class="bench-unit">AF/ac/yr</span></div>
+    html+=`<div class="br" title="${b.notes||''}">
+      <div class="bn">${b.name}</div>
+      <div class="bw"><div class="bb" style="width:${pct}%;background:${b.color}">${pct>15?b.afPerAc+' AF/ac':''}</div></div>
+      <div class="bv">${b.afPerAc} <span style="font-size:9px;color:var(--t4)">AF/ac/yr</span></div>
     </div>`;
   });
-  document.getElementById('benchmark-chart').innerHTML=`<div class="bench-chart">${html}</div>
-  <div class="info"><strong>Key finding:</strong> Google The Dalles (7.02 AF/ac/yr) is more water-intensive per acre than any irrigated crop in the USGS database except semiconductor fabs (8.0 AF/ac/yr). Google Council Bluffs (4.30 AF/ac/yr) is comparable to Southwest golf courses and more intensive than most irrigated agriculture. By contrast, Microsoft Quincy (post-QWRU), Switch Citadel, and Nordic data centers achieve near-zero water intensity — demonstrating that geography + technology can eliminate the water burden entirely.</div>`;
+  document.getElementById('benchmark-chart').innerHTML=`<div class="bc">${html}</div>
+  <div class="info" style="margin-top:14px"><strong>Key finding:</strong> Google The Dalles (7.02 AF/ac/yr) is more water-intensive per acre than any irrigated crop except semiconductor fabs (8.0 AF/ac/yr). Dense urban residential land (0.6 AF/ac) uses less water per acre than any crop or data center using evaporative cooling — the efficiency of density.</div>`;
 }
 
-// ═══════════════════════════ COMPARE ═══════════════════════════
+// ════════════════ COMPARE ════════════════
 function buildCompareSelects(){
   const all=[
-    ...FACILITIES.map(f=>({id:'f:'+f.id,label:f.name+' ('+f.country+')',type:'facility'})),
-    ...BENCHMARKS.map(b=>({id:'b:'+b.id,label:b.name+' [benchmark]',type:'bench'})),
+    ...FACILITIES.map(f=>({id:'f:'+f.id,label:f.name+' ('+f.country+')'})),
+    ...BENCHMARKS.map(b=>({id:'b:'+b.id,label:b.name+' [benchmark]'})),
   ];
   ['cmp-a','cmp-b'].forEach((sid,i)=>{
     const sel=document.getElementById(sid);
@@ -666,214 +626,135 @@ function buildCompareSelects(){
   });
   renderCompare();
 }
-
 function getItem(id){
-  if(id.startsWith('f:')){const f=FACILITIES.find(x=>x.id===id.slice(2));return f?{...f,_type:'facility'}:null;}
-  const b=BENCHMARKS.find(x=>x.id===id.slice(2));return b?{...b,_type:'bench'}:null;
+  if(id.startsWith('f:')){const f=FACILITIES.find(x=>x.id===id.slice(2));return f?{...f,_t:'f'}:null;}
+  const b=BENCHMARKS.find(x=>x.id===id.slice(2));return b?{...b,_t:'b'}:null;
 }
-
+function getAFpa(item){return item._t==='f'?facilityAFperAc(item):item.afPerAc;}
 function renderCompare(){
   const a=getItem(document.getElementById('cmp-a').value);
   const b=getItem(document.getElementById('cmp-b').value);
   ['a','b'].forEach((s,i)=>{
     const item=[a,b][i];
-    const div=document.getElementById(`cmp-${s}-card`);
+    const div=document.getElementById('cmp-'+s+'-card');
     if(!item){div.innerHTML='';return;}
-    if(item._type==='facility'){
-      const f=item;
-      const af=facilityAF(f);
-      const afpa=facilityAFperAc(f);
-      div.innerHTML=`
-        <div style="font-size:11px;color:var(--t2);line-height:1.8">
-          <div><strong style="color:var(--t1)">${f.name}</strong> · ${f.country}</div>
-          <div>MW: <span style="color:var(--t1)">${f.mw||'N/D'}</span> · Acres: <span style="color:var(--t1)">${f.acres||'N/D'}</span></div>
-          <div>Withdrawal: <span style="color:var(--am)">${af?af.toLocaleString()+' AF/yr':'Undisclosed'}</span></div>
-          <div>Intensity: <span style="color:var(--t1)">${afpa||'—'} AF/ac/yr</span></div>
-          <div>Cooling: ${f.cooling}</div>
-          <div>Source: ${f.source}</div>
-          <div>Grid: ${f.gridMix}</div>
-          <div>Onsite: ${f.onsiteGen} · <strong>${f.onsiteRole}</strong></div>
-          <div style="margin-top:6px;color:var(--t3);font-size:10px">${f.notes}</div>
-        </div>`;
+    if(item._t==='f'){
+      const af=facilityAF(item),afpa=facilityAFperAc(item);
+      div.innerHTML=`<div style="font-size:11px;color:var(--t2);line-height:1.8;margin-top:8px">
+        <div><strong style="color:var(--t1)">${item.name}</strong> · ${item.country}</div>
+        <div>MW: ${item.mw||'N/D'} · Acres: ${item.acres||'N/D'} · Köppen: <span class="kc">${item.koppen||'—'}</span></div>
+        <div>Withdrawal: <span style="color:var(--am)">${af?af.toLocaleString()+' AF/yr':'Undisclosed'}</span></div>
+        <div>Intensity: <span style="color:var(--t1)">${afpa||'—'} AF/ac/yr</span></div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">${item.notes||''}</div>
+      </div>`;
     } else {
-      div.innerHTML=`
-        <div style="font-size:11px;color:var(--t2);line-height:1.8">
-          <div><strong style="color:var(--t1)">${item.name}</strong> · ${item.cat}</div>
-          <div>Water intensity: <span style="color:var(--am)">${item.afPerAc} AF/ac/yr</span></div>
-          <div style="margin-top:6px;color:var(--t3);font-size:10px">${item.notes}</div>
-        </div>`;
+      div.innerHTML=`<div style="font-size:11px;color:var(--t2);line-height:1.8;margin-top:8px">
+        <div><strong style="color:var(--t1)">${item.name}</strong> · ${item.cat}</div>
+        <div>Water intensity: <span style="color:var(--am)">${item.afPerAc} AF/ac/yr</span></div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">${item.notes||''}</div>
+      </div>`;
     }
   });
-  // Comparison bars
-  const getAFpa=item=>item._type==='facility'?facilityAFperAc(item):item.afPerAc;
+  // Bars
   const aVal=getAFpa(a)||0,bVal=getAFpa(b)||0;
-  const maxV=Math.max(aVal,bVal,0.01);
-  const fields=a&&a._type==='facility'&&b&&b._type==='facility'?[
+  const fields=a&&a._t==='f'&&b&&b._t==='f'?[
     {label:'AF/ac/yr',av:aVal,bv:bVal,color:'#e8a032'},
     {label:'MW capacity',av:a.mw||0,bv:b.mw||0,color:'#4f86f7'},
     {label:'Acres',av:a.acres||0,bv:b.acres||0,color:'#34c978'},
-    {label:'Site precip (AF)',av:a.precip&&a.acres?a.acres*a.precip/12:0,bv:b.precip&&b.acres?b.acres*b.precip/12:0,color:'#9d72e8'},
+    {label:'Precip (in/yr)',av:a.precip||0,bv:b.precip||0,color:'#9d72e8'},
   ]:[{label:'Water intensity (AF/ac/yr)',av:aVal,bv:bVal,color:'#e8a032'}];
-
-  document.getElementById('compare-bars').innerHTML=`
-    <div class="bench-chart">
-      ${fields.map(row=>{
-        const mx=Math.max(row.av,row.bv,0.01);
-        const an=a?a.name||a.id:'A',bn=b?b.name||b.id:'B';
-        return`<div style="margin-bottom:14px">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">${row.label}</div>
-          <div class="bench-row"><div class="bench-name" style="color:var(--t2);font-size:11px;width:180px">${an.slice(0,22)}</div>
-            <div class="bench-bar-wrap"><div class="bench-bar" style="width:${row.av/mx*100}%;background:${row.color}">${row.av>0?row.av:''}</div></div>
-            <div class="bench-val">${row.av||'—'}</div></div>
-          <div class="bench-row"><div class="bench-name" style="color:var(--t2);font-size:11px;width:180px">${bn.slice(0,22)}</div>
-            <div class="bench-bar-wrap"><div class="bench-bar" style="width:${row.bv/mx*100}%;background:${row.color}90">${row.bv>0?row.bv:''}</div></div>
-            <div class="bench-val">${row.bv||'—'}</div></div>
-        </div>`;
-      }).join('')}
-    </div>`;
+  const an=a?a.name||'A':'A',bn=b?b.name||'B':'B';
+  document.getElementById('compare-bars').innerHTML=`<div class="bc">
+    ${fields.map(row=>{
+      const mx=Math.max(row.av,row.bv,0.01);
+      return`<div style="margin-bottom:12px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">${row.label}</div>
+        <div class="br"><div class="bn" style="width:170px;min-width:170px">${an.slice(0,22)}</div><div class="bw"><div class="bb" style="width:${row.av/mx*100}%;background:${row.color}">${row.av>0?row.av:''}</div></div><div class="bv">${row.av||'—'}</div></div>
+        <div class="br"><div class="bn" style="width:170px;min-width:170px">${bn.slice(0,22)}</div><div class="bw"><div class="bb" style="width:${row.bv/mx*100}%;background:${row.color}90">${row.bv>0?row.bv:''}</div></div><div class="bv">${row.bv||'—'}</div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
-// ═══════════════════════════ DENSITY MAP ═══════════════════════════
+// ════════════════ DENSITY MAP ════════════════
 function buildDensityMap(){
   const el=document.getElementById('density-map');
-  // Simple SVG choropleth of US states (simplified — using state-level density as proxy)
-  // State density data (persons/sq mi, 2020 Census, approximate)
-  const stateDensity={
-    AL:99,AK:1.3,AZ:64,AR:57,CA:254,CO:56,CT:736,DE:504,FL:397,GA:191,
-    HI:226,ID:22,IL:231,IN:189,IA:57,KS:36,KY:112,LA:108,ME:44,MD:637,
-    MA:898,MI:176,MN:72,MS:64,MO:89,MT:7.4,NE:25,NV:29,NH:153,NJ:1211,
-    NM:17,NY:414,NC:213,ND:11,OH:290,OK:58,OR:44,PA:290,RI:1025,SC:169,
-    SD:11.4,TN:167,TX:113,UT:40,VT:70,VA:218,WA:116,WV:74,WI:108,WY:6
-  };
-  // Quintile breaks: Q1<15, Q2 15-100, Q3 100-500, Q4 500-2000, Q5>2000
-  function quintile(d){
-    if(d<15)return 1;if(d<100)return 2;if(d<500)return 3;if(d<2000)return 4;return 5;
-  }
-  const qColors=['#1a2535','#1e3a50','#1a4a6a','#1080c0','#40b8f0'];
-  const qLabels=['Q1 Rural (<15)','Q2 Semi-rural (15-100)','Q3 Low suburban (100-500)','Q4 Medium urban (500-2,000)','Q5 Dense urban (>2,000)'];
-
-  // Simple rectangular state map (not geographic — use positioned rectangles as simplified layout)
-  // Using a known approximate hex-grid US state layout
-  const stateGrid=[
-    // [col, row, abbr]
-    [10,0,'ME'],[10,1,'VT'],[10,2,'NH'],[10,3,'MA'],[10,4,'RI'],[10,5,'CT'],
-    [9,0,'NY'],[9,1,'PA'],[9,2,'NJ'],[9,3,'DE'],[9,4,'MD'],
-    [8,0,'MI'],[8,1,'OH'],[8,2,'WV'],[8,3,'VA'],[8,4,'NC'],[8,5,'SC'],
-    [7,0,'WI'],[7,1,'IN'],[7,2,'KY'],[7,3,'TN'],[7,4,'GA'],[7,5,'FL'],
-    [6,0,'MN'],[6,1,'IL'],[6,2,'MO'],[6,3,'AR'],[6,4,'AL'],[6,5,'MS'],
-    [5,0,'ND'],[5,1,'SD'],[5,2,'NE'],[5,3,'KS'],[5,4,'OK'],[5,5,'TX'],
-    [4,0,'MT'],[4,1,'WY'],[4,2,'CO'],[4,3,'NM'],[4,4,'LA'],
-    [3,0,'ID'],[3,1,'UT'],[3,2,'AZ'],[3,3,'AK'],
-    [2,0,'WA'],[2,1,'OR'],[2,2,'NV'],[2,3,'CA'],[2,4,'HI'],
-    [1,0,'IA'],[1,1,'MO'],[0,0,'DC'],
-  ];
-  // Re-do with proper grid
-  const grid=[
-    [0,0,'AK'],[0,10,'HI'],
-    [1,6,'WA'],[1,7,'OR'],[1,8,'CA'],[1,9,'NV'],[1,10,'AZ'],
-    [2,6,'ID'],[2,7,'MT'],[2,8,'WY'],[2,9,'CO'],[2,10,'NM'],
-    [3,6,'ND'],[3,7,'SD'],[3,8,'NE'],[3,9,'KS'],
-    [4,5,'MN'],[4,6,'IA'],[4,7,'MO'],[4,8,'OK'],[4,9,'TX'],
-    [5,4,'WI'],[5,5,'IL'],[5,6,'AR'],[5,7,'LA'],
-    [6,3,'MI'],[6,4,'IN'],[6,5,'KY'],[6,6,'TN'],[6,7,'MS'],[6,8,'AL'],[6,9,'GA'],[6,10,'FL'],
-    [7,2,'OH'],[7,3,'WV'],[7,4,'VA'],[7,5,'NC'],[7,6,'SC'],
-    [8,1,'PA'],[8,2,'MD'],[8,3,'DC'],[8,4,'DE'],
-    [9,0,'NY'],[9,1,'NJ'],[9,2,'CT'],[9,3,'RI'],
-    [10,0,'VT'],[10,1,'NH'],[10,2,'ME'],
-    [11,0,'MA'],
-    [3,10,'UT'],
-  ];
-
-  const CW=60,CH=40,GAP=3;
-  const cols=12,rows=11;
-  const svgW=cols*(CW+GAP)+GAP;
-  const svgH=rows*(CH+GAP)+GAP;
-
-  let svgStr=`<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">`;
-  grid.forEach(([col,row,abbr])=>{
-    const d=stateDensity[abbr]||1;
-    const q=quintile(d);
-    const x=col*(CW+GAP)+GAP;
-    const y=row*(CH+GAP)+GAP;
-    const fill=qColors[q-1];
-    svgStr+=`<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="3" fill="${fill}" stroke="#0d1018" stroke-width="1"/>
-      <text x="${x+CW/2}" y="${y+CH/2-5}" text-anchor="middle" dominant-baseline="middle" fill="#dde4f0" font-family="DM Mono,monospace" font-size="10" font-weight="500">${abbr}</text>
-      <text x="${x+CW/2}" y="${y+CH/2+7}" text-anchor="middle" dominant-baseline="middle" fill="#8a96b0" font-family="DM Mono,monospace" font-size="8">${d<10?d.toFixed(1):Math.round(d)}/mi²</text>`;
+  const density={AL:99,AK:1.3,AZ:64,AR:57,CA:254,CO:56,CT:736,DE:504,FL:397,GA:191,HI:226,ID:22,IL:231,IN:189,IA:57,KS:36,KY:112,LA:108,ME:44,MD:637,MA:898,MI:176,MN:72,MS:64,MO:89,MT:7.4,NE:25,NV:29,NH:153,NJ:1211,NM:17,NY:414,NC:213,ND:11,OH:290,OK:58,OR:44,PA:290,RI:1025,SC:169,SD:11.4,TN:167,TX:113,UT:40,VT:70,VA:218,WA:116,WV:74,WI:108,WY:6};
+  function q(d){if(d<15)return 0;if(d<100)return 1;if(d<500)return 2;if(d<2000)return 3;return 4;}
+  const qC=['#182030','#1e3a5a','#1a5080','#1080c0','#30b0e8'];
+  const qL=['Q1 Rural <15','Q2 Semi-rural 15-100','Q3 Low suburban 100-500','Q4 Med urban 500-2k','Q5 Dense urban >2k'];
+  // Approximate US state grid layout [col, row, abbr]
+  const grid=[[0,6,'WA'],[0,7,'OR'],[0,8,'CA'],[1,6,'ID'],[1,7,'NV'],[1,8,'AZ'],[2,5,'MT'],[2,6,'WY'],[2,7,'UT'],[2,8,'NM'],[3,5,'ND'],[3,6,'SD'],[3,7,'NE'],[3,8,'KS'],[3,9,'OK'],[3,10,'TX'],[4,4,'MN'],[4,5,'WI'],[4,6,'IA'],[4,7,'MO'],[4,8,'AR'],[4,9,'LA'],[5,4,'MI'],[5,5,'IL'],[5,6,'IN'],[5,7,'KY'],[5,8,'TN'],[5,9,'MS'],[5,10,'AL'],[6,4,'OH'],[6,5,'WV'],[6,6,'VA'],[6,7,'NC'],[6,8,'SC'],[6,9,'GA'],[6,10,'FL'],[7,3,'PA'],[7,4,'MD'],[7,5,'DE'],[7,6,'NJ'],[8,2,'NY'],[8,3,'CT'],[8,4,'RI'],[9,1,'MA'],[9,2,'VT'],[9,3,'NH'],[9,4,'ME'],[0,10,'HI'],[0,0,'AK']];
+  const CW=58,CH=38,G=2;
+  const cols=10,rows=11;
+  const W=cols*(CW+G)+G,Ht=rows*(CH+G)+G;
+  let svg=`<svg viewBox="0 0 ${W} ${Ht}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">`;
+  grid.forEach(([col,row,ab])=>{
+    const d=density[ab]||1;
+    const qi=q(d);
+    const x=col*(CW+G)+G,y=row*(CH+G)+G;
+    svg+=`<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="3" fill="${qC[qi]}" stroke="#080a0f" stroke-width="1"/>
+      <text x="${x+CW/2}" y="${y+CH/2-4}" text-anchor="middle" dominant-baseline="middle" fill="#dde4f0" font-family="DM Mono,monospace" font-size="9.5" font-weight="500">${ab}</text>
+      <text x="${x+CW/2}" y="${y+CH/2+7}" text-anchor="middle" dominant-baseline="middle" fill="#8a96b0" font-family="DM Mono,monospace" font-size="7.5">${d<10?d.toFixed(1):Math.round(d)}/mi²</text>`;
   });
-  svgStr+=`</svg>`;
-  el.innerHTML=svgStr;
-
-  // Legend
-  document.getElementById('map-legend').innerHTML=qColors.map((c,i)=>`
-    <div class="map-legend-item"><div class="map-swatch" style="background:${c}"></div>${qLabels[i]}</div>
-  `).join('');
+  svg+=`</svg>`;
+  el.innerHTML=svg;
+  document.getElementById('map-legend').innerHTML=qC.map((c,i)=>`<div class="mli"><div class="mlsw" style="background:${c}"></div>${qL[i]}</div>`).join('');
 }
 
-// ═══════════════════════════ SOURCES ═══════════════════════════
+// ════════════════ SOURCES ════════════════
 function buildSources(){
-  document.getElementById('sources-content').innerHTML=`
-    <div class="info">
-      <strong>Methodology for estimated [E] figures:</strong>
-      Direct water withdrawal for facilities without disclosed data is estimated as:
-      <em>Withdrawal (m³/yr) = IT capacity (MW) × 1,000 (kW/MW) × 8,760 (hrs/yr) × 1.8 (m³/MWh)</em>,
-      based on the empirical benchmark from <strong>Siddik et al. (2021), Environmental Research Letters</strong>
-      ("The environmental footprint of data centers in the United States"), which found a median direct water footprint of 1.8 m³/MWh for US data centers using evaporative cooling.
-      This benchmark is then converted to gallons (1 m³ = 264.17 gal) and acre-feet (1 AF = 325,851 gal).
-      Estimates are shown as [E] and should be treated as order-of-magnitude indicators, not precise figures.
-      Facilities using air cooling, closed-loop, or seawater cooling will have substantially lower actual use than the estimate.
-    </div>
-    <div class="sec-h">Primary Data Sources</div>
-    <div class="sg">
-      ${[
-        ['OPB / public records','Google The Dalles: 434M gal (2024), 384M gal (2023); city = 1/3 of supply','https://www.opb.org/article/2026/01/15/as-googles-water-demands-grow-the-dalles-aims-to-pull-more-from-mount-hood-forest/'],
-        ['Valicor (May 2026)','Google Council Bluffs: 1.4B gal withdrawn, 1.0B evap, 400M blowdown','https://www.valicor.com/blog/data-center-water-management-afterthought'],
-        ['WPR (May 2025)','Microsoft WDM: 68.5M gal (2024), direct evaporative cooling detail','https://www.wpr.org/news/microsoft-data-center-iowa-wisconsin-expect'],
-        ['US EPA','Microsoft Quincy QWRU: 380M gal/yr savings, 30-mile pipe network','https://www.epa.gov/waterreuse/water-reuse-case-study-quincy-washington'],
-        ['Baxtel','Meta Altoona: 52.7M gal/yr, 1.0M MWh/yr, site profile','https://baxtel.com/data-center/facebook-altoona-iowa'],
-        ['Siddik et al. 2021, ERL','Environmental footprint benchmark: 1.8 m³/MWh median direct water (evap cooling)','https://iopscience.iop.org/article/10.1088/1748-9326/ac14bc'],
-        ['ELI (Jan 2026)','Data Centers and Water Fact Sheet: evap ~80%, discharge ~20%','https://www.eli.org/sites/default/files/files-pdf/Data%20Centers%20and%20Water%20Fact%20Sheet%20ELI%20January%202026%20(1).pdf'],
-        ['MOST Policy Initiative (Apr 2026)','Google fleet: 7.8B gal withdrawn, 78% evaporated (2024)','https://mostpolicyinitiative.org/science-note/data-center-water-use/'],
-        ['USGA/GCSAA (2020)','Golf course water use: national median 2.08 AF/ac; SW 4.0; NE 0.8','https://www.usga.org/content/usga/home-page/course-care/green-section-record/63/issue-06/introducing-the-course-coefficient---a-water-use-benchmarking-to.html'],
-        ['USGS (2015)','Irrigation water use: national avg 2.09 AF/ac; crop-specific benchmarks','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
-        ['Uptime Institute','Cooling tower mechanics: 1% evap of flow rate per MW','https://journal.uptimeinstitute.com/dont-ignore-water-consumption/'],
-        ['IBM.com','IBM Boulder: 48-hr gasoline reserve, 63% free cooling, 300k sq ft','https://www.ibm.com/support/pages/ibmtechu-ibm-storage-university-washington-dc-day-2-green-data-center'],
-        ['Microsoft Local','Quincy QWRU: adiabatic cooling, 97% reduction in potable use','https://local.microsoft.com/blog/partnering-with-the-city-of-quincy-to-open-washingtons-first-industrial-water-reuse-center/'],
-        ['Switch PR (2017)','Citadel: 2,000 ac, 650 MW, 100% solar (179 MW Switch Station)','https://www.prnewswire.com/news-releases/switch-tahoe-reno-now-open-largest-most-advanced-data-center-campus-in-the-world-300407648.html'],
-        ['MIT Tech Review (May 2025)','Nevada DC boom; ~10 in/yr precip; water stress concerns','https://www.technologyreview.com/2025/05/20/1116287/ai-data-centers-nevada-water-reno-computing-environmental-impact/'],
-        ['Brookings (Apr 2026)','Dublin 80% city electricity; Frankfurt 42%; global DC demand growth','https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/'],
-        ['S&P Global (Sep 2025)','Global DC water footprint: 140M m³ (2023), projected 300M m³ (2030)','https://www.spglobal.com/sustainable1/en/insights/special-editorial/beneath-the-surface-water-stress-in-data-centers'],
-        ['AWWA','Residential water use benchmarks by density; 100 gal/person/day average','https://www.awwa.org/Resources-Tools/Resources/Water-Statistics'],
-        ['2020 US Census','State-level population density for quintile map','https://www.census.gov/library/visualizations/interactive/2020-population-and-housing-state-data.html'],
-        ['technostatecraft Substack (Feb 2025)','NWCPUD energy mix shift: 85%→46.5% hydro at The Dalles','https://www.technostatecraft.com/p/how-google-is-reshaping-a-small-oregon'],
-        ['Goldman Sachs (Nov 2025)','BTM systems: 25-33% of DC incremental demand 2024-2030','https://www.goldmansachs.com/insights/articles/fuel-cells-could-help-meet-the-power-demand-from-data-centers'],
-        ['Inside Climate News (Nov 2025)','DC diesel generators; MS committing to phase out petroleum diesel by 2030','https://insideclimatenews.org/news/12112025/data-center-diesel-generators-noise-pollution/'],
-      ].map(([label,desc,url])=>`
-        <div class="si"><div class="sn" style="min-width:auto;width:auto;margin-right:8px">→</div>
-          <div><a class="sl" href="${url}" target="_blank" style="font-weight:500">${label}</a>
-          <div style="font-size:10px;color:var(--t3);margin-top:1px">${desc}</div></div>
-        </div>`).join('')}
-    </div>`;
+  const srcs=[
+    ['OPB (Jan 2026)','Google The Dalles: 434.4M gal (2024) via public records request — city water billing','https://www.opb.org/article/2026/01/15/as-googles-water-demands-grow-the-dalles-aims-to-pull-more-from-mount-hood-forest/'],
+    ['Valicor (May 2026)','Google Council Bluffs: 1.4B gal withdrawn, 1.0B evap, 400M blowdown','https://www.valicor.com/blog/data-center-water-management-afterthought'],
+    ['WPR (May 2025)','Microsoft WDM: 68.5M gal (2024), direct evaporative, WDM utility records','https://www.wpr.org/news/microsoft-data-center-iowa-wisconsin-expect'],
+    ['US EPA','Microsoft Quincy QWRU: 380M gal/yr savings, 30-mile pipe system','https://www.epa.gov/waterreuse/water-reuse-case-study-quincy-washington'],
+    ['Baxtel','Meta Altoona: 52.7M gal/yr, 1.0M MWh/yr, site profile data','https://baxtel.com/data-center/facebook-altoona-iowa'],
+    ['Siddik et al. 2021, ERL','Benchmark formula: 1.8 m³/MWh median direct water, US evap-cooled DCs','https://iopscience.iop.org/article/10.1088/1748-9326/ac14bc'],
+    ['ELI (Jan 2026)','Evap ~80%, discharge ~20% for evaporative cooling systems','https://www.eli.org/sites/default/files/files-pdf/Data%20Centers%20and%20Water%20Fact%20Sheet%20ELI%20January%202026%20(1).pdf'],
+    ['Data Center Frontier (2024)','AWS Susquehanna: $650M acquisition, 960 MW potential, 1,200-acre campus, nuclear co-location','https://www.datacenterfrontier.com/hyperscale/article/33038288/aws-eyes-960-mw-for-newly-acquired-nuclear-power-data-center-in-pennsylvania'],
+    ['Talen Energy SEC (2024)','AWS/Cumulus campus development milestones, 300 MW initial ISA, FERC proceedings','https://www.sec.gov/Archives/edgar/data/0001622536/000162828024038388/a20240826pressreleasecumul.htm'],
+    ['AirTrunk (2021–2025)','SYD1 (130+ MW), SYD2 (110 MW / 9.75 ac), SYD3 (320+ MW / 20.5 ac); 80% less water than traditional; PUE 1.15','https://airtrunk.com/airtrunk-opens-second-sydney-hyperscale-data-centre/'],
+    ['Markets and Markets (2024)','Google Norway (Skien): $624M, 385 MW planned, 100% renewable hydro, heat reuse','https://www.marketsandmarkets.com/Market-Reports/hyperscale-data-center-market-26026183.html'],
+    ['USGS (2015)','Irrigation water use: national avg 2.09 AF/ac; crop-specific benchmarks','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
+    ['USGA/GCSAA (2020)','Golf course: national median 2.08 AF/ac; SW 4.0; NE 0.8 AF/irrigated acre','https://www.usga.org/content/usga/home-page/course-care/green-section-record/63/issue-06/introducing-the-course-coefficient---a-water-use-benchmarking-to.html'],
+    ['MOST Policy Initiative (Apr 2026)','Google fleet: 7.8B gal withdrawn, 78% evaporated (2024)','https://mostpolicyinitiative.org/science-note/data-center-water-use/'],
+    ['Brookings (Apr 2026)','Dublin 80% city electricity; Frankfurt 42%; global DC demand projections','https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/'],
+    ['technostatecraft (Feb 2025)','NWCPUD energy mix: 85%→46.5% hydro at The Dalles 2015–2023','https://www.technostatecraft.com/p/how-google-is-reshaping-a-small-oregon'],
+    ['CBRE Global DC Trends 2025','Atlanta 1,279 MW; Northern VA +523 MW; Frankfurt/Paris growth','https://www.cbre.com/insights/reports/global-data-center-trends-2025'],
+    ['NOAA Climate Normals 1991-2020','All precipitation figures; climate station data','https://www.ncei.noaa.gov/access/us-climate-normals/'],
+    ['en.climate-data.org','Köppen-Geiger classifications confirmed for individual sites','https://en.climate-data.org'],
+    ['US Census 2020','State population density for quintile map','https://www.census.gov'],
+    ['IBM.com','Boulder: 48-hr gasoline reserve, 63% free cooling, 300k sq ft raised floor','https://www.ibm.com/support/pages/ibmtechu-ibm-storage-university-washington-dc-day-2-green-data-center'],
+    ['Microsoft Local','Quincy QWRU partnership; adiabatic cooling, 97% potable reduction','https://local.microsoft.com/blog/partnering-with-the-city-of-quincy-to-open-washingtons-first-industrial-water-reuse-center/'],
+    ['Switch PR Newswire (2017)','Citadel: 2,000 ac, 650 MW, 100% solar (179 MW Switch Station 1+2)','https://www.prnewswire.com/news-releases/switch-tahoe-reno-now-open-largest-most-advanced-data-center-campus-in-the-world-300407648.html'],
+    ['AWWA','Residential water use benchmarks by density; 100 gal/person/day','https://www.awwa.org'],
+    ['Inside Climate News (Nov 2025)','DC diesel generators; Microsoft committing to phase out petroleum diesel by 2030','https://insideclimatenews.org/news/12112025/data-center-diesel-generators-noise-pollution/'],
+  ];
+  document.getElementById('sources-content').innerHTML=`<div class="sg">
+    ${srcs.map(([lbl,desc,url])=>`<div class="si"><div class="sn">→</div><div><a class="sl" href="${url}" target="_blank">${lbl}</a><div style="font-size:10px;color:var(--t3);margin-top:1px">${desc}</div></div></div>`).join('')}
+  </div>
+  <div class="disc">
+    <strong>Estimation methodology:</strong> [E] figures use W(AF/yr) = MW × 1000 × 8760 × 1.8 ÷ 264.172 ÷ 325851. Applies only to evaporative cooling facilities. Air-cooled, seawater, and closed-loop facilities are marked [U] regardless of disclosed MW. ±40–60% uncertainty; treat as order-of-magnitude only.<br><br>
+    <strong>Köppen climate data:</strong> Codes confirmed via en.climate-data.org using 1991–2021 station records (Köppen-Geiger classification). Descriptions follow the standard Köppen-Geiger nomenclature.<br><br>
+    <strong>Energy mix:</strong> Physical generation mix from national grid operator data, not PPA-matched renewable claims. All major hyperscalers claim 100% renewable via PPAs/RECs; physical electrons may differ. The Dalles case illustrates this gap most clearly (NWCPUD 85%→46% hydro as Google growth outpaced BPA allocation).
+  </div>`;
 }
 
-// ═══════════════════════════ PANEL SWITCHING ═══════════════════════════
+// ════════════════ PANEL / INIT ════════════════
 function showPanel(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
-  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('visible');
-  document.querySelectorAll('.ttab').forEach(t=>{
-    if(t.getAttribute('onclick').includes(id))t.classList.add('active');
-  });
-  // Lazy build
-  if(id==='benchmark'&&!document.querySelector('.bench-row'))buildBenchmarkChart();
-  if(id==='compare'&&!document.querySelector('.cp-select option'))buildCompareSelects();
+  document.querySelectorAll('.tab').forEach(t=>{if(t.getAttribute('onclick').includes(id))t.classList.add('active');});
+  if(id==='benchmark'&&!document.querySelector('.br'))buildBenchmarkChart();
+  if(id==='compare'&&!document.querySelector('.cp-sel option'))buildCompareSelects();
   if(id==='densitymap'&&!document.querySelector('#density-map svg'))buildDensityMap();
   if(id==='sources'&&!document.querySelector('.si'))buildSources();
+  window.scrollTo(0,0);
 }
 
-// ═══════════════════════════ INIT ═══════════════════════════
-buildSidebar();
-buildTable();
-buildStats();
+buildSidebar();buildTable();buildStats();
 </script>
 </body>
 </html>
