@@ -182,12 +182,15 @@ td{padding:8px 11px;vertical-align:middle;line-height:1.4}
 <div class="main">
 <div class="topbar">
   <div class="tb-title">Global Data Center Infrastructure &amp; Water Intelligence</div>
-  <div class="tabs">
-    <button class="tab active" onclick="showPanel('overview')">Overview</button>
-    <button class="tab" onclick="showPanel('benchmark')">Benchmarks</button>
-    <button class="tab" onclick="showPanel('compare')">Compare</button>
-    <button class="tab" onclick="showPanel('densitymap')">Density Map</button>
-    <button class="tab" onclick="showPanel('sources')">Sources</button>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="showPanel('overview')">Overview</button>
+      <button class="tab" onclick="showPanel('benchmark')">Benchmarks</button>
+      <button class="tab" onclick="showPanel('compare')">Compare</button>
+      <button class="tab" onclick="showPanel('densitymap')">Density Map</button>
+      <button class="tab" onclick="showPanel('sources')">Sources</button>
+    </div>
+    <button id="unit-toggle" onclick="toggleUnits()" style="font-family:DM Mono,monospace;font-size:10px;padding:5px 12px;border:1px solid var(--b2);border-radius:3px;background:var(--s2);color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s" title="Switch between US customary and metric units">US Units</button>
   </div>
 </div>
 
@@ -249,6 +252,105 @@ td{padding:8px 11px;vertical-align:middle;line-height:1.4}
 <script>
 // ════════════════ DATA ════════════════
 const AF=1/325851;
+
+// ════════════════ UNIT SYSTEM ════════════════
+let METRIC = false;
+
+// Conversion factors
+const C = {
+  AF_TO_M3:      1233.48,        // 1 acre-foot → m³
+  AFAC_TO_M3HA:  3048.0,         // 1 AF/ac/yr → m³/ha/yr
+  IN_TO_MM:      25.4,           // 1 inch → mm
+  AC_TO_HA:      0.404686,       // 1 acre → hectare
+  GAL_TO_M3:     0.00378541,     // 1 US gallon → m³
+};
+
+function toggleUnits(){
+  METRIC = !METRIC;
+  const btn = document.getElementById('unit-toggle');
+  btn.textContent = METRIC ? 'Metric (SI)' : 'US Units';
+  btn.style.background = METRIC ? 'var(--ac2)' : 'var(--s2)';
+  btn.style.color = METRIC ? 'var(--ac)' : 'var(--t2)';
+  btn.style.borderColor = METRIC ? 'var(--ac)' : 'var(--b2)';
+  // Re-render all visible content
+  buildStats();
+  renderBody();
+  // Force lazy panels to rebuild on next visit
+  document.querySelectorAll('.bc').forEach(el => el.closest('.panel') && (el.closest('.panel').dataset.built = ''));
+  const curPanel = document.querySelector('.panel.visible');
+  if(curPanel){
+    const id = curPanel.id.replace('panel-','');
+    if(id==='benchmark'){ buildBenchmarkChart(); }
+    if(id==='compare'){ renderCompare(); }
+  }
+}
+
+// ── Format helpers ──
+// Volume (AF or m³)
+function fmtVol(afVal, decimals){
+  if(afVal == null) return '—';
+  if(METRIC){
+    const m3 = afVal * C.AF_TO_M3;
+    if(m3 >= 1e6) return (m3/1e6).toFixed(decimals!=null?decimals:2) + ' Mm³';
+    if(m3 >= 1000) return (m3/1000).toFixed(decimals!=null?decimals:1) + ' k m³';
+    return m3.toFixed(decimals!=null?decimals:0) + ' m³';
+  }
+  return afVal.toLocaleString(undefined,{maximumFractionDigits:decimals!=null?decimals:1}) + ' AF';
+}
+
+// Intensity (AF/ac/yr or m³/ha/yr)
+function fmtIntensity(afPerAc, decimals){
+  if(afPerAc == null) return '—';
+  if(METRIC){
+    const v = afPerAc * C.AFAC_TO_M3HA;
+    return v.toFixed(decimals!=null?decimals:0) + ' m³/ha/yr';
+  }
+  return afPerAc.toFixed(decimals!=null?decimals:2) + ' AF/ac/yr';
+}
+
+// Intensity value only (no unit label) — for bars
+function fmtIntensityVal(afPerAc, decimals){
+  if(afPerAc == null) return '—';
+  if(METRIC) return (afPerAc * C.AFAC_TO_M3HA).toFixed(decimals!=null?decimals:0);
+  return afPerAc.toFixed(decimals!=null?decimals:2);
+}
+
+// Intensity unit label only
+function intensityUnit(){ return METRIC ? 'm³/ha/yr' : 'AF/ac/yr'; }
+
+// Area (acres or hectares)
+function fmtArea(acres){
+  if(acres == null) return '—';
+  if(METRIC) return (acres * C.AC_TO_HA).toFixed(1) + ' ha';
+  return acres.toLocaleString() + ' ac';
+}
+
+// Precipitation (inches or mm)
+function fmtPrecip(inches){
+  if(inches == null) return '—';
+  if(METRIC) return Math.round(inches * C.IN_TO_MM) + ' mm/yr';
+  return inches + ' in/yr';
+}
+
+// Volume from gallons (for facility drill-downs)
+function fmtGal(gal){
+  if(gal == null) return '—';
+  if(METRIC){
+    const m3 = gal * C.GAL_TO_M3;
+    if(m3 >= 1e6) return (m3/1e6).toFixed(2) + ' Mm³/yr';
+    return (m3/1000).toFixed(1) + ' k m³/yr';
+  }
+  if(gal >= 1e9) return (gal/1e9).toFixed(2) + 'B gal/yr';
+  if(gal >= 1e6) return (gal/1e6).toFixed(1) + 'M gal/yr';
+  return gal.toLocaleString() + ' gal/yr';
+}
+
+// Short unit labels for column headers
+function volUnit(){ return METRIC ? 'm³/yr' : 'AF/yr'; }
+function areaUnit(){ return METRIC ? 'ha' : 'acres'; }
+function precipUnit(){ return METRIC ? 'mm/yr' : 'in/yr'; }
+
+
 
 
 // Water source breakdown: {surface, ground, reclaimed, other} percentages + municipal share of city total
@@ -451,22 +553,22 @@ const COLS=[
   {key:'country',label:'Country',render:f=>`<span style="font-size:11px">${f.country}</span>`},
   {key:'opened',label:'Est.',render:f=>`<span style="font-family:DM Mono,monospace;font-size:10px;color:var(--t2)">${f.opened||'TBD'}</span>`},
   {key:'mw',label:'MW',render:f=>`<span style="font-family:DM Mono,monospace;font-size:11px">${f.mw?f.mw+'&thinsp;MW':'—'}</span>`},
-  {key:'acres',label:'Acres',render:f=>`<span style="font-family:DM Mono,monospace;font-size:11px">${f.acres?f.acres.toLocaleString():'—'}</span>`},
+  {key:'acres',label:'Acres',render:f=>`<span style="font-family:DM Mono,monospace;font-size:11px">${f.acres?fmtArea(f.acres):'—'}</span>`},
   {key:'koppen',label:'Climate',render:f=>f.koppen?`<span class="kc">${f.koppen}</span>`:'<span style="color:var(--t4)">—</span>'},
-  {key:'precip',label:'Precip (in)',render:f=>`<span style="font-family:DM Mono,monospace;font-size:11px">${f.precip!=null?f.precip:'—'}</span>`},
-  {key:'af',label:'Withdrawal (AF/yr)',render:f=>{
+  {key:'precip',label:'Precip',render:f=>`<span style="font-family:DM Mono,monospace;font-size:11px">${f.precip!=null?fmtPrecip(f.precip):'—'}</span>`},
+  {key:'af',label:'Withdrawal',render:f=>{
     const af=facilityAF(f);
     const badge=`<span class="conf c${f.conf.toLowerCase()}">[${f.conf}]</span>`;
     if(!af)return`<span style="color:var(--t3);font-size:10px">[U] undisclosed</span>`;
     const pct=(f.precip&&f.acres)?Math.round(af/(f.acres*f.precip/12)*100):null;
-    return`<div>${badge} <span style="font-family:DM Mono,monospace;font-size:11px;color:var(--am)">${af.toLocaleString()}</span></div>
+    return`<div>${badge} <span style="font-family:DM Mono,monospace;font-size:11px;color:var(--am)">${fmtVol(af,1)}</span></div>
     ${pct?`<div class="rs">${pct>100?`<span style="color:var(--rd)">`:''}${pct}% of site precip${pct>100?'</span>':''}</div>`:''}`;
   }},
-  {key:'afpa',label:'AF/ac/yr',render:f=>{
+  {key:'afpa',label:'Intensity',render:f=>{
     const v=facilityAFperAc(f);
     if(!v)return`<span style="color:var(--t4)">—</span>`;
     const col=v>4?'var(--rd)':v>2?'var(--am)':v>0.5?'var(--yw)':'var(--g)';
-    return`<div style="font-family:DM Mono,monospace;font-size:11px;color:${col}">${v}</div>
+    return`<div style="font-family:DM Mono,monospace;font-size:11px;color:${col}">${fmtIntensity(v,2)}</div>
     <div class="bm"><div class="bf" style="width:${Math.min(100,v/8*100)}%;background:${col}"></div></div>`;
   }},
   {key:'cooling',label:'Cooling',render:f=>`<span style="font-size:10px;color:var(--t2)">${f.cooling}</span>`},
@@ -517,7 +619,7 @@ function buildStats(){
   document.getElementById('stats-row').innerHTML=`
     <div class="stat"><div class="stat-l">Facilities</div><div class="stat-v">${FACILITIES.length}<span class="stat-u"> sites</span></div><div class="stat-s">${FACILITIES.filter(f=>f.country==='USA').length} USA · ${FACILITIES.filter(f=>f.country!=='USA').length} international</div></div>
     <div class="stat"><div class="stat-l">Countries</div><div class="stat-v">${new Set(FACILITIES.map(f=>f.country)).size}<span class="stat-u"> nations</span></div></div>
-    <div class="stat"><div class="stat-l">Measured withdrawal</div><div class="stat-v">${Math.round(totAF/1000)}k<span class="stat-u"> AF/yr</span></div><div class="stat-s">${ms.length} reported facilities</div></div>
+    <div class="stat"><div class="stat-l">Measured withdrawal</div><div class="stat-v">${METRIC?((totAF*1233.48/1e6).toFixed(1))+" Mm³/yr":Math.round(totAF/1000)+"k AF/yr"}</div><div class="stat-s">${ms.length} reported facilities</div></div>
     <div class="stat"><div class="stat-l">Most intensive (AF/ac)</div><div class="stat-v">7.02<span class="stat-u"> AF/ac</span></div><div class="stat-s">Google The Dalles</div></div>
     <div class="stat"><div class="stat-l">Best water efficiency</div><div class="stat-v">≈0<span class="stat-u"> AF/yr</span></div><div class="stat-s">MS Quincy (QWRU)</div></div>
     <div class="stat"><div class="stat-l">Oldest facility</div><div class="stat-v">1967</div><div class="stat-s">IBM Boulder (original plant)</div></div>
@@ -545,7 +647,7 @@ function openModal(id){
         <div class="mr"><span class="mk">Country</span><span class="mv">${f.country}</span></div>
         <div class="mr"><span class="mk">Category</span><span class="mv">${f.cat}</span></div>
         <div class="mr"><span class="mk">Capacity</span><span class="mv">${f.mw?f.mw+' MW':'Not disclosed'}</span></div>
-        <div class="mr"><span class="mk">Land</span><span class="mv">${f.acres?f.acres.toLocaleString()+' acres':'Not disclosed'}</span></div>
+        <div class="mr"><span class="mk">Land</span><span class="mv">${f.acres?fmtArea(f.acres):'Not disclosed'}</span></div>
         <div class="mr"><span class="mk">Cooling</span><span class="mv">${f.cooling}</span></div>
         <div class="mr"><span class="mk">Onsite gen.</span><span class="mv">${f.onsiteGen}</span></div>
         <div class="mr"><span class="mk">Gen. role</span><span class="mv"><span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:600;background:${pilePrimary?'var(--ac2)':'var(--am2)'};color:${pilePrimary?'var(--ac)':'var(--am)'};border:1px solid ${pilePrimary?'var(--ac)':'var(--am)'}">${f.onsiteRole}</span></span></div>
@@ -555,16 +657,16 @@ function openModal(id){
         <div class="mr"><span class="mk">Köppen code</span><span class="mv"><span class="kc">${f.koppen||'—'}</span></span></div>
         <div class="mr"><span class="mk">Climate type</span><span class="mv" style="font-family:'DM Sans',sans-serif;font-size:10.5px">${kcDesc}</span></div>
         <div class="mr"><span class="mk">Annual precip.</span><span class="mv">${f.precip?f.precip+' in/yr':'—'}</span></div>
-        <div class="mr"><span class="mk">Site precip (AF)</span><span class="mv" style="color:var(--g)">${sitePrec?sitePrec.toLocaleString()+' AF/yr':'—'}</span></div>
+        <div class="mr"><span class="mk">Site precip (AF)</span><span class="mv" style="color:var(--g)">${sitePrec?fmtVol(sitePrec,1):'—'}</span></div>
         <div class="mr"><span class="mk">Withdrawal / precip</span><span class="mv">${(af&&sitePrec)?`<span style="color:${af>sitePrec?'var(--rd)':'var(--g)'}"> ${Math.round(af/sitePrec*100)}%</span>`:'—'}</span></div>
         <div class="mr"><span class="mk">Water source</span><span class="mv" style="font-family:'DM Sans',sans-serif;font-size:10.5px">${f.source}</span></div>
       </div>
       <div class="mc">
         <div class="mch">Water Summary <span class="conf c${f.conf.toLowerCase()}">[${f.conf}]</span></div>
-        <div class="mr"><span class="mk">Annual withdrawal</span><span class="mv" style="color:var(--am)">${af?af.toLocaleString()+' AF/yr':'Undisclosed'}</span></div>
-        <div class="mr"><span class="mk">Evaporated (~${f.evapPct}%)</span><span class="mv" style="color:var(--rd)">${evapAF?evapAF.toLocaleString()+' AF':'—'}</span></div>
-        <div class="mr"><span class="mk">Discharged (~${100-f.evapPct}%)</span><span class="mv" style="color:var(--ac)">${dischAF?dischAF.toLocaleString()+' AF':'—'}</span></div>
-        <div class="mr"><span class="mk">AF/acre/year</span><span class="mv">${afpa||'—'}</span></div>
+        <div class="mr"><span class="mk">Annual withdrawal</span><span class="mv" style="color:var(--am)">${af?fmtVol(af,1):'Undisclosed'}</span></div>
+        <div class="mr"><span class="mk">Evaporated (~${f.evapPct}%)</span><span class="mv" style="color:var(--rd)">${evapAF?fmtVol(evapAF,1):'—'}</span></div>
+        <div class="mr"><span class="mk">Discharged (~${100-f.evapPct}%)</span><span class="mv" style="color:var(--ac)">${dischAF?fmtVol(dischAF,1):'—'}</span></div>
+        <div class="mr"><span class="mk">AF/acre/year</span><span class="mv">${afpa?fmtIntensity(afpa,2):'—'}</span></div>
       </div>
       <div class="mc">
         <div class="mch">Energy Grid</div>
@@ -649,7 +751,7 @@ function drawSankey(f,af,evapAF,dischAF,sitePrec){
   // ── Site precip footnote ──
   if(sitePrec&&af){
     const fpY=annY+30;
-    out+=`<text x="${W/2}" y="${fpY}" text-anchor="middle" fill="#3a4255" font-family="DM Mono,monospace" font-size="7.5">Site precipitation: ${sitePrec.toLocaleString()} AF/yr · withdrawal = ${Math.round(af/sitePrec*100)}% of site rainfall budget</text>`;
+    out+=`<text x="${W/2}" y="${fpY}" text-anchor="middle" fill="#3a4255" font-family="DM Mono,monospace" font-size="7.5">Site precipitation: ${fmtVol(sitePrec,1)} · withdrawal = ${Math.round(af/sitePrec*100)}% of site rainfall budget</text>`;
   }
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.style.maxHeight='220px';
@@ -767,7 +869,7 @@ function buildBenchmarkChart(){
           // Irrigation bar (on top)
           '<div style="width:'+irrBarPct+'%;height:100%;background:'+b.color+';border-radius:3px;position:absolute;top:0;left:0;opacity:0.9"></div>'+
           // Value label
-          (irrBarPct>18?'<span style="position:absolute;left:'+Math.min(irrBarPct-1,95)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:4px;font-size:8px;font-family:DM Mono,monospace;color:rgba(255,255,255,.9);white-space:nowrap;pointer-events:none">'+b.afPerAc+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':'')+
+          (irrBarPct>18?'<span style="position:absolute;left:'+Math.min(irrBarPct-1,95)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:4px;font-size:8px;font-family:DM Mono,monospace;color:rgba(255,255,255,.9);white-space:nowrap;pointer-events:none">'+fmtIntensityVal(b.afPerAc,1)+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':'')+
           // Precip label at end of total bar
           (precipAf>0&&pctOfMax>irrBarPct+8?'<span style="position:absolute;left:'+Math.min(pctOfMax-0.5,99)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:3px;font-size:7.5px;font-family:DM Mono,monospace;color:rgba(180,180,220,.8);white-space:nowrap;pointer-events:none">+'+precipAf.toFixed(2)+' rain</span>':'')+
         '</div>'+
@@ -776,7 +878,7 @@ function buildBenchmarkChart(){
       '</div>'+
       '<div style="width:80px;min-width:80px;text-align:right;font-family:DM Mono,monospace;font-size:10px;white-space:nowrap">'+
         (precipAf>0?
-          '<span style="color:var(--t1)">'+totalAf.toFixed(2)+'</span><span style="color:var(--t4);font-size:8px"> AF tot</span><br><span style="color:var(--t3);font-size:9px">'+b.afPerAc+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':
+          '<span style="color:var(--t1)">'+(METRIC?(totalAf*3048).toFixed(0)+' m³/ha':totalAf.toFixed(2)+' AF')+'</span><span style="color:var(--t4);font-size:8px"> tot</span><br><span style="color:var(--t3);font-size:9px">'+fmtIntensityVal(b.afPerAc,1)+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':
           '<span style="color:var(--t3)">'+b.afPerAc+'</span><span style="color:var(--t4);font-size:8px"> AF</span>')+
       '</div>'+
     '</div>';
