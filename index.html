@@ -767,7 +767,7 @@ function buildBenchmarkChart(){
           // Irrigation bar (on top)
           '<div style="width:'+irrBarPct+'%;height:100%;background:'+b.color+';border-radius:3px;position:absolute;top:0;left:0;opacity:0.9"></div>'+
           // Value label
-          (irrBarPct>18?'<span style="position:absolute;left:'+Math.min(irrBarPct-1,95)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:4px;font-size:8px;font-family:DM Mono,monospace;color:rgba(255,255,255,.9);white-space:nowrap;pointer-events:none">'+b.afPerAc+(b.cat==='data-center'?'':' irr')+'</span>':'')+
+          (irrBarPct>18?'<span style="position:absolute;left:'+Math.min(irrBarPct-1,95)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:4px;font-size:8px;font-family:DM Mono,monospace;color:rgba(255,255,255,.9);white-space:nowrap;pointer-events:none">'+b.afPerAc+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':'')+
           // Precip label at end of total bar
           (precipAf>0&&pctOfMax>irrBarPct+8?'<span style="position:absolute;left:'+Math.min(pctOfMax-0.5,99)+'%;transform:translateX(-100%);top:0;height:100%;display:flex;align-items:center;padding-right:3px;font-size:7.5px;font-family:DM Mono,monospace;color:rgba(180,180,220,.8);white-space:nowrap;pointer-events:none">+'+precipAf.toFixed(2)+' rain</span>':'')+
         '</div>'+
@@ -776,7 +776,7 @@ function buildBenchmarkChart(){
       '</div>'+
       '<div style="width:80px;min-width:80px;text-align:right;font-family:DM Mono,monospace;font-size:10px;white-space:nowrap">'+
         (precipAf>0?
-          '<span style="color:var(--t1)">'+totalAf.toFixed(2)+'</span><span style="color:var(--t4);font-size:8px"> AF tot</span><br><span style="color:var(--t3);font-size:9px">'+b.afPerAc+(b.cat==='data-center'?'':' irr')+'</span>':
+          '<span style="color:var(--t1)">'+totalAf.toFixed(2)+'</span><span style="color:var(--t4);font-size:8px"> AF tot</span><br><span style="color:var(--t3);font-size:9px">'+b.afPerAc+(b.cat==='data-center'||b.cat==='industry'?'':' irr')+'</span>':
           '<span style="color:var(--t3)">'+b.afPerAc+'</span><span style="color:var(--t4);font-size:8px"> AF</span>')+
       '</div>'+
     '</div>';
