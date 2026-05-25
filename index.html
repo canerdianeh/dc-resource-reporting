@@ -386,31 +386,42 @@ const FACILITIES=[
 
 // ════════════════ BENCHMARKS ════════════════
 const BENCHMARKS=[
-  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,color:'#e05550'},
-  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,color:'#e05550'},
-  {id:'dc-sg',name:'Google Singapore (est.)',cat:'data-center',afPerAc:2.12,color:'#e05550'},
-  {id:'ag-alfalfa',name:'Irrigated alfalfa (AZ)',cat:'agriculture',afPerAc:5.5,color:'#34c978',notes:'USGS 2015; most water-intensive US crop'},
-  {id:'ag-rice',name:'Irrigated rice (CA)',cat:'agriculture',afPerAc:4.5,color:'#34c978',notes:'USGS; paddy flooding'},
-  {id:'ag-cotton',name:'Irrigated cotton (TX)',cat:'agriculture',afPerAc:2.8,color:'#34c978'},
-  {id:'ag-corn',name:'Irrigated corn (Midwest)',cat:'agriculture',afPerAc:1.5,color:'#34c978'},
-  {id:'ag-dry',name:'Dryland farming',cat:'agriculture',afPerAc:0,color:'#34c978',notes:'Precipitation only; no irrigation'},
-  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water'},
-  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,color:'#e8a032'},
-  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,color:'#9d72e8',notes:'TSMC/Intel; ultrapure water; 2-4M gal/day'},
-  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,color:'#9d72e8'},
-  {id:'in-ref',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,color:'#9d72e8'},
-  {id:'in-lmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,color:'#9d72e8'},
-  {id:'in-wh',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,color:'#9d72e8'},
-  {id:'rec-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,color:'#30c8c8',notes:'USGA/GCSAA 2020'},
-  {id:'rec-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,color:'#30c8c8'},
-  {id:'rec-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,color:'#30c8c8'},
-  {id:'rec-cp',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,color:'#30c8c8',notes:'NYC DEP; 843 ac; ~125M gal/yr'},
-  {id:'rec-st',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,color:'#30c8c8'},
-  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments'},
-  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,color:'#6080f0'},
-  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,color:'#6080f0'},
-  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,color:'#6080f0'},
-  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,color:'#6080f0'},
+  // DATA CENTERS (selected for intensity comparison)
+  {id:'dc-td',name:'Google The Dalles',cat:'data-center',afPerAc:7.02,color:'#e05550',notes:'434M gal/yr ÷ 190 ac. Most intensive DC per acre in dataset.',src:{sw:100,gw:0,note:'Hood River / Mt. Hood watershed surface water via City of The Dalles municipal system'}},
+  {id:'dc-cb',name:'Google Council Bluffs',cat:'data-center',afPerAc:4.30,color:'#e05550',notes:'1,400M gal/yr ÷ 1,000 ac.',src:{sw:100,gw:0,note:'Missouri River basin surface water via Council Bluffs Water Works'}},
+  {id:'dc-sg',name:'Google Singapore (est.)',cat:'data-center',afPerAc:2.12,color:'#e05550',notes:'Estimated from MW capacity.',src:{sw:0,gw:0,rec:60,desal:40,note:'~60% NEWater (reclaimed wastewater), ~40% desalinated seawater; PUB Singapore'}},
+  // CALIFORNIA AGRICULTURE
+  {id:'ag-almond-ca',name:'CA almonds (San Joaquin Valley)',cat:'agriculture',afPerAc:3.7,color:'#34c978',notes:'3–4.5 AF/ac/yr (UC Davis / DWR; avg ~44–48 in/yr evapotranspiration). C-WIN 2024: statewide almond water use 4.7–5.5M AF/yr total. CRS R44093: tree nuts 3–4 AF/ac. 70% of harvest exported.',src:{sw:40,gw:60,note:'~60% groundwater (SJV chronic overdraft, SGMA); ~40% surface water via CVP/SWP and local irrigation districts (Kings R., San Joaquin R., Friant-Kern Canal). Groundwater share rises to 80-90% in drought years. PPIC 2024.'}},
+  {id:'ag-alfalfa',name:'Irrigated alfalfa (CA / AZ)',cat:'agriculture',afPerAc:5.5,color:'#34c978',notes:'Most water-intensive common US crop. USGS 2015; CRS R44093: CA alfalfa >5 AF/ac.',src:{sw:55,gw:45,note:'CA Central Valley: ~55% surface water (Sacramento R. diversions, Delta-Mendota Canal, CVP); ~45% groundwater. AZ: ~60% Colorado River surface water via CAP / irrigation districts; ~40% groundwater (Salt River / Verde R. basin). USGS NWIS.'}},
+  {id:'ag-rice',name:'Irrigated rice (Sacramento Valley, CA)',cat:'agriculture',afPerAc:4.5,color:'#34c978',notes:'USGS / CRS R44093: CA rice 4–5 AF/ac. Paddy flooding; Sacramento Valley.',src:{sw:90,gw:10,note:'~90% Sacramento River surface water via Tehama-Colusa Canal and local water districts; ~10% groundwater. Sacramento Valley rice is among the most surface-water-dependent crops in CA — historically the primary beneficiary of senior water rights on the Sacramento R. PPIC; DWR.'}},
+  {id:'ag-cotton',name:'Irrigated cotton (San Joaquin Valley, CA)',cat:'agriculture',afPerAc:2.8,color:'#34c978',notes:'USGS 2015; CRS R44093: CA cotton 3–4 AF/ac (acreage declining).',src:{sw:35,gw:65,note:'~65% groundwater (SJV west side; historically high groundwater reliance as CVP allocations cut); ~35% surface water (San Joaquin R., CVP contractors, Westlands Water District). Cotton acreage has declined sharply since 2000s as water costs rose. USGS; PPIC.'}},
+  {id:'ag-corn',name:'Irrigated corn (US Midwest / CA)',cat:'agriculture',afPerAc:1.5,color:'#34c978',notes:'USGS national avg ~2.09 AF/ac; Midwest corn lower. CA corn silage (SJV): ~2.5 AF/ac.',src:{sw:60,gw:40,note:'Midwest: ~60% surface water (irrigation canals from Missouri R., Platte R., Arkansas R.); ~40% groundwater (Ogallala / High Plains aquifer). CA corn silage (SJV dairies): ~50% groundwater / ~50% surface water. USGS NWIS 2015.'}},
+  {id:'ag-dry',name:'Dryland farming (no irrigation)',cat:'agriculture',afPerAc:0,color:'#34c978',notes:'Precipitation only; no irrigation withdrawal.',src:{sw:0,gw:0,note:'No irrigation draw. Entirely precipitation-dependent. Includes most US wheat, dryland corn/sorghum (Great Plains), and dry-farmed wine grapes (Sonoma / Napa coastal CA).'}},
+  // HIGH PLAINS / OGALLALA SUB-GROUP
+  {id:'ag-hp-corn',name:'Center-pivot corn — W. Kansas (Ogallala)',cat:'agriculture',afPerAc:2.2,color:'#50c870',notes:'Western KS center-pivot irrigated corn (GMD3/GMD4). Range 1.8–2.5 AF/ac; drought years higher. USGS DS-981 (2013 KS data); K-State SRP-536; USGS SIR 2006-5069. Corn consumes ~95% of center-pivot water by volume despite ~82% of irrigated acres in GMD3.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater (world's largest fossil aquifer; recharge ~0.5 in/yr vs. pumping ~18–24 in/yr for corn). ~3% surface water (limited canal districts: USBR Arkansas R. basin in SW KS). USGS 2015: KS and NE are among the few western states where GW exceeds SW for irrigation. Aquifer will be economically depleted in some SW KS counties by 2040s at current rates. KGS; USGS.'}},
+  {id:'ag-hp-soy',name:'Center-pivot soybeans — W. Kansas / NE',cat:'agriculture',afPerAc:1.6,color:'#50c870',notes:'Center-pivot irrigated soybeans; W. Kansas range 1.3–1.9 AF/ac; NE ~1.0–1.4 AF/ac. USGS DS-981; K-State Extension. Soy is less water-intensive than corn but acreage expanding rapidly in KS/NE as corn insurance costs rise.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater. Same aquifer system as corn. Nebraska leads US in irrigated soy acres. USGS 2015; USDA ERS 2022.'}},
+  {id:'ag-hp-wheat',name:'Center-pivot winter wheat — W. Kansas',cat:'agriculture',afPerAc:0.75,color:'#50c870',notes:'Supplemental-irrigated winter wheat; W. Kansas range 0.5–1.0 AF/ac. Substantially less water than corn or soy — wheat is often deficit-irrigated (pre-plant + 1–2 applications). USGS DS-981; USGS SIR 2006-5069. Wheat acreage declining as farmers shift to higher-value corn.',src:{sw:3,gw:97,note:'~97% Ogallala groundwater. Winter wheat has lower consumptive water requirement (cooler growing season, Oct–June) and is commonly managed with minimum supplemental irrigation in western KS. USGS; K-State Research and Extension.'}},
+  // LIVESTOCK
+  {id:'lv-dairy',name:'CAFO — dairy',cat:'livestock',afPerAc:0.8,color:'#e8a032',notes:'USDA; ~30 gal/head/day + wash water; intensive.',src:{sw:40,gw:60,note:'Varies widely. Midwest dairy: ~50% groundwater / ~50% municipal or surface water. CA Central Valley dairy (San Joaquin / Tulare): ~60–70% groundwater (SGMA-impacted); ~30–40% surface water via local irrigation districts. USDA NASS.'}},
+  {id:'lv-beef',name:'CAFO — beef feedlot',cat:'livestock',afPerAc:0.35,color:'#e8a032',notes:'EPA; ~50 gal/head/day; 1,000-head representative lot.',src:{sw:20,gw:80,note:'Typical feedlot (TX / KS / NE Panhandle): ~80% groundwater (Ogallala aquifer); ~20% surface water or municipal. High Plains feedlot density is a primary driver of Ogallala depletion. EPA; USDA.'}},
+  // INDUSTRY
+  {id:'in-semi',name:'Semiconductor fab',cat:'industry',afPerAc:8.0,color:'#9d72e8',notes:'TSMC/Intel; ultrapure water; 2–4M gal/day per facility on small footprint.',src:{sw:30,gw:30,rec:40,note:'Varies by location. TSMC Arizona: ~40% reclaimed wastewater (EPCOR / City of Chandler); ~30% surface water (SRP/CAP); ~30% groundwater. Intel Chandler: similar mix. Taiwan fabs: primarily surface water (reservoirs) + reclaimed. Water recycling rates 75–85%.'}},
+  {id:'in-steel',name:'Steel mill (integrated)',cat:'industry',afPerAc:1.2,color:'#9d72e8',notes:'WRI; recirculating cooling tower dominated.',src:{sw:70,gw:30,note:'Typically river surface water (once-through historically; now recirculating). US integrated mills (Gary IN: Lake Michigan; Pittsburgh: Monongahela R.; Burns Harbor: Lake Michigan). ~70% surface water; ~30% municipal or groundwater. EPA TRI; WRI Aqueduct.'}},
+  {id:'in-ref',name:'Petroleum refinery',cat:'industry',afPerAc:0.9,color:'#9d72e8',notes:'API/EPA; cooling tower dominated.',src:{sw:65,gw:35,note:'Gulf Coast refineries: ~65% surface water (bayou / river intakes); ~35% municipal or groundwater. CA refineries: mix varies (Richmond: San Francisco Bay; Carson: LA Aqueduct). EPA TRI; API.'}},
+  {id:'in-lmfg',name:'Light manufacturing',cat:'industry',afPerAc:0.15,color:'#9d72e8',notes:'EPA/USGS; process water + HVAC.',src:{sw:20,gw:30,rec:10,muni:40,note:'Predominantly municipal supply (~40%); remainder varies by region. EPA Sector Facility Indexing Project.'}},
+  {id:'in-wh',name:'Warehouse / logistics',cat:'industry',afPerAc:0.02,color:'#9d72e8',notes:'Minimal; sanitary + HVAC only.',src:{sw:0,gw:0,muni:100,note:'100% municipal potable (sanitary use only; no process water). ASHRAE.'}},
+  // RECREATION
+  {id:'rec-sw',name:'Golf course (Southwest)',cat:'recreation',afPerAc:4.0,color:'#30c8c8',notes:'USGA/GCSAA 2020; arid region.',src:{sw:20,gw:30,rec:50,note:'SW US: ~50% reclaimed wastewater (most AZ / NV / SoCal courses are required to use reclaimed water); ~30% groundwater; ~20% surface water. Phoenix / Tucson courses: typically 100% reclaimed by municipal ordinance. USGA; GCSAA 2020 survey.'}},
+  {id:'rec-us',name:'Golf course (national median)',cat:'recreation',afPerAc:2.08,color:'#30c8c8',notes:'USGA/GCSAA 2020.',src:{sw:35,gw:40,rec:25,note:'National median: ~40% groundwater, ~35% surface water, ~25% reclaimed. Highly variable by region and local ordinance. USGA/GCSAA 2020 Water Survey.'}},
+  {id:'rec-ne',name:'Golf course (Northeast)',cat:'recreation',afPerAc:0.8,color:'#30c8c8',notes:'USGA; humid climate.',src:{sw:50,gw:40,rec:10,note:'Northeast: ~50% surface water (ponds, streams); ~40% groundwater (on-site wells); ~10% reclaimed. Lower overall use due to natural rainfall supplement. USGA/GCSAA.'}},
+  {id:'rec-cp',name:'Central Park, NYC',cat:'recreation',afPerAc:0.40,color:'#30c8c8',notes:'NYC DEP; 843 ac; ~125M gal/yr irrigation + fountains.',src:{sw:100,gw:0,note:'100% NYC DEP municipal supply (Delaware / Catskill / Croton aqueduct system — surface water from protected Catskill/Delaware watersheds). No groundwater or reclaimed water used. NYC DEP.'}},
+  {id:'rec-st',name:'NFL stadium (per ac)',cat:'recreation',afPerAc:0.05,color:'#30c8c8',notes:'~82 events/yr; concessions, restrooms, field irrigation; ~20 ac footprint.',src:{sw:0,gw:0,muni:100,note:'100% municipal potable. Field turf (natural grass) irrigation typically reclaimed or potable municipal. Concessions and restrooms: municipal. EPA WaterSense.'}},
+  // RESIDENTIAL
+  {id:'res-q5',name:'Residential: Dense urban (Q5)',cat:'residential',afPerAc:0.60,color:'#6080f0',notes:'AWWA; >2,000/sq mi; apartments, no landscaping.',src:{sw:60,gw:15,rec:10,muni:15,note:'Large US cities: predominantly surface water (NYC: Catskill/Delaware; Chicago: Lake Michigan; LA: Owens Valley / Colorado R. aqueducts). NYC is ~100% surface; Phoenix is ~60% surface (CAP Colorado R.) + ~40% groundwater/reclaimed. AWWA; AMWA.'}},
+  {id:'res-q4',name:'Residential: Medium urban (Q4)',cat:'residential',afPerAc:0.90,color:'#6080f0',notes:'AWWA; 500–2,000/sq mi.',src:{sw:55,gw:30,rec:5,muni:10,note:'Mid-size cities: ~55% surface / ~30% groundwater / ~5% reclaimed. Varies greatly: Sun Belt cities rely more on groundwater (FL ~90% GW; TX cities ~60% GW + surface mix). AWWA State of Water Industry.'}},
+  {id:'res-q3',name:'Residential: Low suburban (Q3)',cat:'residential',afPerAc:1.40,color:'#6080f0',notes:'AWWA; 100–500/sq mi; single family + landscaping.',src:{sw:45,gw:45,rec:5,muni:5,note:'Outer suburbs: roughly equal surface and groundwater. Private wells more common. Lawn irrigation increases per-ac use. AWWA; USGS 2015 Estimated Use.'}},
+  {id:'res-q2',name:'Residential: Semi-rural (Q2)',cat:'residential',afPerAc:1.80,color:'#6080f0',notes:'AWWA/USGS; 15–100/sq mi; large lots, irrigation.',src:{sw:25,gw:70,rec:0,muni:5,note:'Predominantly private groundwater wells (~70%); some small municipal systems drawing from surface water (~25%). Highest per-ac intensity due to large irrigated lots + low efficiency. USGS 2015.'}},
+  {id:'res-q1',name:'Residential: Rural (Q1)',cat:'residential',afPerAc:1.20,color:'#6080f0',notes:'USGS; <15/sq mi; wells, septic.',src:{sw:15,gw:80,rec:0,muni:5,note:'~80% private groundwater wells; ~15% small surface-water systems; ~5% hauled or municipal. Low population density means low per-acre totals despite high per-capita use. USGS 2015 Estimated Use of Water in the United States.'}},
 ];
 
 // ════════════════ HELPERS ════════════════
@@ -679,22 +690,56 @@ function closeModal(e){
 function buildBenchmarkChart(){
   const sorted=[...BENCHMARKS].sort((a,b)=>b.afPerAc-a.afPerAc);
   const max=sorted[0].afPerAc;
-  const catLabels={'data-center':'Data Centers','agriculture':'Agriculture','livestock':'Livestock','industry':'Industry','recreation':'Recreation','residential':'Residential'};
-  let html='',lastCat='';
+  const catLabels={'data-center':'Data Centers','agriculture':'Agriculture (California unless noted)','livestock':'Livestock','industry':'Industry','recreation':'Recreation','residential':'Residential (US)','_hp':'High Plains / Ogallala Aquifer — Center-Pivot Row Crops (KS / NE)'};
+  // Source color key
+  const SC={sw:'#2080d0',gw:'#60a830',rec:'#30b870',desal:'#9060c0',muni:'#8080c0'};
+  const SL={sw:'Surface water',gw:'Groundwater',rec:'Reclaimed/reuse',desal:'Desalinated',muni:'Municipal (unspecified)'};
+
+  let html='',lastCat='',lastHPShown=false;
+  // Legend
+  html+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--s3);border-radius:4px;border:1px solid var(--b1)">' +
+    '<span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-right:4px">Water source:</span>' +
+    Object.entries(SC).map(([k,c])=>'<span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2)"><span style="width:10px;height:10px;border-radius:2px;background:'+c+';display:inline-block"></span>'+SL[k]+'</span>').join('') +
+  '</div>';
+
   sorted.forEach(b=>{
     if(b.cat!==lastCat){
-      html+=`<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:12px 0 5px;border-top:1px solid var(--b1);margin-top:4px">${catLabels[b.cat]||b.cat}</div>`;
+      html+='<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:12px 0 5px;border-top:1px solid var(--b1);margin-top:4px">'+(catLabels[b.cat]||b.cat)+'</div>';
       lastCat=b.cat;
+      lastHPShown=false;
+    }
+    if(b.id&&b.id.startsWith('ag-hp-')&&!lastHPShown){
+      html+='<div style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--te);padding:8px 0 2px 10px;border-left:2px solid var(--te);margin:6px 0 2px;opacity:0.8">High Plains / Ogallala — Center-Pivot KS / NE — ~97% Ogallala groundwater</div>';
+      lastHPShown=true;
     }
     const pct=b.afPerAc/max*100;
-    html+=`<div class="br" title="${b.notes||''}">
-      <div class="bn">${b.name}</div>
-      <div class="bw"><div class="bb" style="width:${pct}%;background:${b.color}">${pct>15?b.afPerAc+' AF/ac':''}</div></div>
-      <div class="bv">${b.afPerAc} <span style="font-size:9px;color:var(--t4)">AF/ac/yr</span></div>
-    </div>`;
+    // Build source bar segments
+    const s=b.src||{};
+    const total=(s.sw||0)+(s.gw||0)+(s.rec||0)+(s.desal||0)+(s.muni||0);
+    let srcBar='';
+    if(total>0){
+      if(s.sw)srcBar+='<div style="width:'+(s.sw/100*100)+'%;background:'+SC.sw+';height:100%;display:inline-block"></div>';
+      if(s.gw)srcBar+='<div style="width:'+(s.gw/100*100)+'%;background:'+SC.gw+';height:100%;display:inline-block"></div>';
+      if(s.rec)srcBar+='<div style="width:'+(s.rec/100*100)+'%;background:'+SC.rec+';height:100%;display:inline-block"></div>';
+      if(s.desal)srcBar+='<div style="width:'+(s.desal/100*100)+'%;background:'+SC.desal+';height:100%;display:inline-block"></div>';
+      if(s.muni)srcBar+='<div style="width:'+(s.muni/100*100)+'%;background:'+SC.muni+';height:100%;display:inline-block"></div>';
+    }
+
+    html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--b1);font-size:11px" title="'+(b.src&&b.src.note?b.src.note:b.notes||'')+'">' +
+      '<div style="width:230px;min-width:230px;color:var(--t2);font-size:10.5px;padding-top:2px">'+(b.name.includes('almond')||b.name.includes('CA ')||b.name.includes('Sacramento')||b.name.includes('San Joaquin')?'<span style="color:var(--te);font-size:9px;font-family:'DM Mono',monospace">CA</span> ':'') + b.name+'</div>' +
+      '<div style="flex:1">' +
+        '<div style="height:17px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:3px">' +
+          '<div style="width:'+pct+'%;height:100%;border-radius:3px;background:'+b.color+';display:flex;align-items:center;padding-left:5px;font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.8)">'+(pct>15?b.afPerAc+' AF/ac':'')+'</div>' +
+        '</div>' +
+        (total>0?'<div style="height:5px;border-radius:2px;overflow:hidden;display:flex">'+srcBar+'</div>':'') +
+        (b.src&&b.src.note?'<div style="font-size:9px;color:var(--t4);margin-top:2px;line-height:1.3">'+b.src.note.slice(0,90)+(b.src.note.length>90?'…':'')+'</div>':'') +
+      '</div>' +
+      '<div style="width:75px;text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap;padding-top:2px">'+b.afPerAc+' <span style="font-size:9px;color:var(--t4)">AF/ac/yr</span></div>' +
+    '</div>';
   });
-  document.getElementById('benchmark-chart').innerHTML=`<div class="bc">${html}</div>
-  <div class="info" style="margin-top:14px"><strong>Key finding:</strong> Google The Dalles (7.02 AF/ac/yr) is more water-intensive per acre than any irrigated crop except semiconductor fabs (8.0 AF/ac/yr). Dense urban residential land (0.6 AF/ac) uses less water per acre than any crop or data center using evaporative cooling — the efficiency of density.</div>`;
+
+  document.getElementById('benchmark-chart').innerHTML='<div class="bc">'+html+'</div>' +
+    '<div class="info" style="margin-top:14px"><strong>Key finding:</strong> California almonds (3.7 AF/ac/yr, ~60% groundwater) and Google The Dalles (7.02 AF/ac/yr, 100% surface water) bracket the upper end of agricultural and industrial water intensity. The Dalles withdraws more per acre than any crop in this dataset except semiconductor fabs. Southwest golf courses, required to use reclaimed water in most jurisdictions, now rival almond orchards in intensity while drawing on a non-potable source. Dense urban residential land (0.6 AF/ac, mostly surface water via aqueduct) is the most efficient land use in this dataset by far. The colored bars below each entry show estimated water source mix: blue=surface, green=groundwater, teal=reclaimed, purple=desalinated.</div>';
 }
 
 // ════════════════ COMPARE ════════════════
