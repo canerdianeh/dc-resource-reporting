@@ -250,6 +250,33 @@ td{padding:8px 11px;vertical-align:middle;line-height:1.4}
 // ════════════════ DATA ════════════════
 const AF=1/325851;
 
+
+// Water source breakdown: {surface, ground, reclaimed, other} percentages + municipal share of city total
+const WSRC = {
+  'g-cb':     {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:18, muniNote:'Council Bluffs Water Works; Google is single largest customer'},
+  'g-td':     {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:33, muniNote:'City of The Dalles; Google consumes ~1/3 of total city supply (pop. ~16,200)'},
+  'ms-qcy':   {surface:0,   ground:0, reclaimed:100, other:0, muniBillPct:null, muniNote:'QWRU closed-loop; near-zero municipal draw post-2021'},
+  'ms-wdm':   {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:2.6, muniNote:'West Des Moines Water Works; Microsoft is #1 user at 2.6% of city total'},
+  'meta-alt':  {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:null, muniNote:'Altoona municipal; Des Moines River basin surface supply'},
+  'ibm-bld':  {surface:50,  ground:50, reclaimed:0, other:0, muniBillPct:null, muniNote:'Boulder Water (~50% South Boulder Creek reservoir, ~50% aquifer)'},
+  'aws-blue': {surface:50,  ground:50, reclaimed:0, other:0, muniBillPct:null, muniNote:'Tucson Water historic mix: ~50% Colorado R. (CAP), ~50% groundwater'},
+  'eqx-ash':  {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:null, muniNote:'Loudoun Water (Goose Creek / Potomac River surface)'},
+  'g-dub':    {surface:80,  ground:15, reclaimed:5, other:0, muniBillPct:null, muniNote:'Irish Water (River Liffey surface + some groundwater)'},
+  'g-fin':    {surface:0,   ground:0, reclaimed:0, other:100, muniBillPct:null, muniNote:'Seawater (Gulf of Finland); no freshwater draw'},
+  'g-sg':     {surface:0,   ground:0, reclaimed:60, other:40, muniBillPct:null, muniNote:'PUB Singapore: ~60% NEWater (reclaimed), ~40% desalination'},
+  'ms-sg':    {surface:0,   ground:0, reclaimed:60, other:40, muniBillPct:null, muniNote:'PUB Singapore: NEWater + desalination'},
+  'ms-uae':   {surface:0,   ground:0, reclaimed:0, other:100, muniBillPct:null, muniNote:'DEWA desalinated seawater (100%)'},
+  'cavern-lenexa':{surface:80, ground:20, reclaimed:0, other:0, muniBillPct:null, muniNote:'KCP&L / Johnson County Water District; Missouri R. basin'},
+  'subtropolis-mo':{surface:80, ground:20, reclaimed:0, other:0, muniBillPct:null, muniNote:'Kansas City Water Services; Missouri R. basin'},
+  'g-kc-clay':{surface:80, ground:20, reclaimed:0, other:0, muniBillPct:null, muniNote:'Clay County / North KC Water; Missouri R. basin'},
+  'aws-sus':  {surface:0,   ground:0, reclaimed:0, other:100, muniBillPct:null, muniNote:'Susquehanna River via nuclear plant cooling loop; not municipal'},
+  'g-chile':  {surface:90,  ground:10, reclaimed:0, other:0, muniBillPct:null, muniNote:'Aguas Andinas; Maipo River (stressed glacial catchment)'},
+  'sw-citadel':{surface:50, ground:50, reclaimed:0, other:0, muniBillPct:null, muniNote:'TRIC municipal (minimal); Storey County; near-zero draw'},
+  'ali-hz':   {surface:100, ground:0, reclaimed:0, other:0, muniBillPct:null, muniNote:'Qiantang River municipal supply'},
+  'ten-sz':   {surface:50,  ground:0, reclaimed:0, other:50, muniBillPct:null, muniNote:'~50% Pearl River estuary seawater cooling, ~50% municipal'},
+};
+function getWSRC(id){return WSRC[id]||{surface:80,ground:20,reclaimed:0,other:0,muniBillPct:null,muniNote:'Source breakdown estimated from regional norms'};}
+
 // Köppen climate descriptions
 const KC={
   'Dfa':'Humid continental — hot summer (Dfa)',
@@ -321,6 +348,19 @@ const FACILITIES=[
   {id:'cs-den',name:'CoreSite Denver Campus',op:'CoreSite',region:'USA-W',country:'USA',city:'Denver, CO',opened:2006,mw:25,acres:6,cooling:'Air + partial evaporative',withdrawalGal:4500000,conf:'E',evapPct:68,source:'Denver Water (South Platte R.)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:30},{s:'Coal',p:15},{s:'Solar',p:10},{s:'Other',p:10}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Denver Water',precip:15,koppen:'BSk',notes:'Urban enterprise colocation. Moderate scale. Denver tech hub.',cat:'enterprise'},
   {id:'g-vir',name:'Loudoun County Campus',op:'Google',region:'USA-E',country:'USA',city:'Loudoun County, VA',opened:2015,mw:250,acres:120,cooling:'Chilled water + air',withdrawalGal:45000000,conf:'E',evapPct:70,source:'Loudoun Water (Goose Creek / Potomac)',gridMix:[{s:'Nuclear',p:30},{s:'Gas',p:30},{s:'Wind',p:15},{s:'Other',p:25}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Loudoun Water',precip:43,koppen:'Cfa',notes:'Northern Virginia cluster. Data Center Alley. Virginia DCs now consume 25%+ of state electricity.',cat:'hyperscale'},
   {id:'edge-node',name:'Edge Node (generic US urban)',op:'Other',region:'USA',country:'USA',city:'Various',opened:2020,mw:2,acres:0.5,cooling:'Air-cooled (100%)',withdrawalGal:360000,conf:'E',evapPct:5,source:'Municipal',gridMix:[{s:'Gas',p:40},{s:'Coal',p:20},{s:'Renewables',p:20},{s:'Nuclear',p:12},{s:'Other',p:8}],onsiteGen:'UPS batteries + small diesel',onsiteRole:'BACKUP',waterSource:'Municipal',precip:null,koppen:null,notes:'Representative edge/CDN node. Typically <5,000 sq ft. Near-zero water. Often in carrier hotels.',cat:'edge'},
+  // ── KANSAS ──
+  {id:'cavern-lenexa',name:'LightEdge / Cavern Technologies Underground DC',op:'Other',region:'USA-MW',country:'USA',city:'Lenexa, KS',opened:2007,mw:7.5,acres:22,cooling:'Passive thermal mass (68°F limestone cave year-round) + CRAC units; minimal mechanical cooling',withdrawalGal:1350000,conf:'E',evapPct:20,source:'KCP&L municipal water (minimal draw)',gridMix:[{s:'Wind',p:52},{s:'Coal',p:22},{s:'Nuclear',p:16},{s:'Gas',p:10}],onsiteGen:'Diesel generators (N+1); two independent substations',onsiteRole:'BACKUP',waterSource:'KCP&L / Johnson County Water District',precip:38,koppen:'Dfa',notes:"125 feet underground in a 3-million-sq-ft limestone formation (Meritex Lenexa Executive Park). Founded 2007; acquired by LightEdge 2021. 160,000 sq ft built out; 7.5 MW operational, expandable to ~50 MW. Stable 68°F ambient cave air dramatically reduces mechanical cooling load and water use. Neighbors: U.S. National Archives and Records Administration occupies adjacent limestone cavern. Kansas grid 52% wind (EIA 2024). Electricity rate ~3.5–4.5¢/kWh, ~half of coastal markets. Tornado-proof by geology.",cat:'enterprise'},
+  {id:'databank-mci',name:'DataBank South Lake Campus (MCI1+MCI2+MCI3)',op:'Other',region:'USA-MW',country:'USA',city:'Lenexa / Overland Park, KS',opened:2014,mw:13,acres:5,cooling:'Chilled water; high-density capable',withdrawalGal:2300000,conf:'E',evapPct:68,source:'Johnson County Water District',gridMix:[{s:'Wind',p:52},{s:'Coal',p:22},{s:'Nuclear',p:16},{s:'Gas',p:10}],onsiteGen:'Diesel generators; two independent substations',onsiteRole:'BACKUP',waterSource:'Johnson County Water District',precip:38,koppen:'Dfa',notes:"Three connected KC-area facilities: MCI1/KC2 (Lenexa), MCI2/Pine Ridge (Overland Park NOC), MCI3 (15721 College Blvd Lenexa, 42,000 sq ft raised floor / 13 MW after 2023 expansion). Tier III design. Interconnection ring links to 1102 Grand KC telecom hotel. Silicon Prairie hub for financial services, healthcare, and government. Evergy / KCP&L territory.",cat:'enterprise'},
+  {id:'bluestem-ks',name:'Project Bluestem (proposed hyperscale)',op:'Other',region:'USA-MW',country:'USA',city:'Tonganoxie, Leavenworth County, KS',opened:null,mw:600,acres:null,cooling:'Closed-loop (per developer disclosure)',withdrawalGal:null,conf:'U',evapPct:20,source:'TBD — closed-loop suggests minimal freshwater draw',gridMix:[{s:'Wind',p:52},{s:'Coal',p:22},{s:'Nuclear',p:16},{s:'Gas',p:10}],onsiteGen:'TBD; two on-site substations planned',onsiteRole:'BACKUP',waterSource:'TBD',precip:38,koppen:'Dfa',notes:"Proposed 600 MW campus near Tonganoxie Business Park, Leavenworth County. Developer: Cloverleaf Infrastructure (Houston; founded by former Microsoft energy executives). Works with Microsoft, Google, Meta, Amazon, and OpenAI — end-user not disclosed. Six buildings ~1.8M sq ft total; ~$12B investment (~$2B/building). Closed-loop cooling commitment would substantially cut water vs. open evaporative towers. Kansas 20-year sales/use tax abatement for large DCs (2025 law). 'Well beyond preliminary phases' per county commissioner, March 2026. No formal permits as of May 2026.",cat:'hyperscale'},
+  {id:'parallel-pkwy-ks',name:'Parallel Parkway Campus (proposed hyperscale)',op:'Other',region:'USA-MW',country:'USA',city:'Kansas City, KS (Wyandotte County)',opened:null,mw:600,acres:null,cooling:'Not yet disclosed',withdrawalGal:null,conf:'U',evapPct:70,source:'TBD — Wyandotte County municipal',gridMix:[{s:'Wind',p:52},{s:'Coal',p:22},{s:'Nuclear',p:16},{s:'Gas',p:10}],onsiteGen:'TBD; two on-site substations planned',onsiteRole:'BACKUP',waterSource:'Wyandotte County water district',precip:38,koppen:'Dfa',notes:"Proposed 600 MW / six-building campus at ~13000 Parallel Pkwy, west of Kansas Speedway (Kansas City, KS). Three buildings each side of Parallel Pkwy. ~$12B total investment; ~$2B per building. Wyandotte EDC president: 'largest single investment the county has seen.' Would generate ~$13M/yr property taxes vs <$50K/yr currently. Developer identity not publicly confirmed as of May 2026. Evergy territory. Chosen for central US location, low natural disaster risk, and new Kansas DC tax incentives.",cat:'hyperscale'},
+
+  // ── MISSOURI ──
+  {id:'subtropolis-mo',name:'SubTropolis Technology Center',op:'Other',region:'USA-MW',country:'USA',city:'Kansas City, MO',opened:2014,mw:15,acres:15,cooling:'Passive limestone cave (65°F stable) + CRAC units; minimal mechanical cooling; 160 ft underground',withdrawalGal:1500000,conf:'E',evapPct:15,source:'Kansas City Water (Missouri R.)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Diesel generators (surface yard); N+1 UPS (Liebert)',onsiteRole:'BACKUP',waterSource:'Kansas City Water Services Dept.',precip:40,koppen:'Dfa',notes:"Hunt Midwest SubTropolis — world's largest underground business complex (7.8M sq ft limestone mine, Bethany Falls formation). STC Phase I: 400,000 sq ft DC-ready space; 15 MW operational, expandable to 200 MW total campus. Stable 65°F cave ambient air cuts mechanical cooling needs dramatically vs. surface DCs. Anchor tenant LightEdge ($58M Phase I investment). 100% renewable from nearby hydroelectric sources (Evergy). ISO 27001 certified. Neighbors: U.S. Postal Service, USDA. Power via 161kV transmission lines. Kansas City ranks 2nd in US for enterprise DC affordability.",cat:'enterprise'},
+  {id:'netrality-kc',name:'1102 Grand — Kansas City Carrier Hotel',op:'Other',region:'USA-MW',country:'USA',city:'Kansas City, MO',opened:2000,mw:20,acres:1,cooling:'Air + chilled water (urban high-rise)',withdrawalGal:3600000,conf:'E',evapPct:65,source:'Kansas City Water (Missouri R.)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Kansas City Water Services',precip:40,koppen:'Dfa',notes:"1102 Grand Ave — Kansas City's primary carrier hotel and neutral interconnection hub. 175,000 sq ft; ~20 MW; large peering ecosystem connecting all KC-area DCs. Netrality operates as anchor. Cross-connect point for Midwest fiber routes (Chicago-Dallas, KC-Denver). Dense urban footprint (~1 acre) in downtown KC. Evergy territory.",cat:'colo'},
+  {id:'patmos-kc',name:'Patmos KC Star Campus (former printing press)',op:'Other',region:'USA-MW',country:'USA',city:'Kansas City, MO',opened:2024,mw:40,acres:3,cooling:'Liquid cooling; waterless ThermalWorks system (partial); high-density AI workloads',withdrawalGal:null,conf:'U',evapPct:10,source:'Kansas City Water (minimal — liquid cooling design)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Kansas City Water (minimal)',precip:40,koppen:'Dfa',notes:"Patmos Hosting conversion of the landmark Kansas City Star Press Pavilion (1601 McGee St, Crossroads Arts District) — iconic blue-glass/copper triangular building adjacent to I-670. 400,000 sq ft facility; $1B retrofit project; 40 MW initial / 100 MW planned. High-density AI/GPU focus (up to 200 kW/rack). Nebius AI (Yandex spinoff) is tenant. Liquid cooling reduces water vs. evaporative systems. Repurposing of a beloved civic building that voters chose to preserve over a Royals stadium in April 2024.",cat:'enterprise'},
+  {id:'g-kc-clay',name:'Google Kansas City Campus — Clay County (Project Mica)',op:'Google',region:'USA-MW',country:'USA',city:'Clay County (N. Kansas City), MO',opened:null,mw:700,acres:500,cooling:'Under construction; air cooling elements reported for Phase 1',withdrawalGal:null,conf:'U',evapPct:30,source:'Clay County / North KC Water (Missouri R. basin)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Diesel generators (planned)',onsiteRole:'BACKUP',waterSource:'North Kansas City / Clay County water district',precip:40,koppen:'Dfa',notes:"Google's primary Kansas City expansion — Project Mica. 500-acre site at I-435 / Hwy 169, Clay County. Five data center buildings; 1.56M sq ft total; up to 700 MW. $1B announced March 2024; $10B in tax breaks from Port KC (75% real property abatement for 25 years). Google partnering with Evergy + Ranger Power + D.E. Shaw Renewable Investments (DESRI) for 400 MW of dedicated renewable generation. Construction underway as of May 2026.",cat:'hyperscale'},
+  {id:'g-montgomery-mo',name:'Google Montgomery County Campus',op:'Google',region:'USA-MW',country:'USA',city:'New Florence, Montgomery County, MO',opened:null,mw:null,acres:null,cooling:'Advanced air cooling — water limited to kitchen/sanitary use only',withdrawalGal:null,conf:'U',evapPct:2,source:'Municipal (minimal — air-cooled design)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Diesel generators (planned)',onsiteRole:'BACKUP',waterSource:'Montgomery County municipal (minimal)',precip:40,koppen:'Dfa',notes:"$15 billion investment announced May 2026 — largest single DC investment in Missouri history. Air-cooling technology limits water consumption 'to uses like kitchens' (Governor Kehoe press release). Google will replenish more water than it consumes via Missouri SWAN Smart Irrigation Initiative (watershed restoration). Site location: New Florence area, rural Montgomery County. Google also announced $20M Energy Impact Fund for households in surrounding counties. Details on acreage/MW not yet disclosed. Community opposition to nearby AWS project in same county (water disclosure lawsuit, June 2026 hearing).",cat:'hyperscale'},
+  {id:'nebius-independence',name:'Nebius Independence Campus (proposed)',op:'Other',region:'USA-MW',country:'USA',city:'Independence, MO',opened:null,mw:800,acres:null,cooling:'Not yet disclosed',withdrawalGal:null,conf:'U',evapPct:70,source:'TBD — Independence Water Dept. (Missouri R.)',gridMix:[{s:'Wind',p:38},{s:'Gas',p:28},{s:'Coal',p:18},{s:'Nuclear',p:10},{s:'Solar',p:6}],onsiteGen:'Power: new 250 MW gas plant (Phase 1) → up to 1.1 GW by 2029 at former Blue Valley Power Plant; privately financed by Independence Power Partners (IPP)',onsiteRole:'PRIMARY',waterSource:'Independence Water / Missouri R.',precip:40,koppen:'Dfa',notes:"Nebius AI (Nasdaq: NBIS; spun out from Yandex 2024) proposed 800 MW campus at former Blue Valley Power Plant site (1601 McGee — actually using retired plant site; project requires ≥800 MW). Remarkable feature: privately financed dedicated power plant (Independence Power Partners / IPP) at retired Blue Valley site (coal closed 2015, gas turbine retired 2020). Phase 1: 250 MW by Oct 2027; full build: ~1.1 GW by Dec 2029. This is co-generation/co-location at scale — dedicated power generation bypasses grid constraints. Nebius also occupies former KC Star building (Patmos). GPU-focused AI cloud.",cat:'hyperscale'},
   // ── EUROPE ──
   {id:'g-dub',name:'Dublin Campus',op:'Google',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2011,mw:500,acres:400,cooling:'Air economizer + evap',withdrawalGal:90000000,conf:'E',evapPct:65,source:'Irish Water (River Liffey)',gridMix:[{s:'Wind',p:35},{s:'Gas',p:35},{s:'Other',p:30}],onsiteGen:'Diesel generators (EU-restricted)',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,koppen:'Cfb',notes:'Part of Dublin cluster consuming ~80% of city electricity. Atlantic climate aids air cooling. Ireland moratorium pressure on new DCs.',cat:'hyperscale'},
   {id:'ms-dub',name:'Dublin Grange Castle',op:'Microsoft',region:'EUR-W',country:'Ireland',city:'Dublin',opened:2009,mw:250,acres:200,cooling:'Air economizer',withdrawalGal:45000000,conf:'E',evapPct:60,source:'Irish Water',gridMix:[{s:'Wind',p:35},{s:'Gas',p:35},{s:'Other',p:30}],onsiteGen:'Diesel generators',onsiteRole:'BACKUP',waterSource:'Irish Water',precip:30,koppen:'Cfb',notes:'Azure EU West. Ireland power grid near capacity from DC demand.',cat:'hyperscale'},
@@ -389,14 +429,8 @@ let sortCol=null,sortDir=1,currentFacilities=[...FACILITIES];
 
 // COLUMNS — operator badge now next to facility name (merged cell)
 const COLS=[
-  {key:'name',label:'Facility',render:f=>`
-    <div style="display:flex;align-items:flex-start;gap:7px">
-      <span class="op-b" style="${opStyle(f.op)}">${f.op}</span>
-      <div>
-        <div class="rn">${f.name}</div>
-        <div class="rs">${f.city}</div>
-      </div>
-    </div>`},
+  {key:'name',label:'Facility',render:f=>`<div><div class="rn">${f.name}</div><div class="rs">${f.city}</div></div>`},
+  {key:'op',label:'Operator',render:f=>`<span class="op-b" style="${opStyle(f.op)}">${f.op}</span>`},
   {key:'cat',label:'Type',render:f=>`<span class="tag" style="background:var(--s3);color:var(--t2)">${f.cat}</span>`},
   {key:'country',label:'Country',render:f=>`<span style="font-size:11px">${f.country}</span>`},
   {key:'opened',label:'Est.',render:f=>`<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t2)">${f.opened||'TBD'}</span>`},
@@ -532,29 +566,77 @@ function openModal(id){
 
 function drawSankey(f,af,evapAF,dischAF,sitePrec){
   const svg=document.getElementById('snk-svg');if(!svg)return;
-  const nw=16,H=160,totH=120,padY=20;
+  // Layout: [Source breakdown] → [Withdrawal node] → [Evap + Discharge]
+  // 4-column layout with source type sub-nodes
+  const W=700,H=220,nw=14,padY=10;
+  const ws=getWSRC(f.id);
+  const srcTypes=[
+    {key:'surface',label:'Surface water',col:'#2080d0'},
+    {key:'reclaimed',label:'Reclaimed/reuse',col:'#30b870'},
+    {key:'ground',label:'Groundwater',col:'#80a040'},
+    {key:'other',label:'Seawater/desalinated',col:'#9060c0'},
+  ].filter(t=>ws[t.key]>0);
+  // total input bar height
+  const totH=Math.max(60, Math.min(140, 140));
+  const wdX=220, outX=480;
+  const wdY=padY+(H-totH)/2-20;
   let out='';
-  function bez(x1,y1,h1,x2,y2,h2,col){
-    const mx=(x1+x2)/2;
-    return`<path d="M${x1+nw},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}
-      L${x2},${y2+h2} C${mx},${y2+h2} ${mx},${y1+h1} ${x1+nw},${y1+h1} Z"
-      fill="${col}" opacity="0.38"/>`;
-  }
+  // ── Source nodes and flows ──
+  let srcY=padY+10;
+  const srcTotalH=totH;
+  srcTypes.forEach(t=>{
+    const h=Math.round(srcTotalH*ws[t.key]/100);
+    if(h<2)return;
+    // bezier: source node → withdrawal node
+    const mx=(0+nw+wdX)/2;
+    out+=`<path d="M${nw},${srcY} C${mx},${srcY} ${mx},${wdY} ${wdX},${wdY}
+      L${wdX},${wdY+totH} C${mx},${wdY+totH} ${mx},${srcY+h} ${nw},${srcY+h} Z"
+      fill="${t.col}" opacity="0.28"/>`;
+    // source node rect
+    out+=`<rect x="0" y="${srcY}" width="${nw}" height="${h}" rx="2" fill="${t.col}" opacity="0.9"/>`;
+    // label left of node
+    if(h>10){
+      out+=`<text x="${nw+4}" y="${srcY+h/2}" dominant-baseline="middle" text-anchor="start" fill="${t.col}" font-family="DM Mono,monospace" font-size="8">${ws[t.key]}% ${t.label.split('/')[0]}</text>`;
+    }
+    srcY+=h+2;
+  });
+  // ── Withdrawal node ──
+  out+=`<rect x="${wdX}" y="${wdY}" width="${nw}" height="${totH}" rx="3" fill="#e8a032" opacity="0.9"/>`;
+  out+=`<text x="${wdX+nw+4}" y="${wdY+totH/2}" dominant-baseline="middle" fill="#e8a032" font-family="DM Mono,monospace" font-size="8">Withdrawal${af?' '+af.toLocaleString()+' AF':''}</text>`;
+  // ── Output flows: evap + discharge ──
   const eh=Math.round(totH*f.evapPct/100);
   const dh=totH-eh;
-  // Links
-  out+=bez(18,padY,totH,320,padY,totH,'#e8a032');
-  out+=bez(320+nw,padY,eh,540,padY,eh,'#e05550');
-  out+=bez(320+nw,padY+eh,dh,540,padY+eh,dh,'#4f86f7');
-  // Nodes
-  [[18,padY,totH,'#3ab0ef',f.source.split('(')[0].trim().slice(0,18)],[320,padY,totH,'#e8a032','Withdrawal'],[540,padY,eh,'#e05550','Evap ~'+f.evapPct+'%'],[540,padY+eh+2,dh-2,'#4f86f7','Discharge']].forEach(([x,y,h,col,lbl])=>{
-    out+=`<rect x="${x}" y="${y}" width="${nw}" height="${h}" rx="3" fill="${col}" opacity="0.9"/>`;
-    const tx=x<300?x+nw+4:x-4,anc=x<300?'start':'end';
-    out+=`<text x="${tx}" y="${y+h/2+1}" dominant-baseline="middle" text-anchor="${anc}" fill="#c8d0e0" font-family="DM Mono,monospace" font-size="8.5">${lbl}</text>`;
-  });
-  // Values
-  if(af)out+=`<text x="329" y="${padY+totH+14}" fill="#8a96b0" font-family="DM Mono,monospace" font-size="8">${af.toLocaleString()} AF/yr withdrawn</text>`;
-  if(sitePrec)out+=`<text x="340" y="${H-2}" text-anchor="middle" fill="#3a4255" font-family="DM Mono,monospace" font-size="7.5">Site precip: ${sitePrec.toLocaleString()} AF/yr · withdrawal = ${Math.round(af/sitePrec*100)}% of site rain</text>`;
+  // evap flow
+  const mx2=(wdX+nw+outX)/2;
+  out+=`<path d="M${wdX+nw},${wdY} C${mx2},${wdY} ${mx2},${wdY} ${outX},${wdY}
+    L${outX},${wdY+eh} C${mx2},${wdY+eh} ${mx2},${wdY+eh} ${wdX+nw},${wdY+eh} Z"
+    fill="#e05550" opacity="0.35"/>`;
+  // discharge flow
+  out+=`<path d="M${wdX+nw},${wdY+eh} C${mx2},${wdY+eh} ${mx2},${wdY+eh+dh} ${outX},${wdY+eh+dh}
+    L${outX},${wdY+totH} C${mx2},${wdY+totH} ${mx2},${wdY+eh} ${wdX+nw},${wdY+eh} Z"
+    fill="#4f86f7" opacity="0.35"/>`;
+  // evap node
+  out+=`<rect x="${outX}" y="${wdY}" width="${nw}" height="${eh}" rx="2" fill="#e05550" opacity="0.9"/>`;
+  out+=`<text x="${outX-4}" y="${wdY+eh/2}" dominant-baseline="middle" text-anchor="end" fill="#e05550" font-family="DM Mono,monospace" font-size="8">Evap ${f.evapPct}%${evapAF?' ('+evapAF+' AF)':''}</text>`;
+  // discharge node
+  out+=`<rect x="${outX}" y="${wdY+eh+2}" width="${nw}" height="${dh-2}" rx="2" fill="#4f86f7" opacity="0.9"/>`;
+  out+=`<text x="${outX-4}" y="${wdY+eh+2+(dh-2)/2}" dominant-baseline="middle" text-anchor="end" fill="#4f86f7" font-family="DM Mono,monospace" font-size="8">Discharge ${100-f.evapPct}%${dischAF?' ('+dischAF+' AF)':''}</text>`;
+  // ── Municipal share annotation ──
+  const annY=wdY+totH+22;
+  if(ws.muniBillPct){
+    out+=`<rect x="0" y="${annY}" width="${W}" height="22" rx="3" fill="#1e2535" opacity="0.7"/>`;
+    out+=`<text x="8" y="${annY+11}" dominant-baseline="middle" fill="#e8a032" font-family="DM Mono,monospace" font-size="8" font-weight="500">Municipal share: ${ws.muniBillPct}% of city supply</text>`;
+    out+=`<text x="${W-8}" y="${annY+11}" dominant-baseline="middle" text-anchor="end" fill="#8a96b0" font-family="DM Mono,monospace" font-size="7.5">${ws.muniNote}</text>`;
+  } else if(ws.muniNote){
+    out+=`<text x="${W/2}" y="${annY+11}" dominant-baseline="middle" text-anchor="middle" fill="#4a5570" font-family="DM Mono,monospace" font-size="7.5">${ws.muniNote}</text>`;
+  }
+  // ── Site precip footnote ──
+  if(sitePrec&&af){
+    const fpY=annY+30;
+    out+=`<text x="${W/2}" y="${fpY}" text-anchor="middle" fill="#3a4255" font-family="DM Mono,monospace" font-size="7.5">Site precipitation: ${sitePrec.toLocaleString()} AF/yr · withdrawal = ${Math.round(af/sitePrec*100)}% of site rainfall budget</text>`;
+  }
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.style.maxHeight='220px';
   svg.innerHTML=out;
 }
 
@@ -707,41 +789,166 @@ function buildDensityMap(){
 // ════════════════ SOURCES ════════════════
 function buildSources(){
   const srcs=[
-    ['OPB (Jan 2026)','Google The Dalles: 434.4M gal (2024) via public records request — city water billing','https://www.opb.org/article/2026/01/15/as-googles-water-demands-grow-the-dalles-aims-to-pull-more-from-mount-hood-forest/'],
+    ['OPB (Jan 2026)','Google The Dalles: 434.4M gal (2024) via public records request','https://www.opb.org/article/2026/01/15/as-googles-water-demands-grow-the-dalles-aims-to-pull-more-from-mount-hood-forest/'],
     ['Valicor (May 2026)','Google Council Bluffs: 1.4B gal withdrawn, 1.0B evap, 400M blowdown','https://www.valicor.com/blog/data-center-water-management-afterthought'],
-    ['WPR (May 2025)','Microsoft WDM: 68.5M gal (2024), direct evaporative, WDM utility records','https://www.wpr.org/news/microsoft-data-center-iowa-wisconsin-expect'],
+    ['WPR (May 2025)','Microsoft WDM: 68.5M gal (2024), direct evaporative, utility records','https://www.wpr.org/news/microsoft-data-center-iowa-wisconsin-expect'],
     ['US EPA','Microsoft Quincy QWRU: 380M gal/yr savings, 30-mile pipe system','https://www.epa.gov/waterreuse/water-reuse-case-study-quincy-washington'],
-    ['Baxtel','Meta Altoona: 52.7M gal/yr, 1.0M MWh/yr, site profile data','https://baxtel.com/data-center/facebook-altoona-iowa'],
-    ['Siddik et al. 2021, ERL','Benchmark formula: 1.8 m³/MWh median direct water, US evap-cooled DCs','https://iopscience.iop.org/article/10.1088/1748-9326/ac14bc'],
-    ['ELI (Jan 2026)','Evap ~80%, discharge ~20% for evaporative cooling systems','https://www.eli.org/sites/default/files/files-pdf/Data%20Centers%20and%20Water%20Fact%20Sheet%20ELI%20January%202026%20(1).pdf'],
-    ['Data Center Frontier (2024)','AWS Susquehanna: $650M acquisition, 960 MW potential, 1,200-acre campus, nuclear co-location','https://www.datacenterfrontier.com/hyperscale/article/33038288/aws-eyes-960-mw-for-newly-acquired-nuclear-power-data-center-in-pennsylvania'],
-    ['Talen Energy SEC (2024)','AWS/Cumulus campus development milestones, 300 MW initial ISA, FERC proceedings','https://www.sec.gov/Archives/edgar/data/0001622536/000162828024038388/a20240826pressreleasecumul.htm'],
-    ['AirTrunk (2021–2025)','SYD1 (130+ MW), SYD2 (110 MW / 9.75 ac), SYD3 (320+ MW / 20.5 ac); 80% less water than traditional; PUE 1.15','https://airtrunk.com/airtrunk-opens-second-sydney-hyperscale-data-centre/'],
-    ['Markets and Markets (2024)','Google Norway (Skien): $624M, 385 MW planned, 100% renewable hydro, heat reuse','https://www.marketsandmarkets.com/Market-Reports/hyperscale-data-center-market-26026183.html'],
-    ['USGS (2015)','Irrigation water use: national avg 2.09 AF/ac; crop-specific benchmarks','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
-    ['USGA/GCSAA (2020)','Golf course: national median 2.08 AF/ac; SW 4.0; NE 0.8 AF/irrigated acre','https://www.usga.org/content/usga/home-page/course-care/green-section-record/63/issue-06/introducing-the-course-coefficient---a-water-use-benchmarking-to.html'],
+    ['Baxtel','Meta Altoona: 52.7M gal/yr, 1.0M MWh/yr','https://baxtel.com/data-center/facebook-altoona-iowa'],
+    ['Siddik et al. 2021, ERL','Benchmark: 1.8 m3/MWh median direct water, US evap-cooled DCs','https://iopscience.iop.org/article/10.1088/1748-9326/ac14bc'],
+    ['ELI (Jan 2026)','Evap ~80%, discharge ~20% for evaporative cooling','https://www.eli.org/sites/default/files/files-pdf/Data%20Centers%20and%20Water%20Fact%20Sheet%20ELI%20January%202026%20(1).pdf'],
+    ['Data Center Frontier (2024)','AWS Susquehanna: $650M, 960 MW, 1,200-acre nuclear campus','https://www.datacenterfrontier.com/hyperscale/article/33038288/aws-eyes-960-mw-for-newly-acquired-nuclear-power-data-center-in-pennsylvania'],
+    ['Talen Energy SEC (2024)','AWS/Cumulus milestones, 300 MW ISA, FERC proceedings','https://www.sec.gov/Archives/edgar/data/0001622536/000162828024038388/a20240826pressreleasecumul.htm'],
+    ['AirTrunk (2021-2025)','SYD1+SYD3: 450+ MW, 80% less water; PUE 1.15','https://airtrunk.com/airtrunk-opens-second-sydney-hyperscale-data-centre/'],
+    ['Markets and Markets (2024)','Google Norway (Skien): $624M, 385 MW, hydro + heat reuse','https://www.marketsandmarkets.com/Market-Reports/hyperscale-data-center-market-26026183.html'],
+    ['USGS (2015)','Irrigation water use: national avg 2.09 AF/ac; crop benchmarks','https://www.usgs.gov/mission-areas/water-resources/science/irrigation-water-use'],
+    ['USGA/GCSAA (2020)','Golf course water: national 2.08, SW 4.0, NE 0.8 AF/irrigated ac','https://www.usga.org/content/usga/home-page/course-care/green-section-record/63/issue-06/introducing-the-course-coefficient---a-water-use-benchmarking-to.html'],
     ['MOST Policy Initiative (Apr 2026)','Google fleet: 7.8B gal withdrawn, 78% evaporated (2024)','https://mostpolicyinitiative.org/science-note/data-center-water-use/'],
-    ['Brookings (Apr 2026)','Dublin 80% city electricity; Frankfurt 42%; global DC demand projections','https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/'],
-    ['technostatecraft (Feb 2025)','NWCPUD energy mix: 85%→46.5% hydro at The Dalles 2015–2023','https://www.technostatecraft.com/p/how-google-is-reshaping-a-small-oregon'],
+    ['Brookings (Apr 2026)','Dublin 80% city electricity; Frankfurt 42%','https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/'],
+    ['technostatecraft (Feb 2025)','NWCPUD mix: 85%->46.5% hydro at The Dalles 2015-2023','https://www.technostatecraft.com/p/how-google-is-reshaping-a-small-oregon'],
     ['CBRE Global DC Trends 2025','Atlanta 1,279 MW; Northern VA +523 MW; Frankfurt/Paris growth','https://www.cbre.com/insights/reports/global-data-center-trends-2025'],
-    ['NOAA Climate Normals 1991-2020','All precipitation figures; climate station data','https://www.ncei.noaa.gov/access/us-climate-normals/'],
-    ['en.climate-data.org','Köppen-Geiger classifications confirmed for individual sites','https://en.climate-data.org'],
+    ['Missouri Governor (May 2026)','Google Montgomery County: $15B, air cooling, water to kitchens only','https://governor.mo.gov/press-releases/archive/missouri-secures-15-billion-investment-google-montgomery-county'],
+    ['DataCenter Dynamics (May 2026)','Google KC Clay County (Project Mica): 500 ac, 700 MW, $10B tax breaks','https://www.datacenterdynamics.com/en/news/construction-begins-at-googles-second-data-center-campus-in-kansas-city-missouri/'],
+    ['DataCenter Dynamics (May 2026)','Nebius 800 MW Independence campus; dedicated gas power plant','https://www.datacenterdynamics.com/en/news/nebius-plans-800mw-data-center-campus-in-kansas-city-missouri/'],
+    ['NOAA Climate Normals 1991-2020','All precipitation and climate figures','https://www.ncei.noaa.gov/access/us-climate-normals/'],
+    ['en.climate-data.org','Koppen-Geiger classifications by site','https://en.climate-data.org'],
     ['US Census 2020','State population density for quintile map','https://www.census.gov'],
     ['IBM.com','Boulder: 48-hr gasoline reserve, 63% free cooling, 300k sq ft raised floor','https://www.ibm.com/support/pages/ibmtechu-ibm-storage-university-washington-dc-day-2-green-data-center'],
-    ['Microsoft Local','Quincy QWRU partnership; adiabatic cooling, 97% potable reduction','https://local.microsoft.com/blog/partnering-with-the-city-of-quincy-to-open-washingtons-first-industrial-water-reuse-center/'],
-    ['Switch PR Newswire (2017)','Citadel: 2,000 ac, 650 MW, 100% solar (179 MW Switch Station 1+2)','https://www.prnewswire.com/news-releases/switch-tahoe-reno-now-open-largest-most-advanced-data-center-campus-in-the-world-300407648.html'],
-    ['AWWA','Residential water use benchmarks by density; 100 gal/person/day','https://www.awwa.org'],
-    ['Inside Climate News (Nov 2025)','DC diesel generators; Microsoft committing to phase out petroleum diesel by 2030','https://insideclimatenews.org/news/12112025/data-center-diesel-generators-noise-pollution/'],
+    ['Microsoft Local','Quincy QWRU: adiabatic cooling, 97% potable reduction','https://local.microsoft.com/blog/partnering-with-the-city-of-quincy-to-open-washingtons-first-industrial-water-reuse-center/'],
+    ['Switch PR Newswire (2017)','Citadel: 2,000 ac, 650 MW, 100% solar (179 MW owned)','https://www.prnewswire.com/news-releases/switch-tahoe-reno-now-open-largest-most-advanced-data-center-campus-in-the-world-300407648.html'],
+    ['AWWA','Residential water use benchmarks; 100 gal/person/day','https://www.awwa.org'],
+    ['Inside Climate News (Nov 2025)','DC diesel generators; Microsoft phase-out commitment by 2030','https://insideclimatenews.org/news/12112025/data-center-diesel-generators-noise-pollution/'],
+    ['Mifflin-St Jeor (1990)','BMR formula for 100 kg adult male; metabolic rate scaling','https://pubmed.ncbi.nlm.nih.gov/2305711/'],
+    ['National Academies of Sciences (2005)','Dietary Reference Intakes for Water: 3.7 L/day total water for adult males','https://www.ncbi.nlm.nih.gov/books/NBK56068/'],
+    ['ASHRAE Fundamentals Handbook','Insensible water loss (respiratory + transepidermal) at various T and RH','https://www.ashrae.org/technical-resources/ashrae-handbook'],
+    ['Dempsey et al. (2005), J Physiol','Human respiratory CO2: ~200 mL/min at rest (70 kg); scaled to 100 kg','https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1464490/'],
+    ['Patterson et al. (2021), arXiv','GPT-3 training energy: ~1,287 MWh; per-token inference scaling','https://arxiv.org/abs/2104.10350'],
+    ['Lannelongue et al. (2021), GigaScience','Green Algorithms: AI compute carbon methodology','https://doi.org/10.1093/gigascience/giab030'],
   ];
-  document.getElementById('sources-content').innerHTML=`<div class="sg">
-    ${srcs.map(([lbl,desc,url])=>`<div class="si"><div class="sn">→</div><div><a class="sl" href="${url}" target="_blank">${lbl}</a><div style="font-size:10px;color:var(--t3);margin-top:1px">${desc}</div></div></div>`).join('')}
-  </div>
-  <div class="disc">
-    <strong>Estimation methodology:</strong> [E] figures use W(AF/yr) = MW × 1000 × 8760 × 1.8 ÷ 264.172 ÷ 325851. Applies only to evaporative cooling facilities. Air-cooled, seawater, and closed-loop facilities are marked [U] regardless of disclosed MW. ±40–60% uncertainty; treat as order-of-magnitude only.<br><br>
-    <strong>Köppen climate data:</strong> Codes confirmed via en.climate-data.org using 1991–2021 station records (Köppen-Geiger classification). Descriptions follow the standard Köppen-Geiger nomenclature.<br><br>
-    <strong>Energy mix:</strong> Physical generation mix from national grid operator data, not PPA-matched renewable claims. All major hyperscalers claim 100% renewable via PPAs/RECs; physical electrons may differ. The Dalles case illustrates this gap most clearly (NWCPUD 85%→46% hydro as Google growth outpaced BPA allocation).
-  </div>`;
+
+  const rows = [
+    {
+      res:'Energy input',col:'#e8a032',
+      human:'333 kcal\n= 0.387 kWh food energy',
+      ai:'~0.285 kWh electrical\n(inference only)',
+      ratio:'~1:1\nremarkably similar',
+      rc:'#34c978',
+      note:'Human: 2,000 kcal/day \u00d7 4/24 hrs. AI: 285k tokens \u00d7 0.001 kWh/1k [E, \u00b11 OOM]. Energy types differ fundamentally: chemical food energy vs. electrical.'
+    },
+    {
+      res:'CO\u2082 exhaled / emitted',col:'#e05550',
+      human:'113 g CO\u2082\nexhaled (biogenic)',
+      ai:'~120 g CO\u2082\ngrid emissions (fossil)',
+      ratio:'~1:1\nbut different carbon',
+      rc:'#e8a032',
+      note:'Human: 255 mL CO\u2082/min \u00d7 240 min \u00d7 1.842 g/L (22\u00b0C density). AI: 0.285 kWh \u00d7 0.42 kg CO\u2082/kWh (US avg grid). Human CO\u2082 is biogenic (short carbon cycle); AI CO\u2082 is fossil (net atmospheric addition).'
+    },
+    {
+      res:'Water vapor exhaled / evaporated',col:'#4f86f7',
+      human:'67 mL respiratory\n+120 mL skin TEWL\n= 187 mL total vapor',
+      ai:'~513 mL\nevaporated in DC cooling',
+      ratio:'Human 0.36\u00d7\nDC evaps ~2.7\u00d7 more',
+      rc:'#e8a032',
+      note:'Human respiratory: 400 mL/day insensible \u00d7 4/24 (100 kg, 72\u00b0F/40%RH, ASHRAE). Transepidermal (TEWL): 30 mL/hr thermoneutral sedentary. AI: 0.285 kWh \u00d7 1.8 L/kWh benchmark (Siddik 2021).'
+    },
+    {
+      res:'Wastewater discharged',col:'#4f86f7',
+      human:'233 mL\nurine + fecal water\n(pro-rated 4 hrs)',
+      ai:'~185 mL\nDC blowdown\n(~27% of withdrawal)',
+      ratio:'Human 1.3\u00d7\nsimilar order',
+      rc:'#34c978',
+      note:'Human: 1,200 mL urine + 100 mL fecal water/day (NAS 2005) \u00d7 4/24 hrs. AI: total withdrawal ~698 mL; blowdown ~27% = ~185 mL returned to sewer/treatment.'
+    },
+    {
+      res:'Total water input (withdrawal)',col:'#34c978',
+      human:'667 mL\n(4.0 L/day recommended,\npro-rated)',
+      ai:'~698 mL\nwithdrawn from source',
+      ratio:'~1:1\nremarkably similar',
+      rc:'#34c978',
+      note:'Human: NAS 3.7 L/day (male); 4.0 L used for 100 kg. AI: 0.285 kWh \u00d7 1.8 L/kWh total withdrawal (evap + blowdown). Includes both consumed and returned fractions.'
+    },
+    {
+      res:'Heat output',col:'#e8a032',
+      human:'97 W average\n= 388 Wh over 4 hrs',
+      ai:'~71 W average\n= 285 Wh (server heat)',
+      ratio:'Human 1.4\u00d7\nhumans run warmer',
+      rc:'#34c978',
+      note:'Human: 2000 kcal/day \u00f7 (24 \u00d7 0.860 kcal/Wh) = 97W. Cognitive work has ~0% mechanical efficiency; virtually all food energy becomes heat. AI server: electrical input essentially all converted to heat.'
+    },
+  ];
+
+  const tableRows = rows.map(r => {
+    const humanLines = r.human.split('\n');
+    const aiLines = r.ai.split('\n');
+    return '<tr style="border-bottom:1px solid var(--b1)">' +
+      '<td style="padding:8px 11px;color:'+r.col+';font-weight:500;vertical-align:top">' + r.res + '</td>' +
+      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--t1);vertical-align:top">' +
+        humanLines.map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
+      '</td>' +
+      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--t1);vertical-align:top">' +
+        aiLines.map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
+      '</td>' +
+      '<td style="padding:8px 11px;font-family:\'DM Mono\',monospace;font-size:11px;color:'+r.rc+';vertical-align:top">' +
+        r.ratio.split('\n').map((l,i) => i===0 ? l : '<span style="color:var(--t3);font-size:10px">'+l+'</span>').join('<br>') +
+      '</td>' +
+      '<td style="padding:8px 11px;font-size:10px;color:var(--t3);vertical-align:top">' + r.note + '</td>' +
+    '</tr>';
+  }).join('');
+
+  const humanHTML =
+    '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:18px 20px;margin-bottom:20px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:10px">Session Resource Consumption Comparison<span style="flex:1;height:1px;background:var(--b1);display:block"></span></div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' +
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Human (this session)</div>' +
+    '<div style="font-size:11px;color:var(--t2);line-height:1.9">' +
+    'Duration: <span style="color:var(--t1);font-weight:500">~4 hours</span> estimated engagement<br>' +
+    'Body mass: <span style="color:var(--t1);font-weight:500">100 kg adult male</span><br>' +
+    'Caloric budget: <span style="color:var(--t1);font-weight:500">2,000 kcal/day</span><br>' +
+    'Ambient: <span style="color:var(--t1);font-weight:500">72&deg;F, 40% RH</span><br>' +
+    'Activity: <span style="color:var(--t1);font-weight:500">1.2 MET</span> (seated cognitive work)' +
+    '</div></div>' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b1);border-radius:4px;padding:10px 12px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">AI session (Claude Sonnet 4.6)</div>' +
+    '<div style="font-size:11px;color:var(--t2);line-height:1.9">' +
+    'Est. tokens: <span style="color:var(--t1);font-weight:500">~285,000</span> input + output<br>' +
+    'Energy rate: <span style="color:var(--t1);font-weight:500">~0.001 kWh / 1k tokens</span> <span style="color:var(--t3);font-size:10px">[E, &plusmn;1 OOM]</span><br>' +
+    'DC water benchmark: <span style="color:var(--t1);font-weight:500">1.8 L/kWh</span> (Siddik 2021)<br>' +
+    'Grid CO&sup2;: <span style="color:var(--t1);font-weight:500">0.42 kg CO&sup2;/kWh</span> (US avg)<br>' +
+    'Confidence: <span style="color:var(--am);font-weight:500">order-of-magnitude only</span>' +
+    '</div></div></div>' +
+
+    '<div style="overflow-x:auto;border:1px solid var(--b1);border-radius:5px;margin-bottom:14px">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11.5px">' +
+    '<thead><tr style="background:var(--s1)">' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Resource</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Human (4 hrs)</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">AI Session (est.)</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Ratio</th>' +
+    '<th style="font-family:\'DM Mono\',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b1)">Methodology</th>' +
+    '</tr></thead><tbody>' + tableRows + '</tbody></table></div>' +
+
+    '<div style="background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:12px 14px;font-size:11.5px;line-height:1.8;color:var(--t2)">' +
+    '<strong style="color:var(--am)">The striking finding:</strong> Over ~4 hours, a 100 kg adult male and the Claude inference that served him consumed remarkably similar quantities of energy (~0.39 vs ~0.29 kWh), produced nearly identical CO\u2082 (~113 vs ~120 g), and required similar total water (~667 vs ~698 mL). The human\'s CO\u2082 is biogenic \u2014 cycling through food chains, not adding net carbon. The AI\'s CO\u2082 is from fossil combustion and is a net atmospheric addition. The DC cooling system evaporated ~2.7\u00d7 more water to atmosphere than the human did through breath and skin. The human discharged ~1.3\u00d7 more liquid wastewater. At the scale of a 400 MW data center running continuously, these ratios invert dramatically: the facility consumes the annual water budget of tens of thousands of people.<br><br>' +
+    '<strong style="color:var(--t3)">Uncertainty:</strong> AI energy per token is the most uncertain figure \u2014 \u00b11 order of magnitude is plausible. Human metabolic figures carry \u00b115% individual variation. The comparison is illustrative, not precise. The token energy estimate could be lower on modern efficient hardware or higher with long context windows and tool use overhead.' +
+    '</div></div>';
+
+  document.getElementById('sources-content').innerHTML = humanHTML +
+    '<div class="sg">' +
+    srcs.map(function(s){
+      return '<div class="si"><div class="sn">\u2192</div><div><a class="sl" href="'+s[2]+'" target="_blank">'+s[0]+'</a><div style="font-size:10px;color:var(--t3);margin-top:1px">'+s[1]+'</div></div></div>';
+    }).join('') +
+    '</div>' +
+    '<div class="disc">' +
+    '<strong>DC water estimation:</strong> [E] figures use W(AF/yr) = MW \u00d7 1000 \u00d7 8760 \u00d7 1.8 \u00f7 264.172 \u00f7 325851. Evaporative cooling only. Air-cooled, seawater, closed-loop = [U]. \u00b140\u201360% uncertainty.<br><br>' +
+    '<strong>Human metabolic sources:</strong> BMR via Mifflin-St Jeor (1990) for 100 kg male. CO\u2082 at 1.2 MET: 255 mL/min (Dempsey et al. 2005, scaled from 70 kg). Respiratory insensible water: 400 mL/day (ASHRAE, 72\u00b0F/40%RH). Transepidermal water loss (TEWL): 30 mL/hr thermoneutral sedentary. Wastewater: 1,300 mL/day urine+fecal (NAS 2005). Intake: 4.0 L/day (NAS 3.7 L for standard male, scaled for 100 kg).<br><br>' +
+    '<strong>AI token energy:</strong> ~0.001 kWh/1k tokens is a rough central estimate from Lannelongue et al. (2021) Green Algorithms and Patterson et al. (2021). Actual Anthropic infrastructure efficiency is not publicly disclosed. Treat as \u00b11 order of magnitude.<br><br>' +
+    '<strong>Energy mix:</strong> Physical generation mix from grid operator data, not PPA-matched renewable claims. The Dalles illustrates this gap (NWCPUD 85%\u219246% hydro as Google demand outpaced BPA allocation).' +
+    '</div>';
 }
+
+
 
 // ════════════════ PANEL / INIT ════════════════
 function showPanel(id){
